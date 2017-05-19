@@ -1,0 +1,9 @@
+.metadata/
+.mvn/
+*.st
+.DS_Store
+*.aterm
+.classpath
+.project
+*.dep
+*.cache

@@ -1,0 +1,49 @@
+module pp
+
+imports
+
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/editor/refactoring/-
+  pp/Smalltalk-parenthesize
+  pp/Smalltalk-pp
+
+rules
+
+  editor-format:
+    (node, _, ast, path, project-path) -> (filename, result)
+    with
+      ext      := <get-extension> path
+    ; filename := <guarantee-extension(|$[pp.[ext]])> path
+    ; result   := <pp-debug> node
+
+rules
+  
+  pp-Smalltalk-string =
+    parenthesize-Smalltalk
+    ; prettyprint-Smalltalk-start-symbols
+    ; !V([], <id>)
+    ; box2text-string(|120)
+      
+  pp-partial-Smalltalk-string =
+    parenthesize-Smalltalk
+    ; prettyprint-Smalltalk
+    ; !V([], <id>)
+    ; box2text-string(|120)
+    
+  pp-partial-Smalltalk-string(|sort) =
+    parenthesize-Smalltalk
+    ; prettyprint-Smalltalk(|sort)
+    ; !V([], <id>)
+    ; box2text-string(|120)  
+      
+  pp-debug :
+    ast -> result
+    with
+       result := <pp-Smalltalk-string> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-Smalltalk-string); debug(!"cannot pp ")))> ast
+    ;  result := ""
+
+rules
+  
+  construct-textual-change = construct-textual-change(pp-partial-Smalltalk-string, parenthesize, override-reconstruction, resugar)

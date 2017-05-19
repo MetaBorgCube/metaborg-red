@@ -1,0 +1,93 @@
+module static-semantics
+
+imports
+  signatures/nabl2/shared/-
+  signatures/nabl2/shared/common/-
+  signatures/nabl2/shared/constraints/-
+  nabl2/shared/-
+  signatures/nabl2/runtime/-
+  signatures/nabl2/runtime/analysis/-
+  signatures/nabl2/runtime/common/-
+  signatures/nabl2/runtime/constraints/-
+  nabl2/runtime/-
+  nabl2/runtime/analysis/-
+  nabl2/runtime/prelude/-
+  nabl2/runtime/stdlib/-
+
+
+rules
+
+
+rules
+
+
+rules
+
+
+imports
+  signatures/-
+
+
+rules
+
+  prettyprint-Smalltalk(|sort) =
+    prettyprint-NaBL2-api-term(|sort)
+
+  prettyprint-Smalltalk-NaBL2Scope(|) =
+    prettyprint-NaBL2-api-term
+
+  prettyprint-Smalltalk-NaBL2Occurrence(|) =
+    prettyprint-NaBL2-api-term
+
+  nabl2--generate-constraint-init-rule(|):
+    nabl2_term@nabl2_source -> (nabl2_args, nabl2_constraint)
+    with(id)
+    with(s := <nabl2--new-scope(|nabl2_source)
+               ; try(nabl2--copy-origin(|nabl2_term))> "s"
+         ; id)
+    with(nabl2_args := Params((s)))
+    with(nabl2_index := <nabl2--get-ast-index> nabl2_term)
+    with(nabl2_constraint := <nabl2--flatten-list> [])
+    with(if nabl2--is-debug-collection-enabled then
+           nabl2--collection-info-msg(
+           | <concat-strings> ["init ^ ", <pp-NaBL2-CTerm> (s)]
+           )
+         end)
+
+  nabl2--generate-constraint-default-rule(|):
+    _ -> nabl2_constraint
+    with(?(nabl2_source, nabl2_term, nabl2_args))
+    where(Empty() := nabl2_term)
+    with(Params(nabl2_params@(s)) := nabl2_args
+         <+ fatal-err(
+            | <concat-strings> [ "Cannot match expected "
+                               , "^ (s)"
+                               , " with actual "
+                               , <nabl2--pp-flat-args> nabl2_args
+                               , " when matching "
+                               , "Empty()"
+                               , " with "
+                               , <pp-NaBL2-Term> nabl2_term
+                               , "."
+                               ]
+            ))
+    with(if nabl2--is-debug-collection-enabled then
+           nabl2--collection-info-msg(
+           | <concat-strings> [ "default"
+                              , " [[ "
+                              , <pp-NaBL2-Term> nabl2_term
+                              , " ^ "
+                              , <pp-NaBL2-CTerm> nabl2_params
+                              , " ]]"
+                              ]
+           )
+         end)
+    with(id)
+    with(nabl2_index := <nabl2--get-ast-index> nabl2_term
+         ; nabl2_metadata := [CAstProperty(nabl2_index, Params(), nabl2_params)])
+    with(nabl2_constraint := <conc ; nabl2--flatten-list> ( nabl2_metadata
+                                                          , [ CFalse(
+                                                                Message(Note(), "Specify name binding and typing rules in static-semantics.nabl2", <nabl2--get-ast-index> nabl2_term)
+                                                              )
+                                                            ]
+                                                          ))

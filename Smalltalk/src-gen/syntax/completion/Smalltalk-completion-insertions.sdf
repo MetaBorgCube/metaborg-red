@@ -1,0 +1,15 @@
+module completion/Smalltalk-completion-insertions
+imports Smalltalk
+
+imports completion/Common-completion-insertions
+
+exports
+  context-free start-symbols
+    Start
+
+  context-free syntax
+    COMPLETION-INSERTION -> Start {cons("Start-Plhdr"), placeholder-insertion}
+
+exports
+  lexical syntax
+     -> COMPLETION-INSERTION 

@@ -1,0 +1,7 @@
+module test
+
+language Smalltalk
+
+test parse [[
+
+]] parse succeeds

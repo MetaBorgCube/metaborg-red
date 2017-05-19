@@ -1,0 +1,12 @@
+module signatures/Smalltalk-sig
+
+imports
+  signatures/Common-sig
+
+
+signature
+  constructors
+    Empty           : Start
+    Start-Plhdr     : Start
+    Start-Plhdr     : COMPLETION-INSERTION -> Start
+    Start-Opt-Plhdr : Start

@@ -1,0 +1,146 @@
+module pp/Common-pp
+
+imports
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/term/origin
+  libstratego-sglr
+  signatures/Common-sig
+
+
+strategies
+  prettyprint-example =
+    prettyprint-Smalltalk
+
+  prettyprint-Smalltalk =
+    fail
+
+  prettyprint-Smalltalk(|sort) =
+    fail
+
+
+strategies
+  prettyprint-SDF-start-symbols =
+    prettyprint-Smalltalk-start-symbols
+
+  prettyprint-Smalltalk-start-symbols =
+    fail
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-ID
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-INT
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-STRING
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-StringChar
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-BackSlashChar
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-CommentChar
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-InsideComment
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-NewLineEOF
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-EOF
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-ID>
+    where <?"ID"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-INT>
+    where <?"INT"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-STRING>
+    where <?"STRING"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-StringChar>
+    where <?"StringChar"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-BackSlashChar>
+    where <?"BackSlashChar"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-CommentChar>
+    where <?"CommentChar"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-InsideComment>
+    where <?"InsideComment"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-NewLineEOF>
+    where <?"NewLineEOF"> sort
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-EOF>
+    where <?"EOF"> sort
+
+  prettyprint-Smalltalk-ID =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-INT =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-STRING =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-StringChar =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-BackSlashChar =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-CommentChar =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-InsideComment =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-NewLineEOF =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-EOF =
+    ![S(<is-string>)]
+
+  prettyprint-Smalltalk-ID :
+    amb([h|hs]) -> <prettyprint-Smalltalk-ID> h
+
+  prettyprint-Smalltalk-INT :
+    amb([h|hs]) -> <prettyprint-Smalltalk-INT> h
+
+  prettyprint-Smalltalk-STRING :
+    amb([h|hs]) -> <prettyprint-Smalltalk-STRING> h
+
+  prettyprint-Smalltalk-StringChar :
+    amb([h|hs]) -> <prettyprint-Smalltalk-StringChar> h
+
+  prettyprint-Smalltalk-BackSlashChar :
+    amb([h|hs]) -> <prettyprint-Smalltalk-BackSlashChar> h
+
+  prettyprint-Smalltalk-CommentChar :
+    amb([h|hs]) -> <prettyprint-Smalltalk-CommentChar> h
+
+  prettyprint-Smalltalk-InsideComment :
+    amb([h|hs]) -> <prettyprint-Smalltalk-InsideComment> h
+
+  prettyprint-Smalltalk-NewLineEOF :
+    amb([h|hs]) -> <prettyprint-Smalltalk-NewLineEOF> h
+
+  prettyprint-Smalltalk-EOF :
+    amb([h|hs]) -> <prettyprint-Smalltalk-EOF> h

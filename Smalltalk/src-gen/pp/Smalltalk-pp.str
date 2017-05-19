@@ -1,0 +1,122 @@
+module pp/Smalltalk-pp
+
+imports
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/term/origin
+  libstratego-sglr
+  signatures/Smalltalk-sig
+
+
+imports
+  signatures/Common-sig
+
+
+imports
+  pp/Common-pp
+
+
+strategies
+  prettyprint-example =
+    prettyprint-Smalltalk
+
+  prettyprint-Smalltalk =
+    fail
+
+  prettyprint-Smalltalk(|sort) =
+    fail
+
+
+strategies
+  prettyprint-SDF-start-symbols =
+    prettyprint-Smalltalk-start-symbols
+
+  prettyprint-Smalltalk-start-symbols =
+    fail
+
+
+strategies
+  prettyprint-Smalltalk-start-symbols =
+    prettyprint-Smalltalk-Start
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Start
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Start>
+    where <?"Start"> sort
+
+  prettyprint-Smalltalk-Start :
+    Empty() -> [ H(
+                   []
+                 , [S("")]
+                 )
+               ]
+
+  is-Smalltalk-Start =
+    ?Empty()
+
+  Smalltalk-get-indent :
+    (t@Empty(), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Empty(), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Empty(), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Start =
+    fail
+
+  prettyprint-Smalltalk-Start :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Start> h
+
+  prettyprint-Smalltalk-Start :
+    Start-Plhdr() -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Start")]
+                       )
+                     ]
+
+  is-Smalltalk-Start =
+    ?Start-Plhdr()
+
+  prettyprint-Smalltalk-Start :
+    Start-Plhdr(_) -> [ H(
+                          [SOpt(HS(), "0")]
+                        , [S("$Start")]
+                        )
+                      ]
+
+  is-Smalltalk-Start =
+    ?Start-Plhdr(_)
+
+  prettyprint-Smalltalk-Start :
+    Start-Opt-Plhdr() -> [ H(
+                             []
+                           , [S("")]
+                           )
+                         ]
+
+  is-Smalltalk-Start =
+    ?Start-Opt-Plhdr()

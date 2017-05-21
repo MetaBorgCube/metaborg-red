@@ -1,108 +1,153 @@
+
 module Smalltalk
-imports Common
+imports Base
 
 exports
   context-free start-symbols
-
-  context-free start-symbols
-    Prog
+    Start
 
   context-free syntax
-    Exp         -> Prog {cons("Program")}
-    INT         -> Exp  {cons("Lit")}
-    Exp "+" Exp -> Exp  {cons("Plus"), left}
-    Exp "-" Exp -> Exp  {cons("Minus"), left}
-    Exp "*" Exp -> Exp  {cons("Times"), left}
-    "(" Exp ")" -> Exp  {bracket}
+    MethodDeclaration                                                 -> Start                                     {cons("MethodDeclaration")}
+    ExecutableCode                                                    -> Start                                     {cons("ExecutableCode")}
+    Identifier                                                        -> Reference                                 {cons("Reference")}
+    "nil"                                                             -> ConstantReference                         {cons("Null")}
+    "false"                                                           -> ConstantReference                         {cons("False")}
+    "true"                                                            -> ConstantReference                         {cons("True")}
+    "self"                                                            -> PsuedoVariableReference                   {cons("Self")}
+    "super"                                                           -> PsuedoVariableReference                   {cons("Super")}
+    "thisContext"                                                     -> PsuedoVariableReference                   {cons("This")}
+    Identifier                                                        -> BindableIdentifier                        {cons("BindableIdentifier")}
+    ConstantReference                                                 -> BindableIdentifier                        {reject}
+    PsuedoVariableReference                                           -> BindableIdentifier                        {reject}
+    Identifier                                                        -> UnaryMessageSelector                      {cons("UnaryMessageSelector")}
+    Identifier ":"                                                    -> Keyword                                   {cons("Keyword")}
+    Keyword+                                                          -> KeywordMessageSelector                    {cons("KeywordMessageSelector")}
+    BinarySelectorChar BinarySelectorChar?                            -> BinaryMessageSelector                     {cons("BinaryMessageSelector")}
+    UnaryMessageSelector                                              -> SymbolInArrayLiteral                      {cons("UnaryMessageSelector")}
+    ConstantReference                                                 -> SymbolInArrayLiteral                      {cons("ConstantReference"), reject}
+    KeywordMessageSelector                                            -> SymbolInArrayLiteral                      {cons("KeywordMessageSelector")}
+    BinaryMessageSelector                                             -> SymbolInArrayLiteral                      {cons("BinaryMessageSelector")}
+    "#" SymbolInArrayLiteral                                          -> SymbolLiteral                             {cons("SymbolInArrayLiteral")}
+    "#" ConstantReference                                             -> SymbolLiteral                             {cons("ConstantReference")}
+    "#" StringLiteral                                                 -> SymbolLiteral                             {cons("StringLiteral")}
+    ObjectArrayLiteral                                                -> ArrayLiteral                              {cons("ObjectArrayLiteral")}
+    ByteArrayLiteral                                                  -> ArrayLiteral                              {cons("ByteArrayLiteral")}
+    "#" NestedObjectArrayLiteral                                      -> ObjectArrayLiteral                        {cons("ObjectArrayLiteral")}
+    "(" LiteralArrayElement* ")"                                      -> NestedObjectArrayLiteral                  {cons("NestedObjectArrayLiteral")}
+    Literal                                                           -> LiteralArrayElement                       {cons("Literal")}
+    BlockLiteral                                                      -> LiteralArrayElement                       {cons("BlockLiteral"), reject}
+    NestedObjectArrayLiteral                                          -> LiteralArrayElement                       {cons("NestedObjectArrayLiteral")}
+    SymbolInArrayLiteral                                              -> LiteralArrayElement                       {cons("SymbolInArrayLiteral")}
+    ConstantReference                                                 -> LiteralArrayElement                       {cons("ConstantReference")}
+    "#[" UnsignedIntegerLiteral* "]"                                  -> ByteArrayLiteral                          {cons("ByteArrayLiteral")}
+    BindableIdentifier                                                -> FormalBlockArgumentDeclaration            {cons("FormalBlockArgumentDeclaration")}
+    FormalBlockArgumentDeclaration+                                   -> FormalBlockArgumentDeclarationList        {cons("FormalBlockArgumentDeclarationList")}
+    FormalBlockArgumentDeclarationList "|"                            -> FormalBlockArgumentDeclarationListWithSep 
+    "[" FormalBlockArgumentDeclarationListWithSep? ExecutableCode "]" -> BlockLiteral                              {cons("BlockLiteral")}
+    ConstantReference                                                 -> Literal                                   {cons("ConstantReference")}
+    IntegerLiteral                                                    -> Literal                                   {cons("IntegerLiteral")}
+    ScaledDecimalLiteral                                              -> Literal                                   {cons("ScaledDecimalLiteral")}
+    FloatingPointLiteral                                              -> Literal                                   {cons("FloatingPointLiteral")}
+    CharacterLiteral                                                  -> Literal                                   {cons("CharacterLiteral")}
+    StringLiteral                                                     -> Literal                                   {cons("StringLiteral")}
+    SymbolLiteral                                                     -> Literal                                   {cons("SymbolLiteral")}
+    ArrayLiteral                                                      -> Literal                                   {cons("ArrayLiteral")}
+    BlockLiteral                                                      -> Literal                                   {cons("BlockLiteral")}
+    "(" Statement ")"                                                 -> NestedExpression                          {cons("NestedExpression")}
+    Literal                                                           -> Operand                                   {cons("Literal")}
+    Reference                                                         -> Operand                                   {cons("Reference")}
+    NestedExpression                                                  -> Operand                                   {cons("NestedExpression")}
+    UnaryMessageSelector                                              -> UnaryMessage                              {cons("UnaryMessage")}
+    UnaryMessage*                                                     -> UnaryMessageChain                         {cons("UnaryMessageChain")}
+    Operand UnaryMessageChain                                         -> BinaryMessageOperand                      {cons("BinaryMessageOperand")}
+    BinaryMessageSelector BinaryMessageOperand                        -> BinaryMessage                             {cons("BinaryMessage")}
+    BinaryMessage*                                                    -> BinaryMessageChain                        {cons("BinaryMessageChain")}
+    BinaryMessageOperand BinaryMessageChain                           -> KeywordMessageArgument                    {cons("KeywordMessageArgument")}
+    Keyword KeywordMessageArgument                                    -> KeywordMessageSegment                     {cons("KeywordMessageSegment")}
+    KeywordMessageSegment KeywordMessageSegment*                      -> KeywordMessage                            {cons("KeywordMessage")}
+    KeywordMessage                                                    -> MessageChain                              {cons("KeywordMessage")}
+    BinaryMessage BinaryMessageChain KeywordMessage?                  -> MessageChain                              {cons("BinaryMessage")}
+    UnaryMessage UnaryMessageChain BinaryMessageChain KeywordMessage? -> MessageChain                              {cons("UnaryMessage")}
+    ";" MessageChain                                                  -> CascadedMessage                           {cons("CascadedMessage")}
+    Operand ExpressionRest?                                           -> Expression                                {cons("Expression")}
+    MessageChain CascadedMessage*                                     -> ExpressionRest                            {cons("ExpressionRest")}
+    BindableIdentifier ":="                                           -> AssignmentOperation                       {cons("AssignmentOperation")}
+    AssignmentOperation* Expression                                   -> Statement                                 {cons("Statement")}
+    "^"                                                               -> MethodReturnOperator                      {cons("MethodReturnOperator")}
+    MethodReturnOperator? "," Statement                               -> FinalStatement                            {cons("FinalStatement")}
+    "|" BindableIdentifier* "|"                                       -> LocalVariableDeclarationList              {cons("LocalVariableDeclarationList")}
+    LocalVariableDeclarationList? ExecutableCodeRest?                 -> ExecutableCode                            {cons("ExecutableCode")}
+    DottedStatement* FinalStatement Dot?                              -> ExecutableCodeRest                        {cons("ExecutableCodeRest")}
+    Statement "."                                                     -> DottedStatement                           {cons("DottedStatement")}
+    "."                                                               -> Dot                                       {cons("Dot")}
+    UnaryMessageSelector                                              -> UnaryMethodHeader                         {cons("UnaryMethodHeader")}
+    BinaryMessageSelector BindableIdentifier                          -> BinaryMethodHeader                        {cons("BinaryMethodHeader")}
+    Keyword BindableIdentifier                                        -> KeywordMethodHeaderSegment                {cons("KeywordMethodHeaderSegment")}
+    KeywordMethodHeaderSegment+                                       -> KeywordMethodHeader                       {cons("KeywordMethodHeader")}
+    UnaryMethodHeader                                                 -> MethodHeader                              {cons("UnaryMethodHeader")}
+    BinaryMethodHeader                                                -> MethodHeader                              {cons("BinaryMethodHeader")}
+    KeywordMethodHeader                                               -> MethodHeader                              {cons("KeywordMethodHeader")}
+    MethodHeader ExecutableCode                                       -> MethodDeclaration                         {cons("MethodDeclaration")}
 
   lexical syntax
     
 
   context-free syntax
-    "$Prog" -> Prog {cons("Prog-Plhdr"), placeholder}
-    "$INT"  -> INT  {cons("INT-Plhdr"), placeholder}
-    "$Exp"  -> Exp  {cons("Exp-Plhdr"), placeholder}
-
-  context-free syntax
-    "let" ID "=" Exp "in" Exp -> Exp {cons("Let"), non-assoc}
-    ID                        -> Exp {cons("Var")}
-
-  lexical syntax
-    
-
-  context-free syntax
-    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
-    "$ID"  -> ID  {cons("ID-Plhdr"), placeholder}
-
-  context-free syntax
-    "box" "(" Exp ")"            -> Exp {cons("Box")}
-    "unbox" "(" Exp ")"          -> Exp {cons("Unbox")}
-    "setbox" "(" Exp "," Exp ")" -> Exp {cons("Setbox")}
-    "print" "(" Exp ")"          -> Exp {cons("Print")}
-    "box"                        -> ID  {reject}
-    "unbox"                      -> ID  {reject}
-    "setbox"                     -> ID  {reject}
-    "print"                      -> ID  {reject}
-
-  lexical syntax
-    
-
-  context-free syntax
-    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
-    "$ID"  -> ID  {cons("ID-Plhdr"), placeholder}
-
-  context-free syntax
-    ID "->" Exp     -> Exp {cons("Fun")}
-    Exp "(" Exp ")" -> Exp {cons("App"), left}
-
-  lexical syntax
-    
-
-  context-free syntax
-    "$ID"  -> ID  {cons("ID-Plhdr"), placeholder}
-    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
-
-  context-free syntax
-    "ifz" Exp "then" Exp "else" Exp -> Exp {cons("Ifz")}
-
-  lexical syntax
-    
-
-  context-free syntax
-    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
-
-  context-free syntax
-    "{" {Exp ";"}* "}" -> Exp {cons("Block")}
-
-  lexical syntax
-    
-
-  context-free syntax
-    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
-
-  context-free syntax
-    "throw" "(" Exp ")"                   -> Exp {cons("Throw")}
-    "try" "(" Exp ")" "catch" "(" Exp ")" -> Exp {cons("TryCatch")}
-
-  lexical syntax
-    
-
-  context-free syntax
-    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
-
-  context-free priorities
-    "{" {Exp ";"}* "}" -> Exp >
-    {left:
-      Exp "(" Exp ")" -> Exp
-    } >
-    {left:
-      Exp "*" Exp -> Exp
-    } >
-    {left:
-      Exp "+" Exp -> Exp
-      Exp "-" Exp -> Exp
-    } >
-    ID "->" Exp -> Exp >
-    {non-assoc:
-      "let" ID "=" Exp "in" Exp -> Exp
-    }
+    "$Start"                                     -> Start                                     {cons("Start-Plhdr"), placeholder}
+    "$PsuedoVariableReference"                   -> PsuedoVariableReference                   {cons("PsuedoVariableReference-Plhdr"), placeholder}
+    "$Identifier"                                -> Identifier                                {cons("Identifier-Plhdr"), placeholder}
+    "$BinarySelectorChar"                        -> BinarySelectorChar                        {cons("BinarySelectorChar-Plhdr"), placeholder}
+    "$KeywordMessageSelector"                    -> KeywordMessageSelector                    {cons("KeywordMessageSelector-Plhdr"), placeholder}
+    "$ObjectArrayLiteral"                        -> ObjectArrayLiteral                        {cons("ObjectArrayLiteral-Plhdr"), placeholder}
+    "$NestedObjectArrayLiteral"                  -> NestedObjectArrayLiteral                  {cons("NestedObjectArrayLiteral-Plhdr"), placeholder}
+    "$SymbolInArrayLiteral"                      -> SymbolInArrayLiteral                      {cons("SymbolInArrayLiteral-Plhdr"), placeholder}
+    "$LiteralArrayElement"                       -> LiteralArrayElement                       {cons("LiteralArrayElement-Plhdr"), placeholder}
+    "$ByteArrayLiteral"                          -> ByteArrayLiteral                          {cons("ByteArrayLiteral-Plhdr"), placeholder}
+    "$UnsignedIntegerLiteral"                    -> UnsignedIntegerLiteral                    {cons("UnsignedIntegerLiteral-Plhdr"), placeholder}
+    "$FormalBlockArgumentDeclaration"            -> FormalBlockArgumentDeclaration            {cons("FormalBlockArgumentDeclaration-Plhdr"), placeholder}
+    "$FormalBlockArgumentDeclarationList"        -> FormalBlockArgumentDeclarationList        {cons("FormalBlockArgumentDeclarationList-Plhdr"), placeholder}
+    "$FormalBlockArgumentDeclarationListWithSep" -> FormalBlockArgumentDeclarationListWithSep {cons("FormalBlockArgumentDeclarationListWithSep-Plhdr"), placeholder}
+    "$ConstantReference"                         -> ConstantReference                         {cons("ConstantReference-Plhdr"), placeholder}
+    "$IntegerLiteral"                            -> IntegerLiteral                            {cons("IntegerLiteral-Plhdr"), placeholder}
+    "$ScaledDecimalLiteral"                      -> ScaledDecimalLiteral                      {cons("ScaledDecimalLiteral-Plhdr"), placeholder}
+    "$FloatingPointLiteral"                      -> FloatingPointLiteral                      {cons("FloatingPointLiteral-Plhdr"), placeholder}
+    "$CharacterLiteral"                          -> CharacterLiteral                          {cons("CharacterLiteral-Plhdr"), placeholder}
+    "$StringLiteral"                             -> StringLiteral                             {cons("StringLiteral-Plhdr"), placeholder}
+    "$SymbolLiteral"                             -> SymbolLiteral                             {cons("SymbolLiteral-Plhdr"), placeholder}
+    "$ArrayLiteral"                              -> ArrayLiteral                              {cons("ArrayLiteral-Plhdr"), placeholder}
+    "$BlockLiteral"                              -> BlockLiteral                              {cons("BlockLiteral-Plhdr"), placeholder}
+    "$Literal"                                   -> Literal                                   {cons("Literal-Plhdr"), placeholder}
+    "$Reference"                                 -> Reference                                 {cons("Reference-Plhdr"), placeholder}
+    "$NestedExpression"                          -> NestedExpression                          {cons("NestedExpression-Plhdr"), placeholder}
+    "$BinaryMessageOperand"                      -> BinaryMessageOperand                      {cons("BinaryMessageOperand-Plhdr"), placeholder}
+    "$KeywordMessageArgument"                    -> KeywordMessageArgument                    {cons("KeywordMessageArgument-Plhdr"), placeholder}
+    "$KeywordMessageSegment"                     -> KeywordMessageSegment                     {cons("KeywordMessageSegment-Plhdr"), placeholder}
+    "$BinaryMessage"                             -> BinaryMessage                             {cons("BinaryMessage-Plhdr"), placeholder}
+    "$UnaryMessage"                              -> UnaryMessage                              {cons("UnaryMessage-Plhdr"), placeholder}
+    "$UnaryMessageChain"                         -> UnaryMessageChain                         {cons("UnaryMessageChain-Plhdr"), placeholder}
+    "$BinaryMessageChain"                        -> BinaryMessageChain                        {cons("BinaryMessageChain-Plhdr"), placeholder}
+    "$KeywordMessage"                            -> KeywordMessage                            {cons("KeywordMessage-Plhdr"), placeholder}
+    "$Operand"                                   -> Operand                                   {cons("Operand-Plhdr"), placeholder}
+    "$ExpressionRest"                            -> ExpressionRest                            {cons("ExpressionRest-Plhdr"), placeholder}
+    "$MessageChain"                              -> MessageChain                              {cons("MessageChain-Plhdr"), placeholder}
+    "$CascadedMessage"                           -> CascadedMessage                           {cons("CascadedMessage-Plhdr"), placeholder}
+    "$AssignmentOperation"                       -> AssignmentOperation                       {cons("AssignmentOperation-Plhdr"), placeholder}
+    "$Expression"                                -> Expression                                {cons("Expression-Plhdr"), placeholder}
+    "$MethodReturnOperator"                      -> MethodReturnOperator                      {cons("MethodReturnOperator-Plhdr"), placeholder}
+    "$LocalVariableDeclarationList"              -> LocalVariableDeclarationList              {cons("LocalVariableDeclarationList-Plhdr"), placeholder}
+    "$ExecutableCodeRest"                        -> ExecutableCodeRest                        {cons("ExecutableCodeRest-Plhdr"), placeholder}
+    "$FinalStatement"                            -> FinalStatement                            {cons("FinalStatement-Plhdr"), placeholder}
+    "$DottedStatement"                           -> DottedStatement                           {cons("DottedStatement-Plhdr"), placeholder}
+    "$Statement"                                 -> Statement                                 {cons("Statement-Plhdr"), placeholder}
+    "$Dot"                                       -> Dot                                       {cons("Dot-Plhdr"), placeholder}
+    "$UnaryMessageSelector"                      -> UnaryMessageSelector                      {cons("UnaryMessageSelector-Plhdr"), placeholder}
+    "$BinaryMessageSelector"                     -> BinaryMessageSelector                     {cons("BinaryMessageSelector-Plhdr"), placeholder}
+    "$Keyword"                                   -> Keyword                                   {cons("Keyword-Plhdr"), placeholder}
+    "$BindableIdentifier"                        -> BindableIdentifier                        {cons("BindableIdentifier-Plhdr"), placeholder}
+    "$KeywordMethodHeaderSegment"                -> KeywordMethodHeaderSegment                {cons("KeywordMethodHeaderSegment-Plhdr"), placeholder}
+    "$UnaryMethodHeader"                         -> UnaryMethodHeader                         {cons("UnaryMethodHeader-Plhdr"), placeholder}
+    "$BinaryMethodHeader"                        -> BinaryMethodHeader                        {cons("BinaryMethodHeader-Plhdr"), placeholder}
+    "$KeywordMethodHeader"                       -> KeywordMethodHeader                       {cons("KeywordMethodHeader-Plhdr"), placeholder}
+    "$MethodDeclaration"                         -> MethodDeclaration                         {cons("MethodDeclaration-Plhdr"), placeholder}
+    "$MethodHeader"                              -> MethodHeader                              {cons("MethodHeader-Plhdr"), placeholder}
+    "$ExecutableCode"                            -> ExecutableCode                            {cons("ExecutableCode-Plhdr"), placeholder}

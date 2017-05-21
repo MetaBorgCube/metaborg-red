@@ -10,16 +10,1283 @@ imports
 
 
 imports
-  completion/Common-cp
+  completion/Base-cp
 
 
 rules
 
-  null-constructor-completion-sort :
-    "Start" -> Empty()
+  suggest-completions(|completions):
+    Start-Plhdr() -> <add-completions(
+                      | ( "MethodDeclaration"
+                        , MethodDeclaration(
+                            <try(inline-completions(|Start-Plhdr()))> MethodDeclaration-Plhdr()
+                          )
+                        )
+                      )
+                      ; fail> completions
+
+  suggest-completions(|completions):
+    Start-Plhdr() -> <add-completions(
+                      | ( "ExecutableCode"
+                        , ExecutableCode(
+                            <try(inline-completions(|Start-Plhdr()))> ExecutableCode-Plhdr()
+                          )
+                        )
+                      )
+                      ; fail> completions
+
+  suggest-completions(|completions):
+    Reference-Plhdr() -> <add-completions(
+                          | ( "Reference"
+                            , Reference(
+                                <try(inline-completions(|Reference-Plhdr()))> Identifier-Plhdr()
+                              )
+                            )
+                          )
+                          ; fail> completions
+
+  suggest-completions(|completions):
+    ConstantReference-Plhdr() -> <add-completions(|("Null", Null()))
+                                  ; fail> completions
+
+  suggest-completions(|completions):
+    ConstantReference-Plhdr() -> <add-completions(|("False", False()))
+                                  ; fail> completions
+
+  suggest-completions(|completions):
+    ConstantReference-Plhdr() -> <add-completions(|("True", True()))
+                                  ; fail> completions
+
+  suggest-completions(|completions):
+    PsuedoVariableReference-Plhdr() -> <add-completions(|("Self", Self()))
+                                        ; fail> completions
+
+  suggest-completions(|completions):
+    PsuedoVariableReference-Plhdr() -> <add-completions(|("Super", Super()))
+                                        ; fail> completions
+
+  suggest-completions(|completions):
+    PsuedoVariableReference-Plhdr() -> <add-completions(|("This", This()))
+                                        ; fail> completions
+
+  suggest-completions(|completions):
+    BindableIdentifier-Plhdr() -> <add-completions(
+                                   | ( "BindableIdentifier"
+                                     , BindableIdentifier(
+                                         <try(inline-completions(|BindableIdentifier-Plhdr()))> Identifier-Plhdr()
+                                       )
+                                     )
+                                   )
+                                   ; fail> completions
+
+  suggest-completions(|completions):
+    BindableIdentifier-Plhdr() -> <suggest-completions(|completions)> ConstantReference-Plhdr()
+    where <not(is-expanded)> (BindableIdentifier-Plhdr(), ConstantReference-Plhdr())
+          ; rules (
+              is-expanded :
+                (BindableIdentifier-Plhdr(), ConstantReference-Plhdr()) -> <id>
+            )
+
+  suggest-completions(|completions):
+    BindableIdentifier-Plhdr() -> <suggest-completions(|completions)> PsuedoVariableReference-Plhdr()
+    where <not(is-expanded)> (BindableIdentifier-Plhdr(), PsuedoVariableReference-Plhdr())
+          ; rules (
+              is-expanded :
+                (BindableIdentifier-Plhdr(), PsuedoVariableReference-Plhdr()) -> <id>
+            )
+
+  suggest-completions(|completions):
+    UnaryMessageSelector-Plhdr() -> <add-completions(
+                                     | ( "UnaryMessageSelector"
+                                       , UnaryMessageSelector(
+                                           <try(inline-completions(|UnaryMessageSelector-Plhdr()))> Identifier-Plhdr()
+                                         )
+                                       )
+                                     )
+                                     ; fail> completions
+
+  suggest-completions(|completions):
+    Keyword-Plhdr() -> <add-completions(
+                        | ( "Keyword"
+                          , Keyword(
+                              <try(inline-completions(|Keyword-Plhdr()))> Identifier-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    KeywordMessageSelector-Plhdr() -> <add-completions(
+                                       | ( "KeywordMessageSelector"
+                                         , KeywordMessageSelector(
+                                             [ <try(inline-completions(|KeywordMessageSelector-Plhdr()))> Keyword-Plhdr()
+                                             ]
+                                           )
+                                         )
+                                       )
+                                       ; fail> completions
+
+  suggest-completions(|completions):
+    BinaryMessageSelector-Plhdr() -> <add-completions(
+                                      | ( "BinaryMessageSelector"
+                                        , BinaryMessageSelector(
+                                            <try(inline-completions(|BinaryMessageSelector-Plhdr()))> BinarySelectorChar-Plhdr()
+                                          , Some(CURSOR_ELEMENT())
+                                          )
+                                        )
+                                      )
+                                      ; fail> completions
+
+  suggest-completions(|completions):
+    SymbolInArrayLiteral-Plhdr() -> <add-completions(
+                                     | ( "UnaryMessageSelector"
+                                       , UnaryMessageSelector(
+                                           <try(inline-completions(|SymbolInArrayLiteral-Plhdr()))> UnaryMessageSelector-Plhdr()
+                                         )
+                                       )
+                                     )
+                                     ; fail> completions
+
+  suggest-completions(|completions):
+    SymbolInArrayLiteral-Plhdr() -> <add-completions(
+                                     | ( "KeywordMessageSelector"
+                                       , KeywordMessageSelector(
+                                           <try(inline-completions(|SymbolInArrayLiteral-Plhdr()))> KeywordMessageSelector-Plhdr()
+                                         )
+                                       )
+                                     )
+                                     ; fail> completions
+
+  suggest-completions(|completions):
+    SymbolInArrayLiteral-Plhdr() -> <add-completions(
+                                     | ( "BinaryMessageSelector"
+                                       , BinaryMessageSelector(
+                                           <try(inline-completions(|SymbolInArrayLiteral-Plhdr()))> BinaryMessageSelector-Plhdr()
+                                         )
+                                       )
+                                     )
+                                     ; fail> completions
+
+  suggest-completions(|completions):
+    SymbolLiteral-Plhdr() -> <add-completions(
+                              | ( "SymbolInArrayLiteral"
+                                , SymbolInArrayLiteral(
+                                    <try(inline-completions(|SymbolLiteral-Plhdr()))> SymbolInArrayLiteral-Plhdr()
+                                  )
+                                )
+                              )
+                              ; fail> completions
+
+  suggest-completions(|completions):
+    SymbolLiteral-Plhdr() -> <add-completions(
+                              | ( "ConstantReference"
+                                , ConstantReference(
+                                    <try(inline-completions(|SymbolLiteral-Plhdr()))> ConstantReference-Plhdr()
+                                  )
+                                )
+                              )
+                              ; fail> completions
+
+  suggest-completions(|completions):
+    SymbolLiteral-Plhdr() -> <add-completions(
+                              | ( "StringLiteral"
+                                , StringLiteral(
+                                    <try(inline-completions(|SymbolLiteral-Plhdr()))> StringLiteral-Plhdr()
+                                  )
+                                )
+                              )
+                              ; fail> completions
+
+  suggest-completions(|completions):
+    ArrayLiteral-Plhdr() -> <add-completions(
+                             | ( "ObjectArrayLiteral"
+                               , ObjectArrayLiteral(
+                                   <try(inline-completions(|ArrayLiteral-Plhdr()))> ObjectArrayLiteral-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    ArrayLiteral-Plhdr() -> <add-completions(
+                             | ( "ByteArrayLiteral"
+                               , ByteArrayLiteral(
+                                   <try(inline-completions(|ArrayLiteral-Plhdr()))> ByteArrayLiteral-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    ObjectArrayLiteral-Plhdr() -> <add-completions(
+                                   | ( "ObjectArrayLiteral"
+                                     , ObjectArrayLiteral(
+                                         <try(inline-completions(|ObjectArrayLiteral-Plhdr()))> NestedObjectArrayLiteral-Plhdr()
+                                       )
+                                     )
+                                   )
+                                   ; fail> completions
+
+  suggest-completions(|completions):
+    NestedObjectArrayLiteral-Plhdr() -> <add-completions(
+                                         | ("NestedObjectArrayLiteral", NestedObjectArrayLiteral(CURSOR_ELEMENT()))
+                                         )
+                                         ; fail> completions
+
+  suggest-completions(|completions):
+    LiteralArrayElement-Plhdr() -> <add-completions(
+                                    | ( "Literal"
+                                      , Literal(
+                                          <try(inline-completions(|LiteralArrayElement-Plhdr()))> Literal-Plhdr()
+                                        )
+                                      )
+                                    )
+                                    ; fail> completions
+
+  suggest-completions(|completions):
+    LiteralArrayElement-Plhdr() -> <add-completions(
+                                    | ( "NestedObjectArrayLiteral"
+                                      , NestedObjectArrayLiteral(
+                                          <try(inline-completions(|LiteralArrayElement-Plhdr()))> NestedObjectArrayLiteral-Plhdr()
+                                        )
+                                      )
+                                    )
+                                    ; fail> completions
+
+  suggest-completions(|completions):
+    LiteralArrayElement-Plhdr() -> <add-completions(
+                                    | ( "SymbolInArrayLiteral"
+                                      , SymbolInArrayLiteral(
+                                          <try(inline-completions(|LiteralArrayElement-Plhdr()))> SymbolInArrayLiteral-Plhdr()
+                                        )
+                                      )
+                                    )
+                                    ; fail> completions
+
+  suggest-completions(|completions):
+    LiteralArrayElement-Plhdr() -> <add-completions(
+                                    | ( "ConstantReference"
+                                      , ConstantReference(
+                                          <try(inline-completions(|LiteralArrayElement-Plhdr()))> ConstantReference-Plhdr()
+                                        )
+                                      )
+                                    )
+                                    ; fail> completions
+
+  suggest-completions(|completions):
+    ByteArrayLiteral-Plhdr() -> <add-completions(
+                                 | ("ByteArrayLiteral", ByteArrayLiteral(CURSOR_ELEMENT()))
+                                 )
+                                 ; fail> completions
+
+  suggest-completions(|completions):
+    FormalBlockArgumentDeclaration-Plhdr() -> <add-completions(
+                                               | ( "FormalBlockArgumentDeclaration"
+                                                 , FormalBlockArgumentDeclaration(
+                                                     <try(inline-completions(|FormalBlockArgumentDeclaration-Plhdr()))> BindableIdentifier-Plhdr()
+                                                   )
+                                                 )
+                                               )
+                                               ; fail> completions
+
+  suggest-completions(|completions):
+    FormalBlockArgumentDeclarationList-Plhdr() -> <add-completions(
+                                                   | ( "FormalBlockArgumentDeclarationList"
+                                                     , FormalBlockArgumentDeclarationList(
+                                                         [ <try(inline-completions(|FormalBlockArgumentDeclarationList-Plhdr()))> FormalBlockArgumentDeclaration-Plhdr()
+                                                         ]
+                                                       )
+                                                     )
+                                                   )
+                                                   ; fail> completions
+
+  suggest-completions(|completions):
+    BlockLiteral-Plhdr() -> <add-completions(
+                             | ( "BlockLiteral"
+                               , BlockLiteral(
+                                   Some(CURSOR_ELEMENT())
+                                 , <try(inline-completions(|BlockLiteral-Plhdr()))> ExecutableCode-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "ConstantReference"
+                          , ConstantReference(
+                              <try(inline-completions(|Literal-Plhdr()))> ConstantReference-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "IntegerLiteral"
+                          , IntegerLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> IntegerLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "ScaledDecimalLiteral"
+                          , ScaledDecimalLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> ScaledDecimalLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "FloatingPointLiteral"
+                          , FloatingPointLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> FloatingPointLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "CharacterLiteral"
+                          , CharacterLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> CharacterLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "StringLiteral"
+                          , StringLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> StringLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "SymbolLiteral"
+                          , SymbolLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> SymbolLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "ArrayLiteral"
+                          , ArrayLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> ArrayLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Literal-Plhdr() -> <add-completions(
+                        | ( "BlockLiteral"
+                          , BlockLiteral(
+                              <try(inline-completions(|Literal-Plhdr()))> BlockLiteral-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    NestedExpression-Plhdr() -> <add-completions(
+                                 | ( "NestedExpression"
+                                   , NestedExpression(
+                                       <try(inline-completions(|NestedExpression-Plhdr()))> Statement-Plhdr()
+                                     )
+                                   )
+                                 )
+                                 ; fail> completions
+
+  suggest-completions(|completions):
+    Operand-Plhdr() -> <add-completions(
+                        | ( "Literal"
+                          , Literal(
+                              <try(inline-completions(|Operand-Plhdr()))> Literal-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Operand-Plhdr() -> <add-completions(
+                        | ( "Reference"
+                          , Reference(
+                              <try(inline-completions(|Operand-Plhdr()))> Reference-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    Operand-Plhdr() -> <add-completions(
+                        | ( "NestedExpression"
+                          , NestedExpression(
+                              <try(inline-completions(|Operand-Plhdr()))> NestedExpression-Plhdr()
+                            )
+                          )
+                        )
+                        ; fail> completions
+
+  suggest-completions(|completions):
+    UnaryMessage-Plhdr() -> <add-completions(
+                             | ( "UnaryMessage"
+                               , UnaryMessage(
+                                   <try(inline-completions(|UnaryMessage-Plhdr()))> UnaryMessageSelector-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    UnaryMessageChain-Plhdr() -> <add-completions(
+                                  | ("UnaryMessageChain", UnaryMessageChain(CURSOR_ELEMENT()))
+                                  )
+                                  ; fail> completions
+
+  suggest-completions(|completions):
+    BinaryMessageOperand-Plhdr() -> <add-completions(
+                                     | ( "BinaryMessageOperand"
+                                       , BinaryMessageOperand(
+                                           <try(inline-completions(|BinaryMessageOperand-Plhdr()))> Operand-Plhdr()
+                                         , <try(inline-completions(|BinaryMessageOperand-Plhdr()))> UnaryMessageChain-Plhdr()
+                                         )
+                                       )
+                                     )
+                                     ; fail> completions
+
+  suggest-completions(|completions):
+    BinaryMessage-Plhdr() -> <add-completions(
+                              | ( "BinaryMessage"
+                                , BinaryMessage(
+                                    <try(inline-completions(|BinaryMessage-Plhdr()))> BinaryMessageSelector-Plhdr()
+                                  , <try(inline-completions(|BinaryMessage-Plhdr()))> BinaryMessageOperand-Plhdr()
+                                  )
+                                )
+                              )
+                              ; fail> completions
+
+  suggest-completions(|completions):
+    BinaryMessageChain-Plhdr() -> <add-completions(
+                                   | ("BinaryMessageChain", BinaryMessageChain(CURSOR_ELEMENT()))
+                                   )
+                                   ; fail> completions
+
+  suggest-completions(|completions):
+    KeywordMessageArgument-Plhdr() -> <add-completions(
+                                       | ( "KeywordMessageArgument"
+                                         , KeywordMessageArgument(
+                                             <try(inline-completions(|KeywordMessageArgument-Plhdr()))> BinaryMessageOperand-Plhdr()
+                                           , <try(inline-completions(|KeywordMessageArgument-Plhdr()))> BinaryMessageChain-Plhdr()
+                                           )
+                                         )
+                                       )
+                                       ; fail> completions
+
+  suggest-completions(|completions):
+    KeywordMessageSegment-Plhdr() -> <add-completions(
+                                      | ( "KeywordMessageSegment"
+                                        , KeywordMessageSegment(
+                                            <try(inline-completions(|KeywordMessageSegment-Plhdr()))> Keyword-Plhdr()
+                                          , <try(inline-completions(|KeywordMessageSegment-Plhdr()))> KeywordMessageArgument-Plhdr()
+                                          )
+                                        )
+                                      )
+                                      ; fail> completions
+
+  suggest-completions(|completions):
+    KeywordMessage-Plhdr() -> <add-completions(
+                               | ( "KeywordMessage"
+                                 , KeywordMessage(
+                                     <try(inline-completions(|KeywordMessage-Plhdr()))> KeywordMessageSegment-Plhdr()
+                                   , CURSOR_ELEMENT()
+                                   )
+                                 )
+                               )
+                               ; fail> completions
+
+  suggest-completions(|completions):
+    MessageChain-Plhdr() -> <add-completions(
+                             | ( "KeywordMessage"
+                               , KeywordMessage(
+                                   <try(inline-completions(|MessageChain-Plhdr()))> KeywordMessage-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    MessageChain-Plhdr() -> <add-completions(
+                             | ( "BinaryMessage"
+                               , BinaryMessage(
+                                   <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessage-Plhdr()
+                                 , <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessageChain-Plhdr()
+                                 , Some(CURSOR_ELEMENT())
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    MessageChain-Plhdr() -> <add-completions(
+                             | ( "UnaryMessage"
+                               , UnaryMessage(
+                                   <try(inline-completions(|MessageChain-Plhdr()))> UnaryMessage-Plhdr()
+                                 , <try(inline-completions(|MessageChain-Plhdr()))> UnaryMessageChain-Plhdr()
+                                 , <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessageChain-Plhdr()
+                                 , Some(CURSOR_ELEMENT())
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    CascadedMessage-Plhdr() -> <add-completions(
+                                | ( "CascadedMessage"
+                                  , CascadedMessage(
+                                      <try(inline-completions(|CascadedMessage-Plhdr()))> MessageChain-Plhdr()
+                                    )
+                                  )
+                                )
+                                ; fail> completions
+
+  suggest-completions(|completions):
+    Expression-Plhdr() -> <add-completions(
+                           | ( "Expression"
+                             , Expression(
+                                 <try(inline-completions(|Expression-Plhdr()))> Operand-Plhdr()
+                               , Some(CURSOR_ELEMENT())
+                               )
+                             )
+                           )
+                           ; fail> completions
+
+  suggest-completions(|completions):
+    ExpressionRest-Plhdr() -> <add-completions(
+                               | ( "ExpressionRest"
+                                 , ExpressionRest(
+                                     <try(inline-completions(|ExpressionRest-Plhdr()))> MessageChain-Plhdr()
+                                   , CURSOR_ELEMENT()
+                                   )
+                                 )
+                               )
+                               ; fail> completions
+
+  suggest-completions(|completions):
+    AssignmentOperation-Plhdr() -> <add-completions(
+                                    | ( "AssignmentOperation"
+                                      , AssignmentOperation(
+                                          <try(inline-completions(|AssignmentOperation-Plhdr()))> BindableIdentifier-Plhdr()
+                                        )
+                                      )
+                                    )
+                                    ; fail> completions
+
+  suggest-completions(|completions):
+    Statement-Plhdr() -> <add-completions(
+                          | ( "Statement"
+                            , Statement(
+                                CURSOR_ELEMENT()
+                              , <try(inline-completions(|Statement-Plhdr()))> Expression-Plhdr()
+                              )
+                            )
+                          )
+                          ; fail> completions
+
+  suggest-completions(|completions):
+    MethodReturnOperator-Plhdr() -> <add-completions(|("MethodReturnOperator", MethodReturnOperator()))
+                                     ; fail> completions
+
+  suggest-completions(|completions):
+    FinalStatement-Plhdr() -> <add-completions(
+                               | ( "FinalStatement"
+                                 , FinalStatement(
+                                     Some(CURSOR_ELEMENT())
+                                   , <try(inline-completions(|FinalStatement-Plhdr()))> Statement-Plhdr()
+                                   )
+                                 )
+                               )
+                               ; fail> completions
+
+  suggest-completions(|completions):
+    LocalVariableDeclarationList-Plhdr() -> <add-completions(
+                                             | ("LocalVariableDeclarationList", LocalVariableDeclarationList(CURSOR_ELEMENT()))
+                                             )
+                                             ; fail> completions
+
+  suggest-completions(|completions):
+    ExecutableCode-Plhdr() -> <add-completions(
+                               | ( "ExecutableCode"
+                                 , ExecutableCode(
+                                     Some(CURSOR_ELEMENT())
+                                   , Some(CURSOR_ELEMENT())
+                                   )
+                                 )
+                               )
+                               ; fail> completions
+
+  suggest-completions(|completions):
+    ExecutableCodeRest-Plhdr() -> <add-completions(
+                                   | ( "ExecutableCodeRest"
+                                     , ExecutableCodeRest(
+                                         CURSOR_ELEMENT()
+                                       , <try(inline-completions(|ExecutableCodeRest-Plhdr()))> FinalStatement-Plhdr()
+                                       , Some(CURSOR_ELEMENT())
+                                       )
+                                     )
+                                   )
+                                   ; fail> completions
+
+  suggest-completions(|completions):
+    DottedStatement-Plhdr() -> <add-completions(
+                                | ( "DottedStatement"
+                                  , DottedStatement(
+                                      <try(inline-completions(|DottedStatement-Plhdr()))> Statement-Plhdr()
+                                    )
+                                  )
+                                )
+                                ; fail> completions
+
+  suggest-completions(|completions):
+    Dot-Plhdr() -> <add-completions(|("Dot", Dot()))
+                    ; fail> completions
+
+  suggest-completions(|completions):
+    UnaryMethodHeader-Plhdr() -> <add-completions(
+                                  | ( "UnaryMethodHeader"
+                                    , UnaryMethodHeader(
+                                        <try(inline-completions(|UnaryMethodHeader-Plhdr()))> UnaryMessageSelector-Plhdr()
+                                      )
+                                    )
+                                  )
+                                  ; fail> completions
+
+  suggest-completions(|completions):
+    BinaryMethodHeader-Plhdr() -> <add-completions(
+                                   | ( "BinaryMethodHeader"
+                                     , BinaryMethodHeader(
+                                         <try(inline-completions(|BinaryMethodHeader-Plhdr()))> BinaryMessageSelector-Plhdr()
+                                       , <try(inline-completions(|BinaryMethodHeader-Plhdr()))> BindableIdentifier-Plhdr()
+                                       )
+                                     )
+                                   )
+                                   ; fail> completions
+
+  suggest-completions(|completions):
+    KeywordMethodHeaderSegment-Plhdr() -> <add-completions(
+                                           | ( "KeywordMethodHeaderSegment"
+                                             , KeywordMethodHeaderSegment(
+                                                 <try(inline-completions(|KeywordMethodHeaderSegment-Plhdr()))> Keyword-Plhdr()
+                                               , <try(inline-completions(|KeywordMethodHeaderSegment-Plhdr()))> BindableIdentifier-Plhdr()
+                                               )
+                                             )
+                                           )
+                                           ; fail> completions
+
+  suggest-completions(|completions):
+    KeywordMethodHeader-Plhdr() -> <add-completions(
+                                    | ( "KeywordMethodHeader"
+                                      , KeywordMethodHeader(
+                                          [ <try(inline-completions(|KeywordMethodHeader-Plhdr()))> KeywordMethodHeaderSegment-Plhdr()
+                                          ]
+                                        )
+                                      )
+                                    )
+                                    ; fail> completions
+
+  suggest-completions(|completions):
+    MethodHeader-Plhdr() -> <add-completions(
+                             | ( "UnaryMethodHeader"
+                               , UnaryMethodHeader(
+                                   <try(inline-completions(|MethodHeader-Plhdr()))> UnaryMethodHeader-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    MethodHeader-Plhdr() -> <add-completions(
+                             | ( "BinaryMethodHeader"
+                               , BinaryMethodHeader(
+                                   <try(inline-completions(|MethodHeader-Plhdr()))> BinaryMethodHeader-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    MethodHeader-Plhdr() -> <add-completions(
+                             | ( "KeywordMethodHeader"
+                               , KeywordMethodHeader(
+                                   <try(inline-completions(|MethodHeader-Plhdr()))> KeywordMethodHeader-Plhdr()
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    MethodDeclaration-Plhdr() -> <add-completions(
+                                  | ( "MethodDeclaration"
+                                    , MethodDeclaration(
+                                        <try(inline-completions(|MethodDeclaration-Plhdr()))> MethodHeader-Plhdr()
+                                      , <try(inline-completions(|MethodDeclaration-Plhdr()))> ExecutableCode-Plhdr()
+                                      )
+                                    )
+                                  )
+                                  ; fail> completions
+
+
+rules
+
+  is-left-recursive :
+    "MethodDeclaration" -> <is-left-recursive> "Start"
+    where <not(is-lexical-completion-sort)> "MethodDeclaration"
+
+  is-right-recursive :
+    "MethodDeclaration" -> <is-right-recursive> "Start"
+    where <not(is-lexical-completion-sort)> "MethodDeclaration"
+
+  is-Start-completion-sort :
+    "MethodDeclaration" -> <id>
+
+  is-left-recursive :
+    "ExecutableCode" -> <is-left-recursive> "Start"
+    where <not(is-lexical-completion-sort)> "ExecutableCode"
+
+  is-right-recursive :
+    "ExecutableCode" -> <is-right-recursive> "Start"
+    where <not(is-lexical-completion-sort)> "ExecutableCode"
+
+  is-Start-completion-sort :
+    "ExecutableCode" -> <id>
+
+  is-left-recursive :
+    "Identifier" -> <is-left-recursive> "Reference"
+    where <not(is-lexical-completion-sort)> "Identifier"
+
+  is-right-recursive :
+    "Identifier" -> <is-right-recursive> "Reference"
+    where <not(is-lexical-completion-sort)> "Identifier"
+
+  is-Reference-completion-sort :
+    "Identifier" -> <id>
+
+  is-left-recursive :
+    "Identifier" -> <is-left-recursive> "BindableIdentifier"
+    where <not(is-lexical-completion-sort)> "Identifier"
+
+  is-right-recursive :
+    "Identifier" -> <is-right-recursive> "BindableIdentifier"
+    where <not(is-lexical-completion-sort)> "Identifier"
+
+  is-BindableIdentifier-completion-sort :
+    "Identifier" -> <id>
+
+  is-left-recursive :
+    "Identifier" -> <is-left-recursive> "UnaryMessageSelector"
+    where <not(is-lexical-completion-sort)> "Identifier"
+
+  is-right-recursive :
+    "Identifier" -> <is-right-recursive> "UnaryMessageSelector"
+    where <not(is-lexical-completion-sort)> "Identifier"
+
+  is-UnaryMessageSelector-completion-sort :
+    "Identifier" -> <id>
+
+  is-left-recursive :
+    "UnaryMessageSelector" -> <is-left-recursive> "SymbolInArrayLiteral"
+    where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
+
+  is-right-recursive :
+    "UnaryMessageSelector" -> <is-right-recursive> "SymbolInArrayLiteral"
+    where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
+
+  is-SymbolInArrayLiteral-completion-sort :
+    "UnaryMessageSelector" -> <id>
+
+  is-left-recursive :
+    "KeywordMessageSelector" -> <is-left-recursive> "SymbolInArrayLiteral"
+    where <not(is-lexical-completion-sort)> "KeywordMessageSelector"
+
+  is-right-recursive :
+    "KeywordMessageSelector" -> <is-right-recursive> "SymbolInArrayLiteral"
+    where <not(is-lexical-completion-sort)> "KeywordMessageSelector"
+
+  is-SymbolInArrayLiteral-completion-sort :
+    "KeywordMessageSelector" -> <id>
+
+  is-left-recursive :
+    "BinaryMessageSelector" -> <is-left-recursive> "SymbolInArrayLiteral"
+    where <not(is-lexical-completion-sort)> "BinaryMessageSelector"
+
+  is-right-recursive :
+    "BinaryMessageSelector" -> <is-right-recursive> "SymbolInArrayLiteral"
+    where <not(is-lexical-completion-sort)> "BinaryMessageSelector"
+
+  is-SymbolInArrayLiteral-completion-sort :
+    "BinaryMessageSelector" -> <id>
+
+  is-left-recursive :
+    "ObjectArrayLiteral" -> <is-left-recursive> "ArrayLiteral"
+    where <not(is-lexical-completion-sort)> "ObjectArrayLiteral"
+
+  is-right-recursive :
+    "ObjectArrayLiteral" -> <is-right-recursive> "ArrayLiteral"
+    where <not(is-lexical-completion-sort)> "ObjectArrayLiteral"
+
+  is-ArrayLiteral-completion-sort :
+    "ObjectArrayLiteral" -> <id>
+
+  is-left-recursive :
+    "ByteArrayLiteral" -> <is-left-recursive> "ArrayLiteral"
+    where <not(is-lexical-completion-sort)> "ByteArrayLiteral"
+
+  is-right-recursive :
+    "ByteArrayLiteral" -> <is-right-recursive> "ArrayLiteral"
+    where <not(is-lexical-completion-sort)> "ByteArrayLiteral"
+
+  is-ArrayLiteral-completion-sort :
+    "ByteArrayLiteral" -> <id>
+
+  is-left-recursive :
+    "Literal" -> <is-left-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "Literal"
+
+  is-right-recursive :
+    "Literal" -> <is-right-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "Literal"
+
+  is-LiteralArrayElement-completion-sort :
+    "Literal" -> <id>
+
+  is-left-recursive :
+    "NestedObjectArrayLiteral" -> <is-left-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "NestedObjectArrayLiteral"
+
+  is-right-recursive :
+    "NestedObjectArrayLiteral" -> <is-right-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "NestedObjectArrayLiteral"
+
+  is-LiteralArrayElement-completion-sort :
+    "NestedObjectArrayLiteral" -> <id>
+
+  is-left-recursive :
+    "SymbolInArrayLiteral" -> <is-left-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "SymbolInArrayLiteral"
+
+  is-right-recursive :
+    "SymbolInArrayLiteral" -> <is-right-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "SymbolInArrayLiteral"
+
+  is-LiteralArrayElement-completion-sort :
+    "SymbolInArrayLiteral" -> <id>
+
+  is-left-recursive :
+    "ConstantReference" -> <is-left-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "ConstantReference"
+
+  is-right-recursive :
+    "ConstantReference" -> <is-right-recursive> "LiteralArrayElement"
+    where <not(is-lexical-completion-sort)> "ConstantReference"
+
+  is-LiteralArrayElement-completion-sort :
+    "ConstantReference" -> <id>
+
+  is-left-recursive :
+    "BindableIdentifier" -> <is-left-recursive> "FormalBlockArgumentDeclaration"
+    where <not(is-lexical-completion-sort)> "BindableIdentifier"
+
+  is-right-recursive :
+    "BindableIdentifier" -> <is-right-recursive> "FormalBlockArgumentDeclaration"
+    where <not(is-lexical-completion-sort)> "BindableIdentifier"
+
+  is-FormalBlockArgumentDeclaration-completion-sort :
+    "BindableIdentifier" -> <id>
+
+  is-left-recursive :
+    "ConstantReference" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "ConstantReference"
+
+  is-right-recursive :
+    "ConstantReference" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "ConstantReference"
+
+  is-Literal-completion-sort :
+    "ConstantReference" -> <id>
+
+  is-left-recursive :
+    "IntegerLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "IntegerLiteral"
+
+  is-right-recursive :
+    "IntegerLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "IntegerLiteral"
+
+  is-Literal-completion-sort :
+    "IntegerLiteral" -> <id>
+
+  is-left-recursive :
+    "ScaledDecimalLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "ScaledDecimalLiteral"
+
+  is-right-recursive :
+    "ScaledDecimalLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "ScaledDecimalLiteral"
+
+  is-Literal-completion-sort :
+    "ScaledDecimalLiteral" -> <id>
+
+  is-left-recursive :
+    "FloatingPointLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "FloatingPointLiteral"
+
+  is-right-recursive :
+    "FloatingPointLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "FloatingPointLiteral"
+
+  is-Literal-completion-sort :
+    "FloatingPointLiteral" -> <id>
+
+  is-left-recursive :
+    "CharacterLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "CharacterLiteral"
+
+  is-right-recursive :
+    "CharacterLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "CharacterLiteral"
+
+  is-Literal-completion-sort :
+    "CharacterLiteral" -> <id>
+
+  is-left-recursive :
+    "StringLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "StringLiteral"
+
+  is-right-recursive :
+    "StringLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "StringLiteral"
+
+  is-Literal-completion-sort :
+    "StringLiteral" -> <id>
+
+  is-left-recursive :
+    "SymbolLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "SymbolLiteral"
+
+  is-right-recursive :
+    "SymbolLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "SymbolLiteral"
+
+  is-Literal-completion-sort :
+    "SymbolLiteral" -> <id>
+
+  is-left-recursive :
+    "ArrayLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "ArrayLiteral"
+
+  is-right-recursive :
+    "ArrayLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "ArrayLiteral"
+
+  is-Literal-completion-sort :
+    "ArrayLiteral" -> <id>
+
+  is-left-recursive :
+    "BlockLiteral" -> <is-left-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "BlockLiteral"
+
+  is-right-recursive :
+    "BlockLiteral" -> <is-right-recursive> "Literal"
+    where <not(is-lexical-completion-sort)> "BlockLiteral"
+
+  is-Literal-completion-sort :
+    "BlockLiteral" -> <id>
+
+  is-left-recursive :
+    "Literal" -> <is-left-recursive> "Operand"
+    where <not(is-lexical-completion-sort)> "Literal"
+
+  is-right-recursive :
+    "Literal" -> <is-right-recursive> "Operand"
+    where <not(is-lexical-completion-sort)> "Literal"
+
+  is-Operand-completion-sort :
+    "Literal" -> <id>
+
+  is-left-recursive :
+    "Reference" -> <is-left-recursive> "Operand"
+    where <not(is-lexical-completion-sort)> "Reference"
+
+  is-right-recursive :
+    "Reference" -> <is-right-recursive> "Operand"
+    where <not(is-lexical-completion-sort)> "Reference"
+
+  is-Operand-completion-sort :
+    "Reference" -> <id>
+
+  is-left-recursive :
+    "NestedExpression" -> <is-left-recursive> "Operand"
+    where <not(is-lexical-completion-sort)> "NestedExpression"
+
+  is-right-recursive :
+    "NestedExpression" -> <is-right-recursive> "Operand"
+    where <not(is-lexical-completion-sort)> "NestedExpression"
+
+  is-Operand-completion-sort :
+    "NestedExpression" -> <id>
+
+  is-left-recursive :
+    "UnaryMessageSelector" -> <is-left-recursive> "UnaryMessage"
+    where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
+
+  is-right-recursive :
+    "UnaryMessageSelector" -> <is-right-recursive> "UnaryMessage"
+    where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
+
+  is-UnaryMessage-completion-sort :
+    "UnaryMessageSelector" -> <id>
+
+  is-left-recursive :
+    "KeywordMessage" -> <is-left-recursive> "MessageChain"
+    where <not(is-lexical-completion-sort)> "KeywordMessage"
+
+  is-right-recursive :
+    "KeywordMessage" -> <is-right-recursive> "MessageChain"
+    where <not(is-lexical-completion-sort)> "KeywordMessage"
+
+  is-MessageChain-completion-sort :
+    "KeywordMessage" -> <id>
+
+  is-left-recursive :
+    "UnaryMessageSelector" -> <is-left-recursive> "UnaryMethodHeader"
+    where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
+
+  is-right-recursive :
+    "UnaryMessageSelector" -> <is-right-recursive> "UnaryMethodHeader"
+    where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
+
+  is-UnaryMethodHeader-completion-sort :
+    "UnaryMessageSelector" -> <id>
+
+  is-left-recursive :
+    "UnaryMethodHeader" -> <is-left-recursive> "MethodHeader"
+    where <not(is-lexical-completion-sort)> "UnaryMethodHeader"
+
+  is-right-recursive :
+    "UnaryMethodHeader" -> <is-right-recursive> "MethodHeader"
+    where <not(is-lexical-completion-sort)> "UnaryMethodHeader"
+
+  is-MethodHeader-completion-sort :
+    "UnaryMethodHeader" -> <id>
+
+  is-left-recursive :
+    "BinaryMethodHeader" -> <is-left-recursive> "MethodHeader"
+    where <not(is-lexical-completion-sort)> "BinaryMethodHeader"
+
+  is-right-recursive :
+    "BinaryMethodHeader" -> <is-right-recursive> "MethodHeader"
+    where <not(is-lexical-completion-sort)> "BinaryMethodHeader"
+
+  is-MethodHeader-completion-sort :
+    "BinaryMethodHeader" -> <id>
+
+  is-left-recursive :
+    "KeywordMethodHeader" -> <is-left-recursive> "MethodHeader"
+    where <not(is-lexical-completion-sort)> "KeywordMethodHeader"
+
+  is-right-recursive :
+    "KeywordMethodHeader" -> <is-right-recursive> "MethodHeader"
+    where <not(is-lexical-completion-sort)> "KeywordMethodHeader"
+
+  is-MethodHeader-completion-sort :
+    "KeywordMethodHeader" -> <id>
 
 
 rules
 
   is-SDF-placeholder =
     ?Start-Plhdr()
+
+  is-SDF-placeholder =
+    ?PsuedoVariableReference-Plhdr()
+
+  is-SDF-placeholder =
+    ?Identifier-Plhdr()
+
+  is-SDF-placeholder =
+    ?BinarySelectorChar-Plhdr()
+
+  is-SDF-placeholder =
+    ?KeywordMessageSelector-Plhdr()
+
+  is-SDF-placeholder =
+    ?ObjectArrayLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?NestedObjectArrayLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?SymbolInArrayLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?LiteralArrayElement-Plhdr()
+
+  is-SDF-placeholder =
+    ?ByteArrayLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?UnsignedIntegerLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?FormalBlockArgumentDeclaration-Plhdr()
+
+  is-SDF-placeholder =
+    ?FormalBlockArgumentDeclarationList-Plhdr()
+
+  is-SDF-placeholder =
+    ?FormalBlockArgumentDeclarationListWithSep-Plhdr()
+
+  is-SDF-placeholder =
+    ?ConstantReference-Plhdr()
+
+  is-SDF-placeholder =
+    ?IntegerLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?ScaledDecimalLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?FloatingPointLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?CharacterLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?StringLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?SymbolLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?ArrayLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?BlockLiteral-Plhdr()
+
+  is-SDF-placeholder =
+    ?Literal-Plhdr()
+
+  is-SDF-placeholder =
+    ?Reference-Plhdr()
+
+  is-SDF-placeholder =
+    ?NestedExpression-Plhdr()
+
+  is-SDF-placeholder =
+    ?BinaryMessageOperand-Plhdr()
+
+  is-SDF-placeholder =
+    ?KeywordMessageArgument-Plhdr()
+
+  is-SDF-placeholder =
+    ?KeywordMessageSegment-Plhdr()
+
+  is-SDF-placeholder =
+    ?BinaryMessage-Plhdr()
+
+  is-SDF-placeholder =
+    ?UnaryMessage-Plhdr()
+
+  is-SDF-placeholder =
+    ?UnaryMessageChain-Plhdr()
+
+  is-SDF-placeholder =
+    ?BinaryMessageChain-Plhdr()
+
+  is-SDF-placeholder =
+    ?KeywordMessage-Plhdr()
+
+  is-SDF-placeholder =
+    ?Operand-Plhdr()
+
+  is-SDF-placeholder =
+    ?ExpressionRest-Plhdr()
+
+  is-SDF-placeholder =
+    ?MessageChain-Plhdr()
+
+  is-SDF-placeholder =
+    ?CascadedMessage-Plhdr()
+
+  is-SDF-placeholder =
+    ?AssignmentOperation-Plhdr()
+
+  is-SDF-placeholder =
+    ?Expression-Plhdr()
+
+  is-SDF-placeholder =
+    ?MethodReturnOperator-Plhdr()
+
+  is-SDF-placeholder =
+    ?LocalVariableDeclarationList-Plhdr()
+
+  is-SDF-placeholder =
+    ?ExecutableCodeRest-Plhdr()
+
+  is-SDF-placeholder =
+    ?FinalStatement-Plhdr()
+
+  is-SDF-placeholder =
+    ?DottedStatement-Plhdr()
+
+  is-SDF-placeholder =
+    ?Statement-Plhdr()
+
+  is-SDF-placeholder =
+    ?Dot-Plhdr()
+
+  is-SDF-placeholder =
+    ?UnaryMessageSelector-Plhdr()
+
+  is-SDF-placeholder =
+    ?BinaryMessageSelector-Plhdr()
+
+  is-SDF-placeholder =
+    ?Keyword-Plhdr()
+
+  is-SDF-placeholder =
+    ?BindableIdentifier-Plhdr()
+
+  is-SDF-placeholder =
+    ?KeywordMethodHeaderSegment-Plhdr()
+
+  is-SDF-placeholder =
+    ?UnaryMethodHeader-Plhdr()
+
+  is-SDF-placeholder =
+    ?BinaryMethodHeader-Plhdr()
+
+  is-SDF-placeholder =
+    ?KeywordMethodHeader-Plhdr()
+
+  is-SDF-placeholder =
+    ?MethodDeclaration-Plhdr()
+
+  is-SDF-placeholder =
+    ?MethodHeader-Plhdr()
+
+  is-SDF-placeholder =
+    ?ExecutableCode-Plhdr()

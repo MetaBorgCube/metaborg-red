@@ -1,0 +1,49 @@
+module Base
+
+lexical syntax
+
+	Character = ~[]
+	WhitespaceCharacter = [\ \t\n\r]
+	DecimalDigit = [0-9]
+	Letter = [a-zA-Z]
+	CommentCharacter = ~[\"]
+	CommentCharacter = [\\\"]
+	Comment = "\"" CommentCharacter* "\""
+	Whitespace = (WhitespaceCharacter | Comment)+
+	
+	LAYOUT = WhitespaceCharacter
+	LAYOUT = Comment
+	
+	LetterOrDigit = DecimalDigit|Letter
+	Identifier = (DecimalDigit|Letter|"_")+
+
+	
+	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
+
+	IntegerLiteral = "-"? UnsignedIntegerLiteral
+	UnsignedIntegerLiteral = DecimalIntegerLiteral | (Radix "r" BaseNIntegerLiteral)
+	DecimalIntegerLiteral = DecimalDigit+
+	Radix = DecimalIntegerLiteral
+	BaseNIntegerLiteral = LetterOrDigit+
+	ScaledDecimalLiteral = "-"? DecimalIntegerLiteral ("." DecimalIntegerLiteral)? "s" DecimalIntegerLiteral?
+	FloatingPointLiteral = "-"? DecimalIntegerLiteral (("." DecimalIntegerLiteral Exponent?) | Exponent)
+	Exponent = ("e"|"d"|"q") ("-"? DecimalIntegerLiteral)?
+	
+	CharacterLiteral = "$" Character
+	StringLiteral = "'" (StringLiteralCharacter|"''")* "'"
+	StringLiteralCharacter = ~[\']
+	
+lexical restrictions
+
+  // Ensure greedy matching for lexicals
+  
+  CommentCharacter   -/- [\"]
+  DecimalDigit       -/- [0-9]
+  Identifier         -/- [a-zA-Z0-9\_]
+
+context-free restrictions
+
+  // Ensure greedy matching for comments
+  
+  LAYOUT? -/- [\ \t\n\r]
+  LAYOUT? -/- [\"]

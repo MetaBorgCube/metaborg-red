@@ -1,0 +1,25 @@
+module signatures/Base-sig
+
+signature
+  constructors
+     : String -> Character
+     : String -> WhitespaceCharacter
+     : String -> DecimalDigit
+     : String -> Letter
+     : String -> CommentCharacter
+     : String -> Comment
+     : String -> Whitespace
+     : String -> LetterOrDigit
+     : String -> Identifier
+     : String -> BinarySelectorChar
+     : String -> IntegerLiteral
+     : String -> UnsignedIntegerLiteral
+     : String -> DecimalIntegerLiteral
+     : String -> Radix
+     : String -> BaseNIntegerLiteral
+     : String -> ScaledDecimalLiteral
+     : String -> FloatingPointLiteral
+     : String -> Exponent
+     : String -> CharacterLiteral
+     : String -> StringLiteral
+     : String -> StringLiteralCharacter

@@ -8,7 +8,7 @@ Module(
   , Language(
       ""
     , [ Table("target/metaborg/sdf.tbl")
-      , StartSymbols([Sort("Start")])
+      , StartSymbols([Sort("Prog")])
       , LineCommentPrefix(String("\"//\""))
       , BlockCommentDefs(BlockCommentDef(String("\"/*\""), "*", String("\"*/\"")))
       , FenceDefs(
@@ -129,7 +129,19 @@ Module(
     )
   , Colorer(
       ""
-    , [ColorRule(ConstructorOnly(Constructor("Start-Plhdr")), AttributeRef("gray"))]
+    , [ ColorRule(ConstructorOnly(Constructor("Prog-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("INT-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("ID-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("ID-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("ID-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      , ColorRule(ConstructorOnly(Constructor("Exp-Plhdr")), AttributeRef("gray"))
+      ]
     )
   , Colorer("", [])
   , Language("", [SemanticObserver(Strategy("editor-analyze"), [Constraint()])])

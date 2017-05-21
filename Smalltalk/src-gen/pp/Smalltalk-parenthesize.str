@@ -2,12 +2,114 @@ module pp/Smalltalk-parenthesize
 
 imports
   libstratego-lib
+  signatures/-
 
 
 strategies
   io-Smalltalk-parenthesize =
-    io-wrap(id)
+    io-wrap(parenthesize-Smalltalk)
 
   parenthesize-Smalltalk =
-    id
+    innermost(SmalltalkParenthesize)
+
+
+rules
+
+  SmalltalkParenthesize :
+    Block(t_0) -> Block(Parenthetical(t_0))
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Minus(_, _)
+            + ?Plus(_, _)
+            + ?Times(_, _)
+            + ?App(_, _)
+            + fail)> t_0
+
+  SmalltalkParenthesize :
+    Times(t_0, t_1) -> Times(Parenthetical(t_0), t_1)
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Minus(_, _)
+            + ?Plus(_, _)
+            + fail)> t_0
+
+  SmalltalkParenthesize :
+    Times(t_0, t_1) -> Times(t_0, Parenthetical(t_1))
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Minus(_, _)
+            + ?Plus(_, _)
+            + ?Times(_, _)
+            + fail)> t_1
+
+  SmalltalkParenthesize :
+    App(t_0, t_1) -> App(Parenthetical(t_0), t_1)
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Minus(_, _)
+            + ?Plus(_, _)
+            + ?Times(_, _)
+            + fail)> t_0
+
+  SmalltalkParenthesize :
+    App(t_0, t_1) -> App(t_0, Parenthetical(t_1))
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Minus(_, _)
+            + ?Plus(_, _)
+            + ?Times(_, _)
+            + fail)> t_1
+
+  SmalltalkParenthesize :
+    Minus(t_0, t_1) -> Minus(Parenthetical(t_0), t_1)
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + fail)> t_0
+
+  SmalltalkParenthesize :
+    Minus(t_0, t_1) -> Minus(t_0, Parenthetical(t_1))
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Minus(_, _)
+            + ?Plus(_, _)
+            + fail)> t_1
+
+  SmalltalkParenthesize :
+    Plus(t_0, t_1) -> Plus(Parenthetical(t_0), t_1)
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + fail)> t_0
+
+  SmalltalkParenthesize :
+    Plus(t_0, t_1) -> Plus(t_0, Parenthetical(t_1))
+    where <(?Let(_, _, _)
+            + ?Fun(_, _)
+            + ?Plus(_, _)
+            + ?Minus(_, _)
+            + fail)> t_1
+
+  SmalltalkParenthesize :
+    Fun(t_0, t_1) -> Fun(Parenthetical(t_0), t_1)
+    where <(?Let(_, _, _) + fail)> t_0
+
+  SmalltalkParenthesize :
+    Fun(t_0, t_1) -> Fun(t_0, Parenthetical(t_1))
+    where <(?Let(_, _, _) + fail)> t_1
+
+  SmalltalkParenthesize :
+    Let(t_0, t_1, t_2) -> Let(Parenthetical(t_0), t_1, t_2)
+    where <(?Let(_, _, _) + fail)> t_0
+
+  SmalltalkParenthesize :
+    Let(t_0, t_1, t_2) -> Let(t_0, Parenthetical(t_1), t_2)
+    where <(?Let(_, _, _) + fail)> t_1
+
+  SmalltalkParenthesize :
+    Let(t_0, t_1, t_2) -> Let(t_0, t_1, Parenthetical(t_2))
+    where <(?Let(_, _, _) + fail)> t_2
+
+
+signature
+  constructors
+    Parenthetical : Unknown -> Unknown
 

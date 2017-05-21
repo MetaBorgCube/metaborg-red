@@ -37,86 +37,1262 @@ strategies
 
 strategies
   prettyprint-Smalltalk-start-symbols =
-    prettyprint-Smalltalk-Start
+    prettyprint-Smalltalk-Prog
 
 
 strategies
   prettyprint-Smalltalk =
-    prettyprint-Smalltalk-Start
+    prettyprint-Smalltalk-Prog
+
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
 
   prettyprint-Smalltalk(|sort):
-    t -> <prettyprint-Smalltalk-Start>
-    where <?"Start"> sort
+    t -> <prettyprint-Smalltalk-Prog>
+    where <?"Prog"> sort
 
-  prettyprint-Smalltalk-Start :
-    Empty() -> [ H(
-                   []
-                 , [S("")]
-                 )
-               ]
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
 
-  is-Smalltalk-Start =
-    ?Empty()
+  prettyprint-Smalltalk-Prog :
+    Program(t1__) -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [t1__']
+                       )
+                     ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Prog =
+    ?Program(_)
 
   Smalltalk-get-indent :
-    (t@Empty(), index) -> indent
+    (t@Program(t1__), index) -> indent
     where sort := <ia-get-sort> t
-          ; <?"Start"> sort
+          ; <?"Prog"> sort
     with switch !index
+           case ?1 :
+             indent := ""
            otherwise :
              indent := ""
          end
 
   Smalltalk-get-separator :
-    (t@Empty(), index) -> separator
+    (t@Program(t1__), index) -> separator
     where sort := <ia-get-sort> t
-          ; <?"Start"> sort
+          ; <?"Prog"> sort
     with switch !index
+           case ?1 :
+             separator := ""
            otherwise :
              separator := ""
          end
 
   Smalltalk-get-leading-ws :
-    (t@Empty(), index) -> ws
+    (t@Program(t1__), index) -> ws
     where sort := <ia-get-sort> t
-          ; <?"Start"> sort
+          ; <?"Prog"> sort
     with switch !index
+           case ?1 :
+             ws := ""
            otherwise :
              ws := ""
          end
 
-  is-Smalltalk-Start =
+  prettyprint-Smalltalk-Exp :
+    Lit(t1__) -> [ H(
+                     [SOpt(HS(), "0")]
+                   , [t1__']
+                   )
+                 ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-INT) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Lit(_)
+
+  Smalltalk-get-indent :
+    (t@Lit(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Lit(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Lit(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Plus(t1__, t2__) -> [ H(
+                            [SOpt(HS(), "0")]
+                          , [t1__', S(" + "), t2__']
+                          )
+                        ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?Plus(_, _)
+
+  Smalltalk-get-indent :
+    (t@Plus(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Plus(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Plus(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Minus(t1__, t2__) -> [ H(
+                             [SOpt(HS(), "0")]
+                           , [t1__', S(" - "), t2__']
+                           )
+                         ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?Minus(_, _)
+
+  Smalltalk-get-indent :
+    (t@Minus(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Minus(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Minus(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Times(t1__, t2__) -> [ H(
+                             [SOpt(HS(), "0")]
+                           , [t1__', S(" * "), t2__']
+                           )
+                         ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?Times(_, _)
+
+  Smalltalk-get-indent :
+    (t@Times(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Times(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Times(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Parenthetical(t1__) -> [ H(
+                               [SOpt(HS(), "0")]
+                             , [ S("(")
+                               , t1__'
+                               , S(")")
+                               ]
+                             )
+                           ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Prog =
     fail
 
-  prettyprint-Smalltalk-Start :
-    amb([h|hs]) -> <prettyprint-Smalltalk-Start> h
+  is-Smalltalk-Exp =
+    fail
 
-  prettyprint-Smalltalk-Start :
-    Start-Plhdr() -> [ H(
+  prettyprint-Smalltalk-Prog :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Prog> h
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-Prog :
+    Prog-Plhdr() -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Prog")]
+                      )
+                    ]
+
+  is-Smalltalk-Prog =
+    ?Prog-Plhdr()
+
+  prettyprint-Smalltalk-INT :
+    INT-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$INT")]
+                     )
+                   ]
+
+  is-Smalltalk-INT =
+    ?INT-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-Prog :
+    Prog-Plhdr(_) -> [ H(
                          [SOpt(HS(), "0")]
-                       , [S("$Start")]
+                       , [S("$Prog")]
                        )
                      ]
 
-  is-Smalltalk-Start =
-    ?Start-Plhdr()
+  is-Smalltalk-Prog =
+    ?Prog-Plhdr(_)
 
-  prettyprint-Smalltalk-Start :
-    Start-Plhdr(_) -> [ H(
-                          [SOpt(HS(), "0")]
-                        , [S("$Start")]
-                        )
-                      ]
+  prettyprint-Smalltalk-INT :
+    INT-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$INT")]
+                      )
+                    ]
 
-  is-Smalltalk-Start =
-    ?Start-Plhdr(_)
+  is-Smalltalk-INT =
+    ?INT-Plhdr(_)
 
-  prettyprint-Smalltalk-Start :
-    Start-Opt-Plhdr() -> [ H(
-                             []
-                           , [S("")]
-                           )
-                         ]
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
 
-  is-Smalltalk-Start =
-    ?Start-Opt-Plhdr()
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-Smalltalk-Exp :
+    Let(t1__, t2__, t3__) -> [ H(
+                                 [SOpt(HS(), "0")]
+                               , [ S("let ")
+                                 , t1__'
+                                 , S(" = ")
+                                 , t2__'
+                                 , S(" in ")
+                                 , t3__'
+                                 ]
+                               )
+                             ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-ID) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+    with t3__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t3__
+
+  is-Smalltalk-Exp =
+    ?Let(_, _, _)
+
+  Smalltalk-get-indent :
+    ( t@Let(t1__, t2__, t3__)
+    , index
+    ) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           case ?3 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    ( t@Let(t1__, t2__, t3__)
+    , index
+    ) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           case ?3 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    ( t@Let(t1__, t2__, t3__)
+    , index
+    ) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := " "
+           case ?2 :
+             ws := " "
+           case ?3 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Var(t1__) -> [ H(
+                     [SOpt(HS(), "0")]
+                   , [t1__']
+                   )
+                 ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-ID) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Var(_)
+
+  Smalltalk-get-indent :
+    (t@Var(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Var(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Var(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Exp =
+    fail
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-ID :
+    ID-Plhdr() -> [ H(
+                      [SOpt(HS(), "0")]
+                    , [S("$ID")]
+                    )
+                  ]
+
+  is-Smalltalk-ID =
+    ?ID-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)
+
+  prettyprint-Smalltalk-ID :
+    ID-Plhdr(_) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$ID")]
+                     )
+                   ]
+
+  is-Smalltalk-ID =
+    ?ID-Plhdr(_)
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-Smalltalk-Exp :
+    Box(t1__) -> [ H(
+                     [SOpt(HS(), "0")]
+                   , [ S("box(")
+                     , t1__'
+                     , S(")")
+                     ]
+                   )
+                 ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Box(_)
+
+  Smalltalk-get-indent :
+    (t@Box(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Box(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Box(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Unbox(t1__) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [ S("unbox(")
+                       , t1__'
+                       , S(")")
+                       ]
+                     )
+                   ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Unbox(_)
+
+  Smalltalk-get-indent :
+    (t@Unbox(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Unbox(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Unbox(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Setbox(t1__, t2__) -> [ H(
+                              [SOpt(HS(), "0")]
+                            , [ S("setbox(")
+                              , t1__'
+                              , S(", ")
+                              , t2__'
+                              , S(")")
+                              ]
+                            )
+                          ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?Setbox(_, _)
+
+  Smalltalk-get-indent :
+    (t@Setbox(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Setbox(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Setbox(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    Print(t1__) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [ S("print(")
+                       , t1__'
+                       , S(")")
+                       ]
+                     )
+                   ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Print(_)
+
+  Smalltalk-get-indent :
+    (t@Print(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Print(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Print(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Exp =
+    fail
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-ID :
+    ID-Plhdr() -> [ H(
+                      [SOpt(HS(), "0")]
+                    , [S("$ID")]
+                    )
+                  ]
+
+  is-Smalltalk-ID =
+    ?ID-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)
+
+  prettyprint-Smalltalk-ID :
+    ID-Plhdr(_) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$ID")]
+                     )
+                   ]
+
+  is-Smalltalk-ID =
+    ?ID-Plhdr(_)
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-Smalltalk-Exp :
+    Fun(t1__, t2__) -> [ H(
+                           [SOpt(HS(), "0")]
+                         , [t1__', S(" -> "), t2__']
+                         )
+                       ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-ID) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?Fun(_, _)
+
+  Smalltalk-get-indent :
+    (t@Fun(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Fun(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Fun(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    App(t1__, t2__) -> [ H(
+                           [SOpt(HS(), "0")]
+                         , [ t1__'
+                           , S("(")
+                           , t2__'
+                           , S(")")
+                           ]
+                         )
+                       ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?App(_, _)
+
+  Smalltalk-get-indent :
+    (t@App(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@App(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@App(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Exp =
+    fail
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-ID :
+    ID-Plhdr() -> [ H(
+                      [SOpt(HS(), "0")]
+                    , [S("$ID")]
+                    )
+                  ]
+
+  is-Smalltalk-ID =
+    ?ID-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-ID :
+    ID-Plhdr(_) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$ID")]
+                     )
+                   ]
+
+  is-Smalltalk-ID =
+    ?ID-Plhdr(_)
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-Smalltalk-Exp :
+    Ifz(t1__, t2__, t3__) -> [ H(
+                                 [SOpt(HS(), "0")]
+                               , [ S("ifz ")
+                                 , t1__'
+                                 , S(" then ")
+                                 , t2__'
+                                 , S(" else ")
+                                 , t3__'
+                                 ]
+                               )
+                             ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+    with t3__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t3__
+
+  is-Smalltalk-Exp =
+    ?Ifz(_, _, _)
+
+  Smalltalk-get-indent :
+    ( t@Ifz(t1__, t2__, t3__)
+    , index
+    ) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           case ?3 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    ( t@Ifz(t1__, t2__, t3__)
+    , index
+    ) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           case ?3 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    ( t@Ifz(t1__, t2__, t3__)
+    , index
+    ) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := " "
+           case ?2 :
+             ws := " "
+           case ?3 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Exp =
+    fail
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-Smalltalk-Exp :
+    Block(t1__) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [ S("{ ")
+                       , t1__'
+                       , S(" }")
+                       ]
+                     )
+                   ]
+    with t1__' := <pp-H-list(prettyprint-Smalltalk-Exp|";")
+                   <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Block(_)
+
+  Smalltalk-get-indent :
+    (t@Block(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Block(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ";"
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Block(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Exp =
+    fail
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Opt-Plhdr() -> [ H(
+                           []
+                         , [S("")]
+                         )
+                       ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Opt-Plhdr()
+
+
+strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Exp
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-Smalltalk-Exp :
+    Throw(t1__) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [ S("throw(")
+                       , t1__'
+                       , S(")")
+                       ]
+                     )
+                   ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Exp =
+    ?Throw(_)
+
+  Smalltalk-get-indent :
+    (t@Throw(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Throw(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Throw(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Exp :
+    TryCatch(t1__, t2__) -> [ H(
+                                [SOpt(HS(), "0")]
+                              , [ S("try(")
+                                , t1__'
+                                , S(")catch(")
+                                , t2__'
+                                , S(")")
+                                ]
+                              )
+                            ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-Exp) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-Exp =
+    ?TryCatch(_, _)
+
+  Smalltalk-get-indent :
+    (t@TryCatch(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@TryCatch(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@TryCatch(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  is-Smalltalk-Exp =
+    fail
+
+  prettyprint-Smalltalk-Exp :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Exp> h
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-Smalltalk-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-Smalltalk-Exp =
+    ?Exp-Plhdr(_)

@@ -6,8 +6,70 @@ imports
 
 context-free start-symbols
   
-  Start
+context-free start-symbols
+  Prog
 
 context-free syntax
+  Prog.Program = Exp
+  Exp.Lit   = <<INT>>
+  Exp.Plus  = <<Exp> + <Exp>> {left}
+  Exp.Minus = <<Exp> - <Exp>> {left}
+  Exp.Times = <<Exp> * <Exp>> {left}
+
+  Exp = <(<Exp>)> {bracket}
   
-  Start.Empty = <>
+context-free syntax
+
+  Exp.Let = <let <ID> = <Exp> in <Exp>> {non-assoc}
+    
+  Exp.Var = <<ID>> 
+
+context-free syntax
+
+  Exp.Box = <box(<Exp>)>
+  Exp.Unbox = <unbox(<Exp>)>
+  Exp.Setbox = <setbox(<Exp>, <Exp>)>
+  Exp.Print = <print(<Exp>)>
+  
+  ID = <box> {reject}
+  ID = <unbox> {reject}
+  ID = <setbox> {reject}
+  ID = <print> {reject}
+  
+context-free syntax
+
+  Exp.Fun = [[ID] -> [Exp]]
+  Exp.App = <<Exp>(<Exp>)> {left}
+
+context-free syntax
+  Exp.Ifz = <ifz <Exp> then <Exp> else <Exp>>
+
+context-free syntax
+      
+  Exp.Block = <{ <{Exp ";"}*> }>
+
+context-free syntax
+
+  Exp.Throw = <throw(<Exp>)>
+  
+  Exp.TryCatch = <try(<Exp>)catch(<Exp>)>
+
+context-free priorities
+
+  Exp.Block
+  >
+  {left:
+    Exp.App
+  } >
+  {left:
+    Exp.Times
+  } >
+  {left:
+    Exp.Plus
+    Exp.Minus
+  } >
+    Exp.Fun
+  >
+  {non-assoc:
+    Exp.Let
+  }

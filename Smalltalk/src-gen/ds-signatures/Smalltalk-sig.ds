@@ -4,6 +4,29 @@ imports ds-signatures/Common-sig
 
 signature
     sorts
-      Start
+      Prog
+      Exp
     constructors
-      Empty : Start 
+      Program : Exp -> Prog 
+      Lit : INT -> Exp 
+      Plus : Exp * Exp -> Exp 
+      Minus : Exp * Exp -> Exp 
+      Times : Exp * Exp -> Exp 
+    constructors
+      Let : ID * Exp * Exp -> Exp 
+      Var : ID -> Exp 
+    constructors
+      Box : Exp -> Exp 
+      Unbox : Exp -> Exp 
+      Setbox : Exp * Exp -> Exp 
+      Print : Exp -> Exp 
+    constructors
+      Fun : ID * Exp -> Exp 
+      App : Exp * Exp -> Exp 
+    constructors
+      Ifz : Exp * Exp * Exp -> Exp 
+    constructors
+      Block : List(Exp) -> Exp 
+    constructors
+      Throw : Exp -> Exp 
+      TryCatch : Exp * Exp -> Exp 

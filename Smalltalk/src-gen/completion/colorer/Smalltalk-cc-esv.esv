@@ -4,4 +4,15 @@ imports
   completion/colorer/Common-cc-esv
 
 colorer
-  _.Start-Plhdr : gray   
+  _.Prog-Plhdr : gray   
+  _.INT-Plhdr  : gray   
+  _.Exp-Plhdr  : gray   
+  _.Exp-Plhdr  : gray   
+  _.ID-Plhdr   : gray   
+  _.Exp-Plhdr  : gray   
+  _.ID-Plhdr   : gray   
+  _.ID-Plhdr   : gray   
+  _.Exp-Plhdr  : gray   
+  _.Exp-Plhdr  : gray   
+  _.Exp-Plhdr  : gray   
+  _.Exp-Plhdr  : gray   

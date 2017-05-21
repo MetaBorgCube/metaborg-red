@@ -5,10 +5,94 @@ imports completion/Common-completion-insertions
 
 exports
   context-free start-symbols
-    Start
+    Prog INT Exp
 
   context-free syntax
-    COMPLETION-INSERTION -> Start {cons("Start-Plhdr"), placeholder-insertion}
+    COMPLETION-INSERTION -> Prog {cons("Prog-Plhdr"), placeholder-insertion}
+    COMPLETION-INSERTION -> INT  {cons("INT-Plhdr"), placeholder-insertion}
+    COMPLETION-INSERTION -> Exp  {cons("Exp-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> "+" {literal-completion}
+    COMPLETION-INSERTION -> "-" {literal-completion}
+    COMPLETION-INSERTION -> "*" {literal-completion}
+    COMPLETION-INSERTION -> "(" {literal-completion}
+    COMPLETION-INSERTION -> ")" {literal-completion}
+
+  context-free start-symbols
+    Exp ID
+
+  context-free syntax
+    COMPLETION-INSERTION -> Exp {cons("Exp-Plhdr"), placeholder-insertion}
+    COMPLETION-INSERTION -> ID  {cons("ID-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> "let" {literal-completion}
+    COMPLETION-INSERTION -> "="   {literal-completion}
+    COMPLETION-INSERTION -> "in"  {literal-completion}
+
+  context-free start-symbols
+    Exp ID
+
+  context-free syntax
+    COMPLETION-INSERTION -> Exp {cons("Exp-Plhdr"), placeholder-insertion}
+    COMPLETION-INSERTION -> ID  {cons("ID-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> ","      {literal-completion}
+    COMPLETION-INSERTION -> "("      {literal-completion}
+    COMPLETION-INSERTION -> ")"      {literal-completion}
+    COMPLETION-INSERTION -> "box"    {literal-completion}
+    COMPLETION-INSERTION -> "unbox"  {literal-completion}
+    COMPLETION-INSERTION -> "setbox" {literal-completion}
+    COMPLETION-INSERTION -> "print"  {literal-completion}
+
+  context-free start-symbols
+    ID Exp
+
+  context-free syntax
+    COMPLETION-INSERTION -> ID  {cons("ID-Plhdr"), placeholder-insertion}
+    COMPLETION-INSERTION -> Exp {cons("Exp-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> "->" {literal-completion}
+    COMPLETION-INSERTION -> "("  {literal-completion}
+    COMPLETION-INSERTION -> ")"  {literal-completion}
+
+  context-free start-symbols
+    Exp
+
+  context-free syntax
+    COMPLETION-INSERTION -> Exp {cons("Exp-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> "ifz"  {literal-completion}
+    COMPLETION-INSERTION -> "then" {literal-completion}
+    COMPLETION-INSERTION -> "else" {literal-completion}
+
+  context-free start-symbols
+    Exp
+
+  context-free syntax
+    COMPLETION-INSERTION -> Exp {cons("Exp-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> "{" {literal-completion}
+    COMPLETION-INSERTION -> ";" {literal-completion}
+    COMPLETION-INSERTION -> "}" {literal-completion}
+
+  context-free start-symbols
+    Exp
+
+  context-free syntax
+    COMPLETION-INSERTION -> Exp {cons("Exp-Plhdr"), placeholder-insertion}
+
+  lexical syntax
+    COMPLETION-INSERTION -> "throw" {literal-completion}
+    COMPLETION-INSERTION -> "try"   {literal-completion}
+    COMPLETION-INSERTION -> "catch" {literal-completion}
+    COMPLETION-INSERTION -> "("     {literal-completion}
+    COMPLETION-INSERTION -> ")"     {literal-completion}
 
 exports
   lexical syntax

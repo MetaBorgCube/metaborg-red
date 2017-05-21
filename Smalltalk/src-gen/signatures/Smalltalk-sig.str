@@ -6,7 +6,45 @@ imports
 
 signature
   constructors
-    Empty           : Start
-    Start-Plhdr     : Start
-    Start-Plhdr     : COMPLETION-INSERTION -> Start
-    Start-Opt-Plhdr : Start
+    Program       : Exp -> Prog
+    Lit           : INT -> Exp
+    Plus          : Exp * Exp -> Exp
+    Minus         : Exp * Exp -> Exp
+    Times         : Exp * Exp -> Exp
+    Prog-Plhdr    : Prog
+    INT-Plhdr     : INT
+    Exp-Plhdr     : Exp
+    Prog-Plhdr    : COMPLETION-INSERTION -> Prog
+    INT-Plhdr     : COMPLETION-INSERTION -> INT
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp
+    Let           : ID * Exp * Exp -> Exp
+    Var           : ID -> Exp
+    Exp-Plhdr     : Exp
+    ID-Plhdr      : ID
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp
+    ID-Plhdr      : COMPLETION-INSERTION -> ID
+    Box           : Exp -> Exp
+    Unbox         : Exp -> Exp
+    Setbox        : Exp * Exp -> Exp
+    Print         : Exp -> Exp
+    Exp-Plhdr     : Exp
+    ID-Plhdr      : ID
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp
+    ID-Plhdr      : COMPLETION-INSERTION -> ID
+    Fun           : ID * Exp -> Exp
+    App           : Exp * Exp -> Exp
+    ID-Plhdr      : ID
+    Exp-Plhdr     : Exp
+    ID-Plhdr      : COMPLETION-INSERTION -> ID
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp
+    Ifz           : Exp * Exp * Exp -> Exp
+    Exp-Plhdr     : Exp
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp
+    Block         : List(Exp) -> Exp
+    Exp-Plhdr     : Exp
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp
+    Exp-Opt-Plhdr : Exp
+    Throw         : Exp -> Exp
+    TryCatch      : Exp * Exp -> Exp
+    Exp-Plhdr     : Exp
+    Exp-Plhdr     : COMPLETION-INSERTION -> Exp

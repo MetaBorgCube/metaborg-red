@@ -3,13 +3,106 @@ imports Common
 
 exports
   context-free start-symbols
-    Start
+
+  context-free start-symbols
+    Prog
 
   context-free syntax
-     -> Start {cons("Empty")}
+    Exp         -> Prog {cons("Program")}
+    INT         -> Exp  {cons("Lit")}
+    Exp "+" Exp -> Exp  {cons("Plus"), left}
+    Exp "-" Exp -> Exp  {cons("Minus"), left}
+    Exp "*" Exp -> Exp  {cons("Times"), left}
+    "(" Exp ")" -> Exp  {bracket}
 
   lexical syntax
     
 
   context-free syntax
-    "$Start" -> Start {cons("Start-Plhdr"), placeholder}
+    "$Prog" -> Prog {cons("Prog-Plhdr"), placeholder}
+    "$INT"  -> INT  {cons("INT-Plhdr"), placeholder}
+    "$Exp"  -> Exp  {cons("Exp-Plhdr"), placeholder}
+
+  context-free syntax
+    "let" ID "=" Exp "in" Exp -> Exp {cons("Let"), non-assoc}
+    ID                        -> Exp {cons("Var")}
+
+  lexical syntax
+    
+
+  context-free syntax
+    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
+    "$ID"  -> ID  {cons("ID-Plhdr"), placeholder}
+
+  context-free syntax
+    "box" "(" Exp ")"            -> Exp {cons("Box")}
+    "unbox" "(" Exp ")"          -> Exp {cons("Unbox")}
+    "setbox" "(" Exp "," Exp ")" -> Exp {cons("Setbox")}
+    "print" "(" Exp ")"          -> Exp {cons("Print")}
+    "box"                        -> ID  {reject}
+    "unbox"                      -> ID  {reject}
+    "setbox"                     -> ID  {reject}
+    "print"                      -> ID  {reject}
+
+  lexical syntax
+    
+
+  context-free syntax
+    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
+    "$ID"  -> ID  {cons("ID-Plhdr"), placeholder}
+
+  context-free syntax
+    ID "->" Exp     -> Exp {cons("Fun")}
+    Exp "(" Exp ")" -> Exp {cons("App"), left}
+
+  lexical syntax
+    
+
+  context-free syntax
+    "$ID"  -> ID  {cons("ID-Plhdr"), placeholder}
+    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
+
+  context-free syntax
+    "ifz" Exp "then" Exp "else" Exp -> Exp {cons("Ifz")}
+
+  lexical syntax
+    
+
+  context-free syntax
+    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
+
+  context-free syntax
+    "{" {Exp ";"}* "}" -> Exp {cons("Block")}
+
+  lexical syntax
+    
+
+  context-free syntax
+    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
+
+  context-free syntax
+    "throw" "(" Exp ")"                   -> Exp {cons("Throw")}
+    "try" "(" Exp ")" "catch" "(" Exp ")" -> Exp {cons("TryCatch")}
+
+  lexical syntax
+    
+
+  context-free syntax
+    "$Exp" -> Exp {cons("Exp-Plhdr"), placeholder}
+
+  context-free priorities
+    "{" {Exp ";"}* "}" -> Exp >
+    {left:
+      Exp "(" Exp ")" -> Exp
+    } >
+    {left:
+      Exp "*" Exp -> Exp
+    } >
+    {left:
+      Exp "+" Exp -> Exp
+      Exp "-" Exp -> Exp
+    } >
+    ID "->" Exp -> Exp >
+    {non-assoc:
+      "let" ID "=" Exp "in" Exp -> Exp
+    }

@@ -2,60 +2,53 @@ module trans/Smalltalk
 
 imports 
 src-gen/ds-signatures/Smalltalk-sig
-trans/runtime/store
-trans/environment/environment
+src-gen/ds-signatures/Base-sig
+src-gen/ds-signatures/Common-sig
 
 signature
+  sorts
+  	V
   constructors
     NumV: Int -> V
-    ClosV: String * Exp * Env -> V
-    BoxV: Int -> V
   arrows
-    Exp --> V
+  	Expression --> V
   variables
-    v : V
-  sort aliases  
-    Heap = Map(Int, V)
-  components
-    E : Env
-    H : Heap
-  arrows
-  	Prog -init -> V
+  	v : V
   native operators
     parseI: String -> Int
-    addI: Int * Int -> Int
-    subI: Int * Int -> Int
-    mulI: Int * Int -> Int
     
 rules
-
-  Program(e) -init-> v
-  where
-    E {} |- e :: H {} --> v :: H _.
-    
-	Lit(s) --> NumV(parseI(s)).
 	
-	Plus(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
-	Minus(NumV(i1), NumV(i2)) --> NumV(subI(i1, i2)).
-	Times(NumV(i1), NumV(i2)) --> NumV(mulI(i1, i2)).	
-	
-   Let(x, v1, e2) --> v2
-  where
-    E bindVar(x, v1) |- e2 --> v2.
-
-  Var(x) --> readVar(x).
-  
-  Box(v) --> BoxV(allocate(v)).
-
-  Unbox(BoxV(addr)) --> read(addr).
-
-  Setbox(BoxV(addr), v) --> write(addr,v).
-  
-  E |- Fun(x, e) --> ClosV(x, e, E).
-
-  App(ClosV(x, e, E), v1) --> v2
-  where
-    E  |- bindVar(x, v1) --> E';
-    E' |- e --> v2.
-    
+//	Program(e) -init-> v
+//	  where
+//	    E {} |- e :: H {} --> v :: H _.
+//	    
+	    
+	Expression(_,_) --> NumV(parseI("5")).
+//    
+//	Lit(s) --> NumV(parseI(s)).
+//	
+//	Plus(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
+//	Minus(NumV(i1), NumV(i2)) --> NumV(subI(i1, i2)).
+//	Times(NumV(i1), NumV(i2)) --> NumV(mulI(i1, i2)).	
+//	
+//   Let(x, v1, e2) --> v2
+//  where
+//    E bindVar(x, v1) |- e2 --> v2.
+//
+//  Var(x) --> readVar(x).
+//  
+//  Box(v) --> BoxV(allocate(v)).
+//
+//  Unbox(BoxV(addr)) --> read(addr).
+//
+//  Setbox(BoxV(addr), v) --> write(addr,v).
+//  
+//  E |- Fun(x, e) --> ClosV(x, e, E).
+//
+//  App(ClosV(x, e, E), v1) --> v2
+//  where
+//    E  |- bindVar(x, v1) --> E';
+//    E' |- e --> v2.
+//    
     

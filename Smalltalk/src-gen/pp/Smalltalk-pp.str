@@ -37,10 +37,13 @@ strategies
 
 strategies
   prettyprint-Smalltalk-start-symbols =
-    prettyprint-Smalltalk-Start
+    prettyprint-Smalltalk-Prog
 
 
 strategies
+  prettyprint-Smalltalk =
+    prettyprint-Smalltalk-Prog
+
   prettyprint-Smalltalk =
     prettyprint-Smalltalk-Start
 
@@ -190,6 +193,10 @@ strategies
 
   prettyprint-Smalltalk =
     prettyprint-Smalltalk-MethodDeclaration
+
+  prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-Prog>
+    where <?"Prog"> sort
 
   prettyprint-Smalltalk(|sort):
     t -> <prettyprint-Smalltalk-Start>
@@ -391,6 +398,94 @@ strategies
     t -> <prettyprint-Smalltalk-MethodDeclaration>
     where <?"MethodDeclaration"> sort
 
+  prettyprint-Smalltalk-Prog :
+    Program(t1__) -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [t1__']
+                       )
+                     ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Start) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Prog =
+    ?Program(_)
+
+  Smalltalk-get-indent :
+    (t@Program(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Prog"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Program(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Prog"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Program(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Prog"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Start :
+    Temp(t1__) -> [ H(
+                      [SOpt(HS(), "0")]
+                    , [t1__']
+                    )
+                  ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Expression) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-Start =
+    ?Temp(_)
+
+  Smalltalk-get-indent :
+    (t@Temp(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Temp(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Temp(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
   prettyprint-Smalltalk-Start :
     MethodDeclaration(t1__) -> [ H(
                                    [SOpt(HS(), "0")]
@@ -480,18 +575,18 @@ strategies
          end
 
   prettyprint-Smalltalk-Reference :
-    Reference(t1__) -> [ H(
-                           [SOpt(HS(), "0")]
-                         , [t1__']
-                         )
-                       ]
+    ReferenceID(t1__) -> [ H(
+                             [SOpt(HS(), "0")]
+                           , [t1__']
+                           )
+                         ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Identifier) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Reference =
-    ?Reference(_)
+    ?ReferenceID(_)
 
   Smalltalk-get-indent :
-    (t@Reference(t1__), index) -> indent
+    (t@ReferenceID(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Reference"> sort
     with switch !index
@@ -502,7 +597,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@Reference(t1__), index) -> separator
+    (t@ReferenceID(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"Reference"> sort
     with switch !index
@@ -513,7 +608,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@Reference(t1__), index) -> ws
+    (t@ReferenceID(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"Reference"> sort
     with switch !index
@@ -790,18 +885,18 @@ strategies
          end
 
   prettyprint-Smalltalk-UnaryMessageSelector :
-    UnaryMessageSelector(t1__) -> [ H(
-                                      [SOpt(HS(), "0")]
-                                    , [t1__']
-                                    )
-                                  ]
+    UnaryMessageSelector1(t1__) -> [ H(
+                                       [SOpt(HS(), "0")]
+                                     , [t1__']
+                                     )
+                                   ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Identifier) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-UnaryMessageSelector =
-    ?UnaryMessageSelector(_)
+    ?UnaryMessageSelector1(_)
 
   Smalltalk-get-indent :
-    (t@UnaryMessageSelector(t1__), index) -> indent
+    (t@UnaryMessageSelector1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"UnaryMessageSelector"> sort
     with switch !index
@@ -812,7 +907,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@UnaryMessageSelector(t1__), index) -> separator
+    (t@UnaryMessageSelector1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"UnaryMessageSelector"> sort
     with switch !index
@@ -823,7 +918,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@UnaryMessageSelector(t1__), index) -> ws
+    (t@UnaryMessageSelector1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"UnaryMessageSelector"> sort
     with switch !index
@@ -878,18 +973,18 @@ strategies
          end
 
   prettyprint-Smalltalk-KeywordMessageSelector :
-    KeywordMessageSelector(t1__) -> [ H(
-                                        [SOpt(HS(), "0")]
-                                      , [t1__']
-                                      )
-                                    ]
+    KeywordMessageSelector1(t1__) -> [ H(
+                                         [SOpt(HS(), "0")]
+                                       , [t1__']
+                                       )
+                                     ]
     with t1__' := <pp-H-list(prettyprint-Smalltalk-Keyword) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-KeywordMessageSelector =
-    ?KeywordMessageSelector(_)
+    ?KeywordMessageSelector1(_)
 
   Smalltalk-get-indent :
-    (t@KeywordMessageSelector(t1__), index) -> indent
+    (t@KeywordMessageSelector1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"KeywordMessageSelector"> sort
     with switch !index
@@ -900,7 +995,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@KeywordMessageSelector(t1__), index) -> separator
+    (t@KeywordMessageSelector1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"KeywordMessageSelector"> sort
     with switch !index
@@ -911,7 +1006,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@KeywordMessageSelector(t1__), index) -> ws
+    (t@KeywordMessageSelector1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"KeywordMessageSelector"> sort
     with switch !index
@@ -922,21 +1017,21 @@ strategies
          end
 
   prettyprint-Smalltalk-BinaryMessageSelector :
-    BinaryMessageSelector(t1__, t2__) -> [ H(
-                                             [SOpt(HS(), "0")]
-                                           , [t1__', S(" "), t2__']
-                                           )
-                                         ]
+    BinaryMessageSelector1(t1__, t2__) -> [ H(
+                                              [SOpt(HS(), "0")]
+                                            , [t1__', S(" "), t2__']
+                                            )
+                                          ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinarySelectorChar) <+ pp-one-Z(prettyprint-completion-aux)> t1__
     with t2__' := <pp-option(
                      pp-one-Z(prettyprint-Smalltalk-BinarySelectorChar) <+ pp-one-Z(prettyprint-completion-aux)
                    )> t2__
 
   is-Smalltalk-BinaryMessageSelector =
-    ?BinaryMessageSelector(_, _)
+    ?BinaryMessageSelector1(_, _)
 
   Smalltalk-get-indent :
-    (t@BinaryMessageSelector(t1__, t2__), index) -> indent
+    (t@BinaryMessageSelector1(t1__, t2__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"BinaryMessageSelector"> sort
     with switch !index
@@ -949,7 +1044,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@BinaryMessageSelector(t1__, t2__), index) -> separator
+    (t@BinaryMessageSelector1(t1__, t2__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"BinaryMessageSelector"> sort
     with switch !index
@@ -962,7 +1057,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@BinaryMessageSelector(t1__, t2__), index) -> ws
+    (t@BinaryMessageSelector1(t1__, t2__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"BinaryMessageSelector"> sort
     with switch !index
@@ -975,106 +1070,106 @@ strategies
          end
 
   prettyprint-Smalltalk-SymbolInArrayLiteral :
-    UnaryMessageSelector(t1__) -> [ H(
-                                      [SOpt(HS(), "0")]
-                                    , [t1__']
-                                    )
-                                  ]
-    with t1__' := <pp-one-Z(prettyprint-Smalltalk-UnaryMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
-
-  is-Smalltalk-SymbolInArrayLiteral =
-    ?UnaryMessageSelector(_)
-
-  Smalltalk-get-indent :
-    (t@UnaryMessageSelector(t1__), index) -> indent
-    where sort := <ia-get-sort> t
-          ; <?"SymbolInArrayLiteral"> sort
-    with switch !index
-           case ?1 :
-             indent := ""
-           otherwise :
-             indent := ""
-         end
-
-  Smalltalk-get-separator :
-    (t@UnaryMessageSelector(t1__), index) -> separator
-    where sort := <ia-get-sort> t
-          ; <?"SymbolInArrayLiteral"> sort
-    with switch !index
-           case ?1 :
-             separator := ""
-           otherwise :
-             separator := ""
-         end
-
-  Smalltalk-get-leading-ws :
-    (t@UnaryMessageSelector(t1__), index) -> ws
-    where sort := <ia-get-sort> t
-          ; <?"SymbolInArrayLiteral"> sort
-    with switch !index
-           case ?1 :
-             ws := ""
-           otherwise :
-             ws := ""
-         end
-
-  prettyprint-Smalltalk-SymbolInArrayLiteral :
-    KeywordMessageSelector(t1__) -> [ H(
-                                        [SOpt(HS(), "0")]
-                                      , [t1__']
-                                      )
-                                    ]
-    with t1__' := <pp-one-Z(prettyprint-Smalltalk-KeywordMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
-
-  is-Smalltalk-SymbolInArrayLiteral =
-    ?KeywordMessageSelector(_)
-
-  Smalltalk-get-indent :
-    (t@KeywordMessageSelector(t1__), index) -> indent
-    where sort := <ia-get-sort> t
-          ; <?"SymbolInArrayLiteral"> sort
-    with switch !index
-           case ?1 :
-             indent := ""
-           otherwise :
-             indent := ""
-         end
-
-  Smalltalk-get-separator :
-    (t@KeywordMessageSelector(t1__), index) -> separator
-    where sort := <ia-get-sort> t
-          ; <?"SymbolInArrayLiteral"> sort
-    with switch !index
-           case ?1 :
-             separator := ""
-           otherwise :
-             separator := ""
-         end
-
-  Smalltalk-get-leading-ws :
-    (t@KeywordMessageSelector(t1__), index) -> ws
-    where sort := <ia-get-sort> t
-          ; <?"SymbolInArrayLiteral"> sort
-    with switch !index
-           case ?1 :
-             ws := ""
-           otherwise :
-             ws := ""
-         end
-
-  prettyprint-Smalltalk-SymbolInArrayLiteral :
-    BinaryMessageSelector(t1__) -> [ H(
+    UnaryMessageSelector2(t1__) -> [ H(
                                        [SOpt(HS(), "0")]
                                      , [t1__']
                                      )
                                    ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-UnaryMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-SymbolInArrayLiteral =
+    ?UnaryMessageSelector2(_)
+
+  Smalltalk-get-indent :
+    (t@UnaryMessageSelector2(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"SymbolInArrayLiteral"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@UnaryMessageSelector2(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"SymbolInArrayLiteral"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@UnaryMessageSelector2(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"SymbolInArrayLiteral"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-SymbolInArrayLiteral :
+    KeywordMessageSelector2(t1__) -> [ H(
+                                         [SOpt(HS(), "0")]
+                                       , [t1__']
+                                       )
+                                     ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-KeywordMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+
+  is-Smalltalk-SymbolInArrayLiteral =
+    ?KeywordMessageSelector2(_)
+
+  Smalltalk-get-indent :
+    (t@KeywordMessageSelector2(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"SymbolInArrayLiteral"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@KeywordMessageSelector2(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"SymbolInArrayLiteral"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@KeywordMessageSelector2(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"SymbolInArrayLiteral"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-SymbolInArrayLiteral :
+    BinaryMessageSelector2(t1__) -> [ H(
+                                        [SOpt(HS(), "0")]
+                                      , [t1__']
+                                      )
+                                    ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-SymbolInArrayLiteral =
-    ?BinaryMessageSelector(_)
+    ?BinaryMessageSelector2(_)
 
   Smalltalk-get-indent :
-    (t@BinaryMessageSelector(t1__), index) -> indent
+    (t@BinaryMessageSelector2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"SymbolInArrayLiteral"> sort
     with switch !index
@@ -1085,7 +1180,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@BinaryMessageSelector(t1__), index) -> separator
+    (t@BinaryMessageSelector2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"SymbolInArrayLiteral"> sort
     with switch !index
@@ -1096,7 +1191,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@BinaryMessageSelector(t1__), index) -> ws
+    (t@BinaryMessageSelector2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"SymbolInArrayLiteral"> sort
     with switch !index
@@ -1107,18 +1202,18 @@ strategies
          end
 
   prettyprint-Smalltalk-SymbolLiteral :
-    SymbolInArrayLiteral(t1__) -> [ H(
-                                      [SOpt(HS(), "0")]
-                                    , [S("# "), t1__']
-                                    )
-                                  ]
+    SymbolInArrayLiteral1(t1__) -> [ H(
+                                       [SOpt(HS(), "0")]
+                                     , [S("# "), t1__']
+                                     )
+                                   ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-SymbolInArrayLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-SymbolLiteral =
-    ?SymbolInArrayLiteral(_)
+    ?SymbolInArrayLiteral1(_)
 
   Smalltalk-get-indent :
-    (t@SymbolInArrayLiteral(t1__), index) -> indent
+    (t@SymbolInArrayLiteral1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1129,7 +1224,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@SymbolInArrayLiteral(t1__), index) -> separator
+    (t@SymbolInArrayLiteral1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1140,7 +1235,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@SymbolInArrayLiteral(t1__), index) -> ws
+    (t@SymbolInArrayLiteral1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1151,18 +1246,18 @@ strategies
          end
 
   prettyprint-Smalltalk-SymbolLiteral :
-    ConstantReference(t1__) -> [ H(
-                                   [SOpt(HS(), "0")]
-                                 , [S("# "), t1__']
-                                 )
-                               ]
+    ConstantReference2(t1__) -> [ H(
+                                    [SOpt(HS(), "0")]
+                                  , [S("# "), t1__']
+                                  )
+                                ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-ConstantReference) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-SymbolLiteral =
-    ?ConstantReference(_)
+    ?ConstantReference2(_)
 
   Smalltalk-get-indent :
-    (t@ConstantReference(t1__), index) -> indent
+    (t@ConstantReference2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1173,7 +1268,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ConstantReference(t1__), index) -> separator
+    (t@ConstantReference2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1184,7 +1279,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ConstantReference(t1__), index) -> ws
+    (t@ConstantReference2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1195,18 +1290,18 @@ strategies
          end
 
   prettyprint-Smalltalk-SymbolLiteral :
-    StringLiteral(t1__) -> [ H(
-                               [SOpt(HS(), "0")]
-                             , [S("# "), t1__']
-                             )
-                           ]
+    StringLiteral1(t1__) -> [ H(
+                                [SOpt(HS(), "0")]
+                              , [S("# "), t1__']
+                              )
+                            ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-StringLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-SymbolLiteral =
-    ?StringLiteral(_)
+    ?StringLiteral1(_)
 
   Smalltalk-get-indent :
-    (t@StringLiteral(t1__), index) -> indent
+    (t@StringLiteral1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1217,7 +1312,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@StringLiteral(t1__), index) -> separator
+    (t@StringLiteral1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1228,7 +1323,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@StringLiteral(t1__), index) -> ws
+    (t@StringLiteral1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"SymbolLiteral"> sort
     with switch !index
@@ -1239,18 +1334,18 @@ strategies
          end
 
   prettyprint-Smalltalk-ArrayLiteral :
-    ObjectArrayLiteral(t1__) -> [ H(
-                                    [SOpt(HS(), "0")]
-                                  , [t1__']
-                                  )
-                                ]
+    ObjectArrayLiteral1(t1__) -> [ H(
+                                     [SOpt(HS(), "0")]
+                                   , [t1__']
+                                   )
+                                 ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-ObjectArrayLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-ArrayLiteral =
-    ?ObjectArrayLiteral(_)
+    ?ObjectArrayLiteral1(_)
 
   Smalltalk-get-indent :
-    (t@ObjectArrayLiteral(t1__), index) -> indent
+    (t@ObjectArrayLiteral1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"ArrayLiteral"> sort
     with switch !index
@@ -1261,7 +1356,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ObjectArrayLiteral(t1__), index) -> separator
+    (t@ObjectArrayLiteral1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"ArrayLiteral"> sort
     with switch !index
@@ -1272,7 +1367,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ObjectArrayLiteral(t1__), index) -> ws
+    (t@ObjectArrayLiteral1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"ArrayLiteral"> sort
     with switch !index
@@ -1283,18 +1378,18 @@ strategies
          end
 
   prettyprint-Smalltalk-ArrayLiteral :
-    ByteArrayLiteral(t1__) -> [ H(
-                                  [SOpt(HS(), "0")]
-                                , [t1__']
-                                )
-                              ]
+    ByteArrayLiteral1(t1__) -> [ H(
+                                   [SOpt(HS(), "0")]
+                                 , [t1__']
+                                 )
+                               ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-ByteArrayLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-ArrayLiteral =
-    ?ByteArrayLiteral(_)
+    ?ByteArrayLiteral1(_)
 
   Smalltalk-get-indent :
-    (t@ByteArrayLiteral(t1__), index) -> indent
+    (t@ByteArrayLiteral1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"ArrayLiteral"> sort
     with switch !index
@@ -1305,7 +1400,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ByteArrayLiteral(t1__), index) -> separator
+    (t@ByteArrayLiteral1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"ArrayLiteral"> sort
     with switch !index
@@ -1316,7 +1411,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ByteArrayLiteral(t1__), index) -> ws
+    (t@ByteArrayLiteral1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"ArrayLiteral"> sort
     with switch !index
@@ -1327,18 +1422,18 @@ strategies
          end
 
   prettyprint-Smalltalk-ObjectArrayLiteral :
-    ObjectArrayLiteral(t1__) -> [ H(
-                                    [SOpt(HS(), "0")]
-                                  , [S("# "), t1__']
-                                  )
-                                ]
+    ObjectArrayLiteral2(t1__) -> [ H(
+                                     [SOpt(HS(), "0")]
+                                   , [S("# "), t1__']
+                                   )
+                                 ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-NestedObjectArrayLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-ObjectArrayLiteral =
-    ?ObjectArrayLiteral(_)
+    ?ObjectArrayLiteral2(_)
 
   Smalltalk-get-indent :
-    (t@ObjectArrayLiteral(t1__), index) -> indent
+    (t@ObjectArrayLiteral2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"ObjectArrayLiteral"> sort
     with switch !index
@@ -1349,7 +1444,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ObjectArrayLiteral(t1__), index) -> separator
+    (t@ObjectArrayLiteral2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"ObjectArrayLiteral"> sort
     with switch !index
@@ -1360,7 +1455,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ObjectArrayLiteral(t1__), index) -> ws
+    (t@ObjectArrayLiteral2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"ObjectArrayLiteral"> sort
     with switch !index
@@ -1371,21 +1466,21 @@ strategies
          end
 
   prettyprint-Smalltalk-NestedObjectArrayLiteral :
-    NestedObjectArrayLiteral(t1__) -> [ H(
-                                          [SOpt(HS(), "0")]
-                                        , [ S("( ")
-                                          , t1__'
-                                          , S(" )")
-                                          ]
-                                        )
-                                      ]
+    NestedObjectArrayLiteral1(t1__) -> [ H(
+                                           [SOpt(HS(), "0")]
+                                         , [ S("( ")
+                                           , t1__'
+                                           , S(" )")
+                                           ]
+                                         )
+                                       ]
     with t1__' := <pp-H-list(prettyprint-Smalltalk-LiteralArrayElement) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-NestedObjectArrayLiteral =
-    ?NestedObjectArrayLiteral(_)
+    ?NestedObjectArrayLiteral1(_)
 
   Smalltalk-get-indent :
-    (t@NestedObjectArrayLiteral(t1__), index) -> indent
+    (t@NestedObjectArrayLiteral1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"NestedObjectArrayLiteral"> sort
     with switch !index
@@ -1396,7 +1491,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@NestedObjectArrayLiteral(t1__), index) -> separator
+    (t@NestedObjectArrayLiteral1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"NestedObjectArrayLiteral"> sort
     with switch !index
@@ -1407,7 +1502,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@NestedObjectArrayLiteral(t1__), index) -> ws
+    (t@NestedObjectArrayLiteral1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"NestedObjectArrayLiteral"> sort
     with switch !index
@@ -1418,18 +1513,18 @@ strategies
          end
 
   prettyprint-Smalltalk-LiteralArrayElement :
-    Literal(t1__) -> [ H(
-                         [SOpt(HS(), "0")]
-                       , [t1__']
-                       )
-                     ]
+    Literal1(t1__) -> [ H(
+                          [SOpt(HS(), "0")]
+                        , [t1__']
+                        )
+                      ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Literal) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-LiteralArrayElement =
-    ?Literal(_)
+    ?Literal1(_)
 
   Smalltalk-get-indent :
-    (t@Literal(t1__), index) -> indent
+    (t@Literal1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1440,7 +1535,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@Literal(t1__), index) -> separator
+    (t@Literal1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1451,7 +1546,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@Literal(t1__), index) -> ws
+    (t@Literal1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1462,18 +1557,18 @@ strategies
          end
 
   prettyprint-Smalltalk-LiteralArrayElement :
-    NestedObjectArrayLiteral(t1__) -> [ H(
-                                          [SOpt(HS(), "0")]
-                                        , [t1__']
-                                        )
-                                      ]
+    NestedObjectArrayLiteral2(t1__) -> [ H(
+                                           [SOpt(HS(), "0")]
+                                         , [t1__']
+                                         )
+                                       ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-NestedObjectArrayLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-LiteralArrayElement =
-    ?NestedObjectArrayLiteral(_)
+    ?NestedObjectArrayLiteral2(_)
 
   Smalltalk-get-indent :
-    (t@NestedObjectArrayLiteral(t1__), index) -> indent
+    (t@NestedObjectArrayLiteral2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1484,7 +1579,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@NestedObjectArrayLiteral(t1__), index) -> separator
+    (t@NestedObjectArrayLiteral2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1495,7 +1590,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@NestedObjectArrayLiteral(t1__), index) -> ws
+    (t@NestedObjectArrayLiteral2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1506,18 +1601,18 @@ strategies
          end
 
   prettyprint-Smalltalk-LiteralArrayElement :
-    SymbolInArrayLiteral(t1__) -> [ H(
-                                      [SOpt(HS(), "0")]
-                                    , [t1__']
-                                    )
-                                  ]
+    SymbolInArrayLiteral2(t1__) -> [ H(
+                                       [SOpt(HS(), "0")]
+                                     , [t1__']
+                                     )
+                                   ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-SymbolInArrayLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-LiteralArrayElement =
-    ?SymbolInArrayLiteral(_)
+    ?SymbolInArrayLiteral2(_)
 
   Smalltalk-get-indent :
-    (t@SymbolInArrayLiteral(t1__), index) -> indent
+    (t@SymbolInArrayLiteral2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1528,7 +1623,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@SymbolInArrayLiteral(t1__), index) -> separator
+    (t@SymbolInArrayLiteral2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1539,7 +1634,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@SymbolInArrayLiteral(t1__), index) -> ws
+    (t@SymbolInArrayLiteral2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1550,18 +1645,18 @@ strategies
          end
 
   prettyprint-Smalltalk-LiteralArrayElement :
-    ConstantReference(t1__) -> [ H(
-                                   [SOpt(HS(), "0")]
-                                 , [t1__']
-                                 )
-                               ]
+    ConstantReference3(t1__) -> [ H(
+                                    [SOpt(HS(), "0")]
+                                  , [t1__']
+                                  )
+                                ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-ConstantReference) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-LiteralArrayElement =
-    ?ConstantReference(_)
+    ?ConstantReference3(_)
 
   Smalltalk-get-indent :
-    (t@ConstantReference(t1__), index) -> indent
+    (t@ConstantReference3(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1572,7 +1667,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ConstantReference(t1__), index) -> separator
+    (t@ConstantReference3(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1583,7 +1678,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ConstantReference(t1__), index) -> ws
+    (t@ConstantReference3(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"LiteralArrayElement"> sort
     with switch !index
@@ -1594,22 +1689,22 @@ strategies
          end
 
   prettyprint-Smalltalk-ByteArrayLiteral :
-    ByteArrayLiteral(t1__) -> [ H(
-                                  [SOpt(HS(), "0")]
-                                , [ S("#[ ")
-                                  , t1__'
-                                  , S(" ]")
-                                  ]
-                                )
-                              ]
+    ByteArrayLiteral2(t1__) -> [ H(
+                                   [SOpt(HS(), "0")]
+                                 , [ S("#[ ")
+                                   , t1__'
+                                   , S(" ]")
+                                   ]
+                                 )
+                               ]
     with t1__' := <pp-H-list(prettyprint-Smalltalk-UnsignedIntegerLiteral|"")
                    <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-ByteArrayLiteral =
-    ?ByteArrayLiteral(_)
+    ?ByteArrayLiteral2(_)
 
   Smalltalk-get-indent :
-    (t@ByteArrayLiteral(t1__), index) -> indent
+    (t@ByteArrayLiteral2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"ByteArrayLiteral"> sort
     with switch !index
@@ -1620,7 +1715,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ByteArrayLiteral(t1__), index) -> separator
+    (t@ByteArrayLiteral2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"ByteArrayLiteral"> sort
     with switch !index
@@ -1631,7 +1726,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ByteArrayLiteral(t1__), index) -> ws
+    (t@ByteArrayLiteral2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"ByteArrayLiteral"> sort
     with switch !index
@@ -1739,26 +1834,26 @@ strategies
     where t1__' := <pp-one-Z(prettyprint-Smalltalk-FormalBlockArgumentDeclarationList) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   prettyprint-Smalltalk-BlockLiteral :
-    BlockLiteral(t1__, t2__) -> [ H(
-                                    [SOpt(HS(), "0")]
-                                  , [ S("[ ")
-                                    , t1__'
-                                    , S(" ")
-                                    , t2__'
-                                    , S(" ]")
-                                    ]
-                                  )
-                                ]
+    BlockLiteral1(t1__, t2__) -> [ H(
+                                     [SOpt(HS(), "0")]
+                                   , [ S("[ ")
+                                     , t1__'
+                                     , S(" ")
+                                     , t2__'
+                                     , S(" ]")
+                                     ]
+                                   )
+                                 ]
     with t1__' := <pp-option(
                      pp-one-Z(prettyprint-Smalltalk-FormalBlockArgumentDeclarationListWithSep) <+ pp-one-Z(prettyprint-completion-aux)
                    )> t1__
     with t2__' := <pp-one-Z(prettyprint-Smalltalk-ExecutableCode) <+ pp-one-Z(prettyprint-completion-aux)> t2__
 
   is-Smalltalk-BlockLiteral =
-    ?BlockLiteral(_, _)
+    ?BlockLiteral1(_, _)
 
   Smalltalk-get-indent :
-    (t@BlockLiteral(t1__, t2__), index) -> indent
+    (t@BlockLiteral1(t1__, t2__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"BlockLiteral"> sort
     with switch !index
@@ -1771,7 +1866,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@BlockLiteral(t1__, t2__), index) -> separator
+    (t@BlockLiteral1(t1__, t2__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"BlockLiteral"> sort
     with switch !index
@@ -1784,7 +1879,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@BlockLiteral(t1__, t2__), index) -> ws
+    (t@BlockLiteral1(t1__, t2__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"BlockLiteral"> sort
     with switch !index
@@ -1797,18 +1892,18 @@ strategies
          end
 
   prettyprint-Smalltalk-Literal :
-    ConstantReference(t1__) -> [ H(
-                                   [SOpt(HS(), "0")]
-                                 , [t1__']
-                                 )
-                               ]
+    ConstantReference4(t1__) -> [ H(
+                                    [SOpt(HS(), "0")]
+                                  , [t1__']
+                                  )
+                                ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-ConstantReference) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Literal =
-    ?ConstantReference(_)
+    ?ConstantReference4(_)
 
   Smalltalk-get-indent :
-    (t@ConstantReference(t1__), index) -> indent
+    (t@ConstantReference4(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -1819,7 +1914,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@ConstantReference(t1__), index) -> separator
+    (t@ConstantReference4(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -1830,7 +1925,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@ConstantReference(t1__), index) -> ws
+    (t@ConstantReference4(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2017,18 +2112,18 @@ strategies
          end
 
   prettyprint-Smalltalk-Literal :
-    StringLiteral(t1__) -> [ H(
-                               [SOpt(HS(), "0")]
-                             , [t1__']
-                             )
-                           ]
+    StringLiteral2(t1__) -> [ H(
+                                [SOpt(HS(), "0")]
+                              , [t1__']
+                              )
+                            ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-StringLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Literal =
-    ?StringLiteral(_)
+    ?StringLiteral2(_)
 
   Smalltalk-get-indent :
-    (t@StringLiteral(t1__), index) -> indent
+    (t@StringLiteral2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2039,7 +2134,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@StringLiteral(t1__), index) -> separator
+    (t@StringLiteral2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2050,7 +2145,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@StringLiteral(t1__), index) -> ws
+    (t@StringLiteral2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2149,18 +2244,18 @@ strategies
          end
 
   prettyprint-Smalltalk-Literal :
-    BlockLiteral(t1__) -> [ H(
-                              [SOpt(HS(), "0")]
-                            , [t1__']
-                            )
-                          ]
+    BlockLiteral2(t1__) -> [ H(
+                               [SOpt(HS(), "0")]
+                             , [t1__']
+                             )
+                           ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BlockLiteral) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Literal =
-    ?BlockLiteral(_)
+    ?BlockLiteral2(_)
 
   Smalltalk-get-indent :
-    (t@BlockLiteral(t1__), index) -> indent
+    (t@BlockLiteral2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2171,7 +2266,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@BlockLiteral(t1__), index) -> separator
+    (t@BlockLiteral2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2182,7 +2277,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@BlockLiteral(t1__), index) -> ws
+    (t@BlockLiteral2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"Literal"> sort
     with switch !index
@@ -2193,21 +2288,21 @@ strategies
          end
 
   prettyprint-Smalltalk-NestedExpression :
-    NestedExpression(t1__) -> [ H(
-                                  [SOpt(HS(), "0")]
-                                , [ S("( ")
-                                  , t1__'
-                                  , S(" )")
-                                  ]
-                                )
-                              ]
+    NestedExpression1(t1__) -> [ H(
+                                   [SOpt(HS(), "0")]
+                                 , [ S("( ")
+                                   , t1__'
+                                   , S(" )")
+                                   ]
+                                 )
+                               ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Statement) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-NestedExpression =
-    ?NestedExpression(_)
+    ?NestedExpression1(_)
 
   Smalltalk-get-indent :
-    (t@NestedExpression(t1__), index) -> indent
+    (t@NestedExpression1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"NestedExpression"> sort
     with switch !index
@@ -2218,7 +2313,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@NestedExpression(t1__), index) -> separator
+    (t@NestedExpression1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"NestedExpression"> sort
     with switch !index
@@ -2229,7 +2324,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@NestedExpression(t1__), index) -> ws
+    (t@NestedExpression1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"NestedExpression"> sort
     with switch !index
@@ -2240,18 +2335,18 @@ strategies
          end
 
   prettyprint-Smalltalk-Operand :
-    Literal(t1__) -> [ H(
-                         [SOpt(HS(), "0")]
-                       , [t1__']
-                       )
-                     ]
+    Literal2(t1__) -> [ H(
+                          [SOpt(HS(), "0")]
+                        , [t1__']
+                        )
+                      ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Literal) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Operand =
-    ?Literal(_)
+    ?Literal2(_)
 
   Smalltalk-get-indent :
-    (t@Literal(t1__), index) -> indent
+    (t@Literal2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Operand"> sort
     with switch !index
@@ -2262,7 +2357,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@Literal(t1__), index) -> separator
+    (t@Literal2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"Operand"> sort
     with switch !index
@@ -2273,7 +2368,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@Literal(t1__), index) -> ws
+    (t@Literal2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"Operand"> sort
     with switch !index
@@ -2328,18 +2423,18 @@ strategies
          end
 
   prettyprint-Smalltalk-Operand :
-    NestedExpression(t1__) -> [ H(
-                                  [SOpt(HS(), "0")]
-                                , [t1__']
-                                )
-                              ]
+    NestedExpression2(t1__) -> [ H(
+                                   [SOpt(HS(), "0")]
+                                 , [t1__']
+                                 )
+                               ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-NestedExpression) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Operand =
-    ?NestedExpression(_)
+    ?NestedExpression2(_)
 
   Smalltalk-get-indent :
-    (t@NestedExpression(t1__), index) -> indent
+    (t@NestedExpression2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Operand"> sort
     with switch !index
@@ -2350,7 +2445,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@NestedExpression(t1__), index) -> separator
+    (t@NestedExpression2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"Operand"> sort
     with switch !index
@@ -2361,7 +2456,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@NestedExpression(t1__), index) -> ws
+    (t@NestedExpression2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"Operand"> sort
     with switch !index
@@ -2511,19 +2606,19 @@ strategies
          end
 
   prettyprint-Smalltalk-BinaryMessage :
-    BinaryMessage(t1__, t2__) -> [ H(
-                                     [SOpt(HS(), "0")]
-                                   , [t1__', S(" "), t2__']
-                                   )
-                                 ]
+    BinaryMessage1(t1__, t2__) -> [ H(
+                                      [SOpt(HS(), "0")]
+                                    , [t1__', S(" "), t2__']
+                                    )
+                                  ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
     with t2__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessageOperand) <+ pp-one-Z(prettyprint-completion-aux)> t2__
 
   is-Smalltalk-BinaryMessage =
-    ?BinaryMessage(_, _)
+    ?BinaryMessage1(_, _)
 
   Smalltalk-get-indent :
-    (t@BinaryMessage(t1__, t2__), index) -> indent
+    (t@BinaryMessage1(t1__, t2__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"BinaryMessage"> sort
     with switch !index
@@ -2536,7 +2631,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@BinaryMessage(t1__, t2__), index) -> separator
+    (t@BinaryMessage1(t1__, t2__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"BinaryMessage"> sort
     with switch !index
@@ -2549,7 +2644,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@BinaryMessage(t1__, t2__), index) -> ws
+    (t@BinaryMessage1(t1__, t2__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"BinaryMessage"> sort
     with switch !index
@@ -2803,16 +2898,16 @@ strategies
          end
 
   prettyprint-Smalltalk-MessageChain :
-    BinaryMessage(t1__, t2__, t3__) -> [ H(
-                                           [SOpt(HS(), "0")]
-                                         , [ t1__'
-                                           , S(" ")
-                                           , t2__'
-                                           , S(" ")
-                                           , t3__'
-                                           ]
-                                         )
-                                       ]
+    BinaryMessage2(t1__, t2__, t3__) -> [ H(
+                                            [SOpt(HS(), "0")]
+                                          , [ t1__'
+                                            , S(" ")
+                                            , t2__'
+                                            , S(" ")
+                                            , t3__'
+                                            ]
+                                          )
+                                        ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessage) <+ pp-one-Z(prettyprint-completion-aux)> t1__
     with t2__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessageChain) <+ pp-one-Z(prettyprint-completion-aux)> t2__
     with t3__' := <pp-option(
@@ -2820,10 +2915,10 @@ strategies
                    )> t3__
 
   is-Smalltalk-MessageChain =
-    ?BinaryMessage(_, _, _)
+    ?BinaryMessage2(_, _, _)
 
   Smalltalk-get-indent :
-    ( t@BinaryMessage(t1__, t2__, t3__)
+    ( t@BinaryMessage2(t1__, t2__, t3__)
     , index
     ) -> indent
     where sort := <ia-get-sort> t
@@ -2840,7 +2935,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    ( t@BinaryMessage(t1__, t2__, t3__)
+    ( t@BinaryMessage2(t1__, t2__, t3__)
     , index
     ) -> separator
     where sort := <ia-get-sort> t
@@ -2857,7 +2952,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    ( t@BinaryMessage(t1__, t2__, t3__)
+    ( t@BinaryMessage2(t1__, t2__, t3__)
     , index
     ) -> ws
     where sort := <ia-get-sort> t
@@ -3541,18 +3636,18 @@ strategies
          end
 
   prettyprint-Smalltalk-UnaryMethodHeader :
-    UnaryMethodHeader(t1__) -> [ H(
-                                   [SOpt(HS(), "0")]
-                                 , [t1__']
-                                 )
-                               ]
+    UnaryMethodHeader1(t1__) -> [ H(
+                                    [SOpt(HS(), "0")]
+                                  , [t1__']
+                                  )
+                                ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-UnaryMessageSelector) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-UnaryMethodHeader =
-    ?UnaryMethodHeader(_)
+    ?UnaryMethodHeader1(_)
 
   Smalltalk-get-indent :
-    (t@UnaryMethodHeader(t1__), index) -> indent
+    (t@UnaryMethodHeader1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"UnaryMethodHeader"> sort
     with switch !index
@@ -3563,7 +3658,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@UnaryMethodHeader(t1__), index) -> separator
+    (t@UnaryMethodHeader1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"UnaryMethodHeader"> sort
     with switch !index
@@ -3574,7 +3669,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@UnaryMethodHeader(t1__), index) -> ws
+    (t@UnaryMethodHeader1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"UnaryMethodHeader"> sort
     with switch !index
@@ -3687,18 +3782,18 @@ strategies
          end
 
   prettyprint-Smalltalk-KeywordMethodHeader :
-    KeywordMethodHeader(t1__) -> [ H(
-                                     [SOpt(HS(), "0")]
-                                   , [t1__']
-                                   )
-                                 ]
+    KeywordMethodHeader1(t1__) -> [ H(
+                                      [SOpt(HS(), "0")]
+                                    , [t1__']
+                                    )
+                                  ]
     with t1__' := <pp-H-list(prettyprint-Smalltalk-KeywordMethodHeaderSegment) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-KeywordMethodHeader =
-    ?KeywordMethodHeader(_)
+    ?KeywordMethodHeader1(_)
 
   Smalltalk-get-indent :
-    (t@KeywordMethodHeader(t1__), index) -> indent
+    (t@KeywordMethodHeader1(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"KeywordMethodHeader"> sort
     with switch !index
@@ -3709,7 +3804,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@KeywordMethodHeader(t1__), index) -> separator
+    (t@KeywordMethodHeader1(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"KeywordMethodHeader"> sort
     with switch !index
@@ -3720,7 +3815,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@KeywordMethodHeader(t1__), index) -> ws
+    (t@KeywordMethodHeader1(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"KeywordMethodHeader"> sort
     with switch !index
@@ -3731,18 +3826,18 @@ strategies
          end
 
   prettyprint-Smalltalk-MethodHeader :
-    UnaryMethodHeader(t1__) -> [ H(
-                                   [SOpt(HS(), "0")]
-                                 , [t1__']
-                                 )
-                               ]
+    UnaryMethodHeader2(t1__) -> [ H(
+                                    [SOpt(HS(), "0")]
+                                  , [t1__']
+                                  )
+                                ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-UnaryMethodHeader) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-MethodHeader =
-    ?UnaryMethodHeader(_)
+    ?UnaryMethodHeader2(_)
 
   Smalltalk-get-indent :
-    (t@UnaryMethodHeader(t1__), index) -> indent
+    (t@UnaryMethodHeader2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"MethodHeader"> sort
     with switch !index
@@ -3753,7 +3848,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@UnaryMethodHeader(t1__), index) -> separator
+    (t@UnaryMethodHeader2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"MethodHeader"> sort
     with switch !index
@@ -3764,7 +3859,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@UnaryMethodHeader(t1__), index) -> ws
+    (t@UnaryMethodHeader2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"MethodHeader"> sort
     with switch !index
@@ -3819,18 +3914,18 @@ strategies
          end
 
   prettyprint-Smalltalk-MethodHeader :
-    KeywordMethodHeader(t1__) -> [ H(
-                                     [SOpt(HS(), "0")]
-                                   , [t1__']
-                                   )
-                                 ]
+    KeywordMethodHeader2(t1__) -> [ H(
+                                      [SOpt(HS(), "0")]
+                                    , [t1__']
+                                    )
+                                  ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-KeywordMethodHeader) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-MethodHeader =
-    ?KeywordMethodHeader(_)
+    ?KeywordMethodHeader2(_)
 
   Smalltalk-get-indent :
-    (t@KeywordMethodHeader(t1__), index) -> indent
+    (t@KeywordMethodHeader2(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"MethodHeader"> sort
     with switch !index
@@ -3841,7 +3936,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@KeywordMethodHeader(t1__), index) -> separator
+    (t@KeywordMethodHeader2(t1__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"MethodHeader"> sort
     with switch !index
@@ -3852,7 +3947,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@KeywordMethodHeader(t1__), index) -> ws
+    (t@KeywordMethodHeader2(t1__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"MethodHeader"> sort
     with switch !index
@@ -3912,6 +4007,9 @@ strategies
            otherwise :
              ws := ""
          end
+
+  is-Smalltalk-Prog =
+    fail
 
   is-Smalltalk-Start =
     fail
@@ -4063,6 +4161,9 @@ strategies
   is-Smalltalk-MethodDeclaration =
     fail
 
+  prettyprint-Smalltalk-Prog :
+    amb([h|hs]) -> <prettyprint-Smalltalk-Prog> h
+
   prettyprint-Smalltalk-Start :
     amb([h|hs]) -> <prettyprint-Smalltalk-Start> h
 
@@ -4212,6 +4313,16 @@ strategies
 
   prettyprint-Smalltalk-MethodDeclaration :
     amb([h|hs]) -> <prettyprint-Smalltalk-MethodDeclaration> h
+
+  prettyprint-Smalltalk-Prog :
+    Prog-Plhdr() -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Prog")]
+                      )
+                    ]
+
+  is-Smalltalk-Prog =
+    ?Prog-Plhdr()
 
   prettyprint-Smalltalk-Start :
     Start-Plhdr() -> [ H(
@@ -4792,6 +4903,16 @@ strategies
 
   is-Smalltalk-ExecutableCode =
     ?ExecutableCode-Plhdr()
+
+  prettyprint-Smalltalk-Prog :
+    Prog-Plhdr(_) -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Prog")]
+                       )
+                     ]
+
+  is-Smalltalk-Prog =
+    ?Prog-Plhdr(_)
 
   prettyprint-Smalltalk-Start :
     Start-Plhdr(_) -> [ H(

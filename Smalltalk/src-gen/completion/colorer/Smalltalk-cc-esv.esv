@@ -4,6 +4,7 @@ imports
   completion/colorer/Base-cc-esv
 
 colorer
+  _.Prog-Plhdr                                      : gray   
   _.Start-Plhdr                                     : gray   
   _.PsuedoVariableReference-Plhdr                   : gray   
   _.Identifier-Plhdr                                : gray   

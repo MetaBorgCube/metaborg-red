@@ -5,7 +5,7 @@ imports completion/Base-completion-insertions
 
 exports
   context-free start-symbols
-    Start PsuedoVariableReference Identifier BinarySelectorChar
+    Prog Start PsuedoVariableReference Identifier BinarySelectorChar
     KeywordMessageSelector ObjectArrayLiteral NestedObjectArrayLiteral
     SymbolInArrayLiteral LiteralArrayElement ByteArrayLiteral
     UnsignedIntegerLiteral FormalBlockArgumentDeclaration
@@ -23,6 +23,7 @@ exports
     MethodHeader ExecutableCode
 
   context-free syntax
+    COMPLETION-INSERTION -> Prog                                      {cons("Prog-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> Start                                     {cons("Start-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> PsuedoVariableReference                   {cons("PsuedoVariableReference-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> Identifier                                {cons("Identifier-Plhdr"), placeholder-insertion}

@@ -16,6 +16,26 @@ imports
 rules
 
   suggest-completions(|completions):
+    Prog-Plhdr() -> <add-completions(
+                     | ( "Program"
+                       , Program(
+                           <try(inline-completions(|Prog-Plhdr()))> Start-Plhdr()
+                         )
+                       )
+                     )
+                     ; fail> completions
+
+  suggest-completions(|completions):
+    Start-Plhdr() -> <add-completions(
+                      | ( "Temp"
+                        , Temp(
+                            <try(inline-completions(|Start-Plhdr()))> Expression-Plhdr()
+                          )
+                        )
+                      )
+                      ; fail> completions
+
+  suggest-completions(|completions):
     Start-Plhdr() -> <add-completions(
                       | ( "MethodDeclaration"
                         , MethodDeclaration(
@@ -37,8 +57,8 @@ rules
 
   suggest-completions(|completions):
     Reference-Plhdr() -> <add-completions(
-                          | ( "Reference"
-                            , Reference(
+                          | ( "ReferenceID"
+                            , ReferenceID(
                                 <try(inline-completions(|Reference-Plhdr()))> Identifier-Plhdr()
                               )
                             )
@@ -97,8 +117,8 @@ rules
 
   suggest-completions(|completions):
     UnaryMessageSelector-Plhdr() -> <add-completions(
-                                     | ( "UnaryMessageSelector"
-                                       , UnaryMessageSelector(
+                                     | ( "UnaryMessageSelector1"
+                                       , UnaryMessageSelector1(
                                            <try(inline-completions(|UnaryMessageSelector-Plhdr()))> Identifier-Plhdr()
                                          )
                                        )
@@ -117,8 +137,8 @@ rules
 
   suggest-completions(|completions):
     KeywordMessageSelector-Plhdr() -> <add-completions(
-                                       | ( "KeywordMessageSelector"
-                                         , KeywordMessageSelector(
+                                       | ( "KeywordMessageSelector1"
+                                         , KeywordMessageSelector1(
                                              [ <try(inline-completions(|KeywordMessageSelector-Plhdr()))> Keyword-Plhdr()
                                              ]
                                            )
@@ -128,8 +148,8 @@ rules
 
   suggest-completions(|completions):
     BinaryMessageSelector-Plhdr() -> <add-completions(
-                                      | ( "BinaryMessageSelector"
-                                        , BinaryMessageSelector(
+                                      | ( "BinaryMessageSelector1"
+                                        , BinaryMessageSelector1(
                                             <try(inline-completions(|BinaryMessageSelector-Plhdr()))> BinarySelectorChar-Plhdr()
                                           , Some(CURSOR_ELEMENT())
                                           )
@@ -139,8 +159,8 @@ rules
 
   suggest-completions(|completions):
     SymbolInArrayLiteral-Plhdr() -> <add-completions(
-                                     | ( "UnaryMessageSelector"
-                                       , UnaryMessageSelector(
+                                     | ( "UnaryMessageSelector2"
+                                       , UnaryMessageSelector2(
                                            <try(inline-completions(|SymbolInArrayLiteral-Plhdr()))> UnaryMessageSelector-Plhdr()
                                          )
                                        )
@@ -149,8 +169,8 @@ rules
 
   suggest-completions(|completions):
     SymbolInArrayLiteral-Plhdr() -> <add-completions(
-                                     | ( "KeywordMessageSelector"
-                                       , KeywordMessageSelector(
+                                     | ( "KeywordMessageSelector2"
+                                       , KeywordMessageSelector2(
                                            <try(inline-completions(|SymbolInArrayLiteral-Plhdr()))> KeywordMessageSelector-Plhdr()
                                          )
                                        )
@@ -159,8 +179,8 @@ rules
 
   suggest-completions(|completions):
     SymbolInArrayLiteral-Plhdr() -> <add-completions(
-                                     | ( "BinaryMessageSelector"
-                                       , BinaryMessageSelector(
+                                     | ( "BinaryMessageSelector2"
+                                       , BinaryMessageSelector2(
                                            <try(inline-completions(|SymbolInArrayLiteral-Plhdr()))> BinaryMessageSelector-Plhdr()
                                          )
                                        )
@@ -169,8 +189,8 @@ rules
 
   suggest-completions(|completions):
     SymbolLiteral-Plhdr() -> <add-completions(
-                              | ( "SymbolInArrayLiteral"
-                                , SymbolInArrayLiteral(
+                              | ( "SymbolInArrayLiteral1"
+                                , SymbolInArrayLiteral1(
                                     <try(inline-completions(|SymbolLiteral-Plhdr()))> SymbolInArrayLiteral-Plhdr()
                                   )
                                 )
@@ -179,8 +199,8 @@ rules
 
   suggest-completions(|completions):
     SymbolLiteral-Plhdr() -> <add-completions(
-                              | ( "ConstantReference"
-                                , ConstantReference(
+                              | ( "ConstantReference2"
+                                , ConstantReference2(
                                     <try(inline-completions(|SymbolLiteral-Plhdr()))> ConstantReference-Plhdr()
                                   )
                                 )
@@ -189,8 +209,8 @@ rules
 
   suggest-completions(|completions):
     SymbolLiteral-Plhdr() -> <add-completions(
-                              | ( "StringLiteral"
-                                , StringLiteral(
+                              | ( "StringLiteral1"
+                                , StringLiteral1(
                                     <try(inline-completions(|SymbolLiteral-Plhdr()))> StringLiteral-Plhdr()
                                   )
                                 )
@@ -199,8 +219,8 @@ rules
 
   suggest-completions(|completions):
     ArrayLiteral-Plhdr() -> <add-completions(
-                             | ( "ObjectArrayLiteral"
-                               , ObjectArrayLiteral(
+                             | ( "ObjectArrayLiteral1"
+                               , ObjectArrayLiteral1(
                                    <try(inline-completions(|ArrayLiteral-Plhdr()))> ObjectArrayLiteral-Plhdr()
                                  )
                                )
@@ -209,8 +229,8 @@ rules
 
   suggest-completions(|completions):
     ArrayLiteral-Plhdr() -> <add-completions(
-                             | ( "ByteArrayLiteral"
-                               , ByteArrayLiteral(
+                             | ( "ByteArrayLiteral1"
+                               , ByteArrayLiteral1(
                                    <try(inline-completions(|ArrayLiteral-Plhdr()))> ByteArrayLiteral-Plhdr()
                                  )
                                )
@@ -219,8 +239,8 @@ rules
 
   suggest-completions(|completions):
     ObjectArrayLiteral-Plhdr() -> <add-completions(
-                                   | ( "ObjectArrayLiteral"
-                                     , ObjectArrayLiteral(
+                                   | ( "ObjectArrayLiteral2"
+                                     , ObjectArrayLiteral2(
                                          <try(inline-completions(|ObjectArrayLiteral-Plhdr()))> NestedObjectArrayLiteral-Plhdr()
                                        )
                                      )
@@ -229,14 +249,14 @@ rules
 
   suggest-completions(|completions):
     NestedObjectArrayLiteral-Plhdr() -> <add-completions(
-                                         | ("NestedObjectArrayLiteral", NestedObjectArrayLiteral(CURSOR_ELEMENT()))
+                                         | ("NestedObjectArrayLiteral1", NestedObjectArrayLiteral1(CURSOR_ELEMENT()))
                                          )
                                          ; fail> completions
 
   suggest-completions(|completions):
     LiteralArrayElement-Plhdr() -> <add-completions(
-                                    | ( "Literal"
-                                      , Literal(
+                                    | ( "Literal1"
+                                      , Literal1(
                                           <try(inline-completions(|LiteralArrayElement-Plhdr()))> Literal-Plhdr()
                                         )
                                       )
@@ -245,8 +265,8 @@ rules
 
   suggest-completions(|completions):
     LiteralArrayElement-Plhdr() -> <add-completions(
-                                    | ( "NestedObjectArrayLiteral"
-                                      , NestedObjectArrayLiteral(
+                                    | ( "NestedObjectArrayLiteral2"
+                                      , NestedObjectArrayLiteral2(
                                           <try(inline-completions(|LiteralArrayElement-Plhdr()))> NestedObjectArrayLiteral-Plhdr()
                                         )
                                       )
@@ -255,8 +275,8 @@ rules
 
   suggest-completions(|completions):
     LiteralArrayElement-Plhdr() -> <add-completions(
-                                    | ( "SymbolInArrayLiteral"
-                                      , SymbolInArrayLiteral(
+                                    | ( "SymbolInArrayLiteral2"
+                                      , SymbolInArrayLiteral2(
                                           <try(inline-completions(|LiteralArrayElement-Plhdr()))> SymbolInArrayLiteral-Plhdr()
                                         )
                                       )
@@ -265,8 +285,8 @@ rules
 
   suggest-completions(|completions):
     LiteralArrayElement-Plhdr() -> <add-completions(
-                                    | ( "ConstantReference"
-                                      , ConstantReference(
+                                    | ( "ConstantReference3"
+                                      , ConstantReference3(
                                           <try(inline-completions(|LiteralArrayElement-Plhdr()))> ConstantReference-Plhdr()
                                         )
                                       )
@@ -275,7 +295,7 @@ rules
 
   suggest-completions(|completions):
     ByteArrayLiteral-Plhdr() -> <add-completions(
-                                 | ("ByteArrayLiteral", ByteArrayLiteral(CURSOR_ELEMENT()))
+                                 | ("ByteArrayLiteral2", ByteArrayLiteral2(CURSOR_ELEMENT()))
                                  )
                                  ; fail> completions
 
@@ -302,8 +322,8 @@ rules
 
   suggest-completions(|completions):
     BlockLiteral-Plhdr() -> <add-completions(
-                             | ( "BlockLiteral"
-                               , BlockLiteral(
+                             | ( "BlockLiteral1"
+                               , BlockLiteral1(
                                    Some(CURSOR_ELEMENT())
                                  , <try(inline-completions(|BlockLiteral-Plhdr()))> ExecutableCode-Plhdr()
                                  )
@@ -313,8 +333,8 @@ rules
 
   suggest-completions(|completions):
     Literal-Plhdr() -> <add-completions(
-                        | ( "ConstantReference"
-                          , ConstantReference(
+                        | ( "ConstantReference4"
+                          , ConstantReference4(
                               <try(inline-completions(|Literal-Plhdr()))> ConstantReference-Plhdr()
                             )
                           )
@@ -363,8 +383,8 @@ rules
 
   suggest-completions(|completions):
     Literal-Plhdr() -> <add-completions(
-                        | ( "StringLiteral"
-                          , StringLiteral(
+                        | ( "StringLiteral2"
+                          , StringLiteral2(
                               <try(inline-completions(|Literal-Plhdr()))> StringLiteral-Plhdr()
                             )
                           )
@@ -393,8 +413,8 @@ rules
 
   suggest-completions(|completions):
     Literal-Plhdr() -> <add-completions(
-                        | ( "BlockLiteral"
-                          , BlockLiteral(
+                        | ( "BlockLiteral2"
+                          , BlockLiteral2(
                               <try(inline-completions(|Literal-Plhdr()))> BlockLiteral-Plhdr()
                             )
                           )
@@ -403,8 +423,8 @@ rules
 
   suggest-completions(|completions):
     NestedExpression-Plhdr() -> <add-completions(
-                                 | ( "NestedExpression"
-                                   , NestedExpression(
+                                 | ( "NestedExpression1"
+                                   , NestedExpression1(
                                        <try(inline-completions(|NestedExpression-Plhdr()))> Statement-Plhdr()
                                      )
                                    )
@@ -413,8 +433,8 @@ rules
 
   suggest-completions(|completions):
     Operand-Plhdr() -> <add-completions(
-                        | ( "Literal"
-                          , Literal(
+                        | ( "Literal2"
+                          , Literal2(
                               <try(inline-completions(|Operand-Plhdr()))> Literal-Plhdr()
                             )
                           )
@@ -433,8 +453,8 @@ rules
 
   suggest-completions(|completions):
     Operand-Plhdr() -> <add-completions(
-                        | ( "NestedExpression"
-                          , NestedExpression(
+                        | ( "NestedExpression2"
+                          , NestedExpression2(
                               <try(inline-completions(|Operand-Plhdr()))> NestedExpression-Plhdr()
                             )
                           )
@@ -470,8 +490,8 @@ rules
 
   suggest-completions(|completions):
     BinaryMessage-Plhdr() -> <add-completions(
-                              | ( "BinaryMessage"
-                                , BinaryMessage(
+                              | ( "BinaryMessage1"
+                                , BinaryMessage1(
                                     <try(inline-completions(|BinaryMessage-Plhdr()))> BinaryMessageSelector-Plhdr()
                                   , <try(inline-completions(|BinaryMessage-Plhdr()))> BinaryMessageOperand-Plhdr()
                                   )
@@ -530,8 +550,8 @@ rules
 
   suggest-completions(|completions):
     MessageChain-Plhdr() -> <add-completions(
-                             | ( "BinaryMessage"
-                               , BinaryMessage(
+                             | ( "BinaryMessage2"
+                               , BinaryMessage2(
                                    <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessage-Plhdr()
                                  , <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessageChain-Plhdr()
                                  , Some(CURSOR_ELEMENT())
@@ -666,8 +686,8 @@ rules
 
   suggest-completions(|completions):
     UnaryMethodHeader-Plhdr() -> <add-completions(
-                                  | ( "UnaryMethodHeader"
-                                    , UnaryMethodHeader(
+                                  | ( "UnaryMethodHeader1"
+                                    , UnaryMethodHeader1(
                                         <try(inline-completions(|UnaryMethodHeader-Plhdr()))> UnaryMessageSelector-Plhdr()
                                       )
                                     )
@@ -698,8 +718,8 @@ rules
 
   suggest-completions(|completions):
     KeywordMethodHeader-Plhdr() -> <add-completions(
-                                    | ( "KeywordMethodHeader"
-                                      , KeywordMethodHeader(
+                                    | ( "KeywordMethodHeader1"
+                                      , KeywordMethodHeader1(
                                           [ <try(inline-completions(|KeywordMethodHeader-Plhdr()))> KeywordMethodHeaderSegment-Plhdr()
                                           ]
                                         )
@@ -709,8 +729,8 @@ rules
 
   suggest-completions(|completions):
     MethodHeader-Plhdr() -> <add-completions(
-                             | ( "UnaryMethodHeader"
-                               , UnaryMethodHeader(
+                             | ( "UnaryMethodHeader2"
+                               , UnaryMethodHeader2(
                                    <try(inline-completions(|MethodHeader-Plhdr()))> UnaryMethodHeader-Plhdr()
                                  )
                                )
@@ -729,8 +749,8 @@ rules
 
   suggest-completions(|completions):
     MethodHeader-Plhdr() -> <add-completions(
-                             | ( "KeywordMethodHeader"
-                               , KeywordMethodHeader(
+                             | ( "KeywordMethodHeader2"
+                               , KeywordMethodHeader2(
                                    <try(inline-completions(|MethodHeader-Plhdr()))> KeywordMethodHeader-Plhdr()
                                  )
                                )
@@ -750,6 +770,28 @@ rules
 
 
 rules
+
+  is-left-recursive :
+    "Start" -> <is-left-recursive> "Prog"
+    where <not(is-lexical-completion-sort)> "Start"
+
+  is-right-recursive :
+    "Start" -> <is-right-recursive> "Prog"
+    where <not(is-lexical-completion-sort)> "Start"
+
+  is-Prog-completion-sort :
+    "Start" -> <id>
+
+  is-left-recursive :
+    "Expression" -> <is-left-recursive> "Start"
+    where <not(is-lexical-completion-sort)> "Expression"
+
+  is-right-recursive :
+    "Expression" -> <is-right-recursive> "Start"
+    where <not(is-lexical-completion-sort)> "Expression"
+
+  is-Start-completion-sort :
+    "Expression" -> <id>
 
   is-left-recursive :
     "MethodDeclaration" -> <is-left-recursive> "Start"
@@ -1116,6 +1158,9 @@ rules
 
 
 rules
+
+  is-SDF-placeholder =
+    ?Prog-Plhdr()
 
   is-SDF-placeholder =
     ?Start-Plhdr()

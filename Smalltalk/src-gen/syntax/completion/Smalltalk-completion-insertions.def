@@ -20,7 +20,7 @@ exports
     WhitespaceCharacter                                                                            -> LAYOUT                 
     Comment                                                                                        -> LAYOUT                 
     DecimalDigit | Letter                                                                          -> LetterOrDigit          
-    ( DecimalDigit | Letter | "_" )+                                                               -> Identifier             
+    Letter | "_" ( DecimalDigit | Letter | "_" )+                                                  -> Identifier             
     "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/" -> BinarySelectorChar     
     "-"? UnsignedIntegerLiteral                                                                    -> IntegerLiteral         
     DecimalIntegerLiteral | ( Radix "r" BaseNIntegerLiteral )                                      -> UnsignedIntegerLiteral 
@@ -48,12 +48,14 @@ imports Base
 
 exports
   context-free start-symbols
-    Start
+    Prog
 
   context-free syntax
+    Start                                                             -> Prog                                      {cons("Program")}
+    Expression                                                        -> Start                                     {cons("Temp")}
     MethodDeclaration                                                 -> Start                                     {cons("MethodDeclaration")}
     ExecutableCode                                                    -> Start                                     {cons("ExecutableCode")}
-    Identifier                                                        -> Reference                                 {cons("Reference")}
+    Identifier                                                        -> Reference                                 {cons("ReferenceID")}
     "nil"                                                             -> ConstantReference                         {cons("Null")}
     "false"                                                           -> ConstantReference                         {cons("False")}
     "true"                                                            -> ConstantReference                         {cons("True")}
@@ -63,52 +65,54 @@ exports
     Identifier                                                        -> BindableIdentifier                        {cons("BindableIdentifier")}
     ConstantReference                                                 -> BindableIdentifier                        {reject}
     PsuedoVariableReference                                           -> BindableIdentifier                        {reject}
-    Identifier                                                        -> UnaryMessageSelector                      {cons("UnaryMessageSelector")}
+    Identifier                                                        -> UnaryMessageSelector                      {cons("UnaryMessageSelector1")}
     Identifier ":"                                                    -> Keyword                                   {cons("Keyword")}
-    Keyword+                                                          -> KeywordMessageSelector                    {cons("KeywordMessageSelector")}
-    BinarySelectorChar BinarySelectorChar?                            -> BinaryMessageSelector                     {cons("BinaryMessageSelector")}
-    UnaryMessageSelector                                              -> SymbolInArrayLiteral                      {cons("UnaryMessageSelector")}
-    ConstantReference                                                 -> SymbolInArrayLiteral                      {cons("ConstantReference"), reject}
-    KeywordMessageSelector                                            -> SymbolInArrayLiteral                      {cons("KeywordMessageSelector")}
-    BinaryMessageSelector                                             -> SymbolInArrayLiteral                      {cons("BinaryMessageSelector")}
-    "#" SymbolInArrayLiteral                                          -> SymbolLiteral                             {cons("SymbolInArrayLiteral")}
-    "#" ConstantReference                                             -> SymbolLiteral                             {cons("ConstantReference")}
-    "#" StringLiteral                                                 -> SymbolLiteral                             {cons("StringLiteral")}
-    ObjectArrayLiteral                                                -> ArrayLiteral                              {cons("ObjectArrayLiteral")}
-    ByteArrayLiteral                                                  -> ArrayLiteral                              {cons("ByteArrayLiteral")}
-    "#" NestedObjectArrayLiteral                                      -> ObjectArrayLiteral                        {cons("ObjectArrayLiteral")}
-    "(" LiteralArrayElement* ")"                                      -> NestedObjectArrayLiteral                  {cons("NestedObjectArrayLiteral")}
-    NestedObjectArrayLiteral                                          -> LiteralArrayElement                       {cons("NestedObjectArrayLiteral")}
-    SymbolInArrayLiteral                                              -> LiteralArrayElement                       {cons("SymbolInArrayLiteral")}
-    ConstantReference                                                 -> LiteralArrayElement                       {cons("ConstantReference")}
-    "#[" UnsignedIntegerLiteral* "]"                                  -> ByteArrayLiteral                          {cons("ByteArrayLiteral")}
+    Keyword+                                                          -> KeywordMessageSelector                    {cons("KeywordMessageSelector1")}
+    BinarySelectorChar BinarySelectorChar?                            -> BinaryMessageSelector                     {cons("BinaryMessageSelector1")}
+    UnaryMessageSelector                                              -> SymbolInArrayLiteral                      {cons("UnaryMessageSelector2")}
+    ConstantReference                                                 -> SymbolInArrayLiteral                      {cons("ConstantReference1"), reject}
+    KeywordMessageSelector                                            -> SymbolInArrayLiteral                      {cons("KeywordMessageSelector2")}
+    BinaryMessageSelector                                             -> SymbolInArrayLiteral                      {cons("BinaryMessageSelector2")}
+    "#" SymbolInArrayLiteral                                          -> SymbolLiteral                             {cons("SymbolInArrayLiteral1")}
+    "#" ConstantReference                                             -> SymbolLiteral                             {cons("ConstantReference2")}
+    "#" StringLiteral                                                 -> SymbolLiteral                             {cons("StringLiteral1")}
+    ObjectArrayLiteral                                                -> ArrayLiteral                              {cons("ObjectArrayLiteral1")}
+    ByteArrayLiteral                                                  -> ArrayLiteral                              {cons("ByteArrayLiteral1")}
+    "#" NestedObjectArrayLiteral                                      -> ObjectArrayLiteral                        {cons("ObjectArrayLiteral2")}
+    "(" LiteralArrayElement* ")"                                      -> NestedObjectArrayLiteral                  {cons("NestedObjectArrayLiteral1")}
+    Literal                                                           -> LiteralArrayElement                       {cons("Literal1")}
+    BlockLiteral                                                      -> LiteralArrayElement                       {cons("BlockLiteral"), reject}
+    NestedObjectArrayLiteral                                          -> LiteralArrayElement                       {cons("NestedObjectArrayLiteral2")}
+    SymbolInArrayLiteral                                              -> LiteralArrayElement                       {cons("SymbolInArrayLiteral2")}
+    ConstantReference                                                 -> LiteralArrayElement                       {cons("ConstantReference3")}
+    "#[" UnsignedIntegerLiteral* "]"                                  -> ByteArrayLiteral                          {cons("ByteArrayLiteral2")}
     BindableIdentifier                                                -> FormalBlockArgumentDeclaration            {cons("FormalBlockArgumentDeclaration")}
     FormalBlockArgumentDeclaration+                                   -> FormalBlockArgumentDeclarationList        {cons("FormalBlockArgumentDeclarationList")}
     FormalBlockArgumentDeclarationList "|"                            -> FormalBlockArgumentDeclarationListWithSep 
-    "[" FormalBlockArgumentDeclarationListWithSep? ExecutableCode "]" -> BlockLiteral                              {cons("BlockLiteral")}
-    ConstantReference                                                 -> Literal                                   {cons("ConstantReference")}
+    "[" FormalBlockArgumentDeclarationListWithSep? ExecutableCode "]" -> BlockLiteral                              {cons("BlockLiteral1")}
+    ConstantReference                                                 -> Literal                                   {cons("ConstantReference4")}
     IntegerLiteral                                                    -> Literal                                   {cons("IntegerLiteral")}
     ScaledDecimalLiteral                                              -> Literal                                   {cons("ScaledDecimalLiteral")}
     FloatingPointLiteral                                              -> Literal                                   {cons("FloatingPointLiteral")}
     CharacterLiteral                                                  -> Literal                                   {cons("CharacterLiteral")}
-    StringLiteral                                                     -> Literal                                   {cons("StringLiteral")}
+    StringLiteral                                                     -> Literal                                   {cons("StringLiteral2")}
     SymbolLiteral                                                     -> Literal                                   {cons("SymbolLiteral")}
     ArrayLiteral                                                      -> Literal                                   {cons("ArrayLiteral")}
-    BlockLiteral                                                      -> Literal                                   {cons("BlockLiteral")}
-    "(" Statement ")"                                                 -> NestedExpression                          {cons("NestedExpression")}
-    Literal                                                           -> Operand                                   {cons("Literal")}
+    BlockLiteral                                                      -> Literal                                   {cons("BlockLiteral2")}
+    "(" Statement ")"                                                 -> NestedExpression                          {cons("NestedExpression1")}
+    Literal                                                           -> Operand                                   {cons("Literal2")}
     Reference                                                         -> Operand                                   {cons("Reference")}
-    NestedExpression                                                  -> Operand                                   {cons("NestedExpression")}
+    NestedExpression                                                  -> Operand                                   {cons("NestedExpression2")}
     UnaryMessageSelector                                              -> UnaryMessage                              {cons("UnaryMessage")}
     UnaryMessage*                                                     -> UnaryMessageChain                         {cons("UnaryMessageChain")}
     Operand UnaryMessageChain                                         -> BinaryMessageOperand                      {cons("BinaryMessageOperand")}
-    BinaryMessageSelector BinaryMessageOperand                        -> BinaryMessage                             {cons("BinaryMessage")}
+    BinaryMessageSelector BinaryMessageOperand                        -> BinaryMessage                             {cons("BinaryMessage1")}
     BinaryMessage*                                                    -> BinaryMessageChain                        {cons("BinaryMessageChain")}
     BinaryMessageOperand BinaryMessageChain                           -> KeywordMessageArgument                    {cons("KeywordMessageArgument")}
     Keyword KeywordMessageArgument                                    -> KeywordMessageSegment                     {cons("KeywordMessageSegment")}
     KeywordMessageSegment KeywordMessageSegment*                      -> KeywordMessage                            {cons("KeywordMessage")}
     KeywordMessage                                                    -> MessageChain                              {cons("KeywordMessage")}
-    BinaryMessage BinaryMessageChain KeywordMessage?                  -> MessageChain                              {cons("BinaryMessage")}
+    BinaryMessage BinaryMessageChain KeywordMessage?                  -> MessageChain                              {cons("BinaryMessage2")}
     UnaryMessage UnaryMessageChain BinaryMessageChain KeywordMessage? -> MessageChain                              {cons("UnaryMessage")}
     ";" MessageChain                                                  -> CascadedMessage                           {cons("CascadedMessage")}
     Operand ExpressionRest?                                           -> Expression                                {cons("Expression")}
@@ -122,19 +126,20 @@ exports
     DottedStatement* FinalStatement Dot?                              -> ExecutableCodeRest                        {cons("ExecutableCodeRest")}
     Statement "."                                                     -> DottedStatement                           {cons("DottedStatement")}
     "."                                                               -> Dot                                       {cons("Dot")}
-    UnaryMessageSelector                                              -> UnaryMethodHeader                         {cons("UnaryMethodHeader")}
+    UnaryMessageSelector                                              -> UnaryMethodHeader                         {cons("UnaryMethodHeader1")}
     BinaryMessageSelector BindableIdentifier                          -> BinaryMethodHeader                        {cons("BinaryMethodHeader")}
     Keyword BindableIdentifier                                        -> KeywordMethodHeaderSegment                {cons("KeywordMethodHeaderSegment")}
-    KeywordMethodHeaderSegment+                                       -> KeywordMethodHeader                       {cons("KeywordMethodHeader")}
-    UnaryMethodHeader                                                 -> MethodHeader                              {cons("UnaryMethodHeader")}
+    KeywordMethodHeaderSegment+                                       -> KeywordMethodHeader                       {cons("KeywordMethodHeader1")}
+    UnaryMethodHeader                                                 -> MethodHeader                              {cons("UnaryMethodHeader2")}
     BinaryMethodHeader                                                -> MethodHeader                              {cons("BinaryMethodHeader")}
-    KeywordMethodHeader                                               -> MethodHeader                              {cons("KeywordMethodHeader")}
+    KeywordMethodHeader                                               -> MethodHeader                              {cons("KeywordMethodHeader2")}
     MethodHeader ExecutableCode                                       -> MethodDeclaration                         {cons("MethodDeclaration")}
 
   lexical syntax
     
 
   context-free syntax
+    "$Prog"                                      -> Prog                                      {cons("Prog-Plhdr"), placeholder}
     "$Start"                                     -> Start                                     {cons("Start-Plhdr"), placeholder}
     "$PsuedoVariableReference"                   -> PsuedoVariableReference                   {cons("PsuedoVariableReference-Plhdr"), placeholder}
     "$Identifier"                                -> Identifier                                {cons("Identifier-Plhdr"), placeholder}
@@ -201,7 +206,7 @@ imports completion/Base-completion-insertions
 
 exports
   context-free start-symbols
-    Start PsuedoVariableReference Identifier BinarySelectorChar
+    Prog Start PsuedoVariableReference Identifier BinarySelectorChar
     KeywordMessageSelector ObjectArrayLiteral NestedObjectArrayLiteral
     SymbolInArrayLiteral LiteralArrayElement ByteArrayLiteral
     UnsignedIntegerLiteral FormalBlockArgumentDeclaration
@@ -219,6 +224,7 @@ exports
     MethodHeader ExecutableCode
 
   context-free syntax
+    COMPLETION-INSERTION -> Prog                                      {cons("Prog-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> Start                                     {cons("Start-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> PsuedoVariableReference                   {cons("PsuedoVariableReference-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> Identifier                                {cons("Identifier-Plhdr"), placeholder-insertion}

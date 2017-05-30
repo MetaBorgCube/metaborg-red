@@ -15,7 +15,7 @@ lexical syntax
 	LAYOUT = Comment
 	
 	LetterOrDigit = DecimalDigit|Letter
-	Identifier = (DecimalDigit|Letter|"_")+
+	Identifier = (Letter|"_")(DecimalDigit|Letter|"_")+
 
 	
 	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"

@@ -12,7 +12,7 @@ exports
     WhitespaceCharacter                                                                            -> LAYOUT                 
     Comment                                                                                        -> LAYOUT                 
     DecimalDigit | Letter                                                                          -> LetterOrDigit          
-    ( DecimalDigit | Letter | "_" )+                                                               -> Identifier             
+    Letter | "_" ( DecimalDigit | Letter | "_" )+                                                  -> Identifier             
     "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/" -> BinarySelectorChar     
     "-"? UnsignedIntegerLiteral                                                                    -> IntegerLiteral         
     DecimalIntegerLiteral | ( Radix "r" BaseNIntegerLiteral )                                      -> UnsignedIntegerLiteral 

@@ -183,7 +183,8 @@ exports
     Identifier                                                        -> UnaryMessageSelector                      {cons("UnaryMessageSelector1")}
     Identifier ":"                                                    -> Keyword                                   {cons("Keyword")}
     Keyword+                                                          -> KeywordMessageSelector                    {cons("KeywordMessageSelector1")}
-    BinarySelectorChar BinarySelectorChar?                            -> BinaryMessageSelector                     {cons("BinaryMessageSelector1")}
+    BinarySelectorChar                                                -> BinaryMessageSelector                     {cons("UnarySelector")}
+    BinarySelectorChar BinarySelectorChar                             -> BinaryMessageSelector                     {cons("BinarySelector")}
     UnaryMessageSelector                                              -> SymbolInArrayLiteral                      {cons("UnaryMessageSelector2")}
     ConstantReference                                                 -> SymbolInArrayLiteral                      {cons("ConstantReference1"), reject}
     KeywordMessageSelector                                            -> SymbolInArrayLiteral                      {cons("KeywordMessageSelector2")}
@@ -227,10 +228,12 @@ exports
     Keyword KeywordMessageArgument                                    -> KeywordMessageSegment                     {cons("KeywordMessageSegment")}
     KeywordMessageSegment KeywordMessageSegment*                      -> KeywordMessage                            {cons("KeywordMessage")}
     KeywordMessage                                                    -> MessageChain                              {cons("KeywordMessage")}
-    BinaryMessage BinaryMessageChain KeywordMessage?                  -> MessageChain                              {cons("BinaryMessage2")}
+    BinaryMessage BinaryMessageChain                                  -> MessageChain                              {cons("BinaryMessage2")}
+    BinaryMessage BinaryMessageChain KeywordMessage                   -> MessageChain                              {cons("KeywordMessage")}
     UnaryMessage UnaryMessageChain BinaryMessageChain KeywordMessage? -> MessageChain                              {cons("UnaryMessage")}
     ";" MessageChain                                                  -> CascadedMessage                           {cons("CascadedMessage")}
-    Operand ExpressionRest?                                           -> Expression                                {cons("Expression")}
+    Operand ExpressionRest                                            -> Expression                                {cons("Expression")}
+                                                                      -> ExpressionRest                            {cons("EREmpty")}
     MessageChain CascadedMessage*                                     -> ExpressionRest                            {cons("ExpressionRest")}
     BindableIdentifier ":="                                           -> AssignmentOperation                       {cons("AssignmentOperation")}
     AssignmentOperation* Expression                                   -> Statement                                 {cons("Statement")}

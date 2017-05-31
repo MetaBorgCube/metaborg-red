@@ -148,10 +148,20 @@ rules
 
   suggest-completions(|completions):
     BinaryMessageSelector-Plhdr() -> <add-completions(
-                                      | ( "BinaryMessageSelector1"
-                                        , BinaryMessageSelector1(
+                                      | ( "UnarySelector"
+                                        , UnarySelector(
                                             <try(inline-completions(|BinaryMessageSelector-Plhdr()))> BinarySelectorChar-Plhdr()
-                                          , Some(CURSOR_ELEMENT())
+                                          )
+                                        )
+                                      )
+                                      ; fail> completions
+
+  suggest-completions(|completions):
+    BinaryMessageSelector-Plhdr() -> <add-completions(
+                                      | ( "BinarySelector"
+                                        , BinarySelector(
+                                            <try(inline-completions(|BinaryMessageSelector-Plhdr()))> BinarySelectorChar-Plhdr()
+                                          , <try(inline-completions(|BinaryMessageSelector-Plhdr()))> BinarySelectorChar-Plhdr()
                                           )
                                         )
                                       )
@@ -554,7 +564,18 @@ rules
                                , BinaryMessage2(
                                    <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessage-Plhdr()
                                  , <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessageChain-Plhdr()
-                                 , Some(CURSOR_ELEMENT())
+                                 )
+                               )
+                             )
+                             ; fail> completions
+
+  suggest-completions(|completions):
+    MessageChain-Plhdr() -> <add-completions(
+                             | ( "KeywordMessage"
+                               , KeywordMessage(
+                                   <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessage-Plhdr()
+                                 , <try(inline-completions(|MessageChain-Plhdr()))> BinaryMessageChain-Plhdr()
+                                 , <try(inline-completions(|MessageChain-Plhdr()))> KeywordMessage-Plhdr()
                                  )
                                )
                              )
@@ -588,11 +609,14 @@ rules
                            | ( "Expression"
                              , Expression(
                                  <try(inline-completions(|Expression-Plhdr()))> Operand-Plhdr()
-                               , Some(CURSOR_ELEMENT())
+                               , <try(inline-completions(|Expression-Plhdr()))> ExpressionRest-Plhdr()
                                )
                              )
                            )
                            ; fail> completions
+
+  null-constructor-completion-sort :
+    "ExpressionRest" -> EREmpty()
 
   suggest-completions(|completions):
     ExpressionRest-Plhdr() -> <add-completions(
@@ -847,6 +871,17 @@ rules
 
   is-UnaryMessageSelector-completion-sort :
     "Identifier" -> <id>
+
+  is-left-recursive :
+    "BinarySelectorChar" -> <is-left-recursive> "BinaryMessageSelector"
+    where <not(is-lexical-completion-sort)> "BinarySelectorChar"
+
+  is-right-recursive :
+    "BinarySelectorChar" -> <is-right-recursive> "BinaryMessageSelector"
+    where <not(is-lexical-completion-sort)> "BinarySelectorChar"
+
+  is-BinaryMessageSelector-completion-sort :
+    "BinarySelectorChar" -> <id>
 
   is-left-recursive :
     "UnaryMessageSelector" -> <is-left-recursive> "SymbolInArrayLiteral"

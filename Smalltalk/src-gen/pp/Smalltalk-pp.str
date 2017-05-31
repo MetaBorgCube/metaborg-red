@@ -1017,21 +1017,63 @@ strategies
          end
 
   prettyprint-Smalltalk-BinaryMessageSelector :
-    BinaryMessageSelector1(t1__, t2__) -> [ H(
-                                              [SOpt(HS(), "0")]
-                                            , [t1__', S(" "), t2__']
-                                            )
-                                          ]
+    UnarySelector(t1__) -> [ H(
+                               [SOpt(HS(), "0")]
+                             , [t1__']
+                             )
+                           ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinarySelectorChar) <+ pp-one-Z(prettyprint-completion-aux)> t1__
-    with t2__' := <pp-option(
-                     pp-one-Z(prettyprint-Smalltalk-BinarySelectorChar) <+ pp-one-Z(prettyprint-completion-aux)
-                   )> t2__
 
   is-Smalltalk-BinaryMessageSelector =
-    ?BinaryMessageSelector1(_, _)
+    ?UnarySelector(_)
 
   Smalltalk-get-indent :
-    (t@BinaryMessageSelector1(t1__, t2__), index) -> indent
+    (t@UnarySelector(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"BinaryMessageSelector"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@UnarySelector(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"BinaryMessageSelector"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@UnarySelector(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"BinaryMessageSelector"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-BinaryMessageSelector :
+    BinarySelector(t1__, t2__) -> [ H(
+                                      [SOpt(HS(), "0")]
+                                    , [t1__', S(" "), t2__']
+                                    )
+                                  ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinarySelectorChar) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-BinarySelectorChar) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-BinaryMessageSelector =
+    ?BinarySelector(_, _)
+
+  Smalltalk-get-indent :
+    (t@BinarySelector(t1__, t2__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"BinaryMessageSelector"> sort
     with switch !index
@@ -1044,7 +1086,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    (t@BinaryMessageSelector1(t1__, t2__), index) -> separator
+    (t@BinarySelector(t1__, t2__), index) -> separator
     where sort := <ia-get-sort> t
           ; <?"BinaryMessageSelector"> sort
     with switch !index
@@ -1057,7 +1099,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    (t@BinaryMessageSelector1(t1__, t2__), index) -> ws
+    (t@BinarySelector(t1__, t2__), index) -> ws
     where sort := <ia-get-sort> t
           ; <?"BinaryMessageSelector"> sort
     with switch !index
@@ -2898,7 +2940,58 @@ strategies
          end
 
   prettyprint-Smalltalk-MessageChain :
-    BinaryMessage2(t1__, t2__, t3__) -> [ H(
+    BinaryMessage2(t1__, t2__) -> [ H(
+                                      [SOpt(HS(), "0")]
+                                    , [t1__', S(" "), t2__']
+                                    )
+                                  ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessage) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessageChain) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+
+  is-Smalltalk-MessageChain =
+    ?BinaryMessage2(_, _)
+
+  Smalltalk-get-indent :
+    (t@BinaryMessage2(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"MessageChain"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@BinaryMessage2(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"MessageChain"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@BinaryMessage2(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"MessageChain"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-MessageChain :
+    KeywordMessage(t1__, t2__, t3__) -> [ H(
                                             [SOpt(HS(), "0")]
                                           , [ t1__'
                                             , S(" ")
@@ -2910,15 +3003,13 @@ strategies
                                         ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessage) <+ pp-one-Z(prettyprint-completion-aux)> t1__
     with t2__' := <pp-one-Z(prettyprint-Smalltalk-BinaryMessageChain) <+ pp-one-Z(prettyprint-completion-aux)> t2__
-    with t3__' := <pp-option(
-                     pp-one-Z(prettyprint-Smalltalk-KeywordMessage) <+ pp-one-Z(prettyprint-completion-aux)
-                   )> t3__
+    with t3__' := <pp-one-Z(prettyprint-Smalltalk-KeywordMessage) <+ pp-one-Z(prettyprint-completion-aux)> t3__
 
   is-Smalltalk-MessageChain =
-    ?BinaryMessage2(_, _, _)
+    ?KeywordMessage(_, _, _)
 
   Smalltalk-get-indent :
-    ( t@BinaryMessage2(t1__, t2__, t3__)
+    ( t@KeywordMessage(t1__, t2__, t3__)
     , index
     ) -> indent
     where sort := <ia-get-sort> t
@@ -2935,7 +3026,7 @@ strategies
          end
 
   Smalltalk-get-separator :
-    ( t@BinaryMessage2(t1__, t2__, t3__)
+    ( t@KeywordMessage(t1__, t2__, t3__)
     , index
     ) -> separator
     where sort := <ia-get-sort> t
@@ -2952,7 +3043,7 @@ strategies
          end
 
   Smalltalk-get-leading-ws :
-    ( t@BinaryMessage2(t1__, t2__, t3__)
+    ( t@KeywordMessage(t1__, t2__, t3__)
     , index
     ) -> ws
     where sort := <ia-get-sort> t
@@ -3099,9 +3190,7 @@ strategies
                                 )
                               ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Operand) <+ pp-one-Z(prettyprint-completion-aux)> t1__
-    with t2__' := <pp-option(
-                     pp-one-Z(prettyprint-Smalltalk-ExpressionRest) <+ pp-one-Z(prettyprint-completion-aux)
-                   )> t2__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-ExpressionRest) <+ pp-one-Z(prettyprint-completion-aux)> t2__
 
   is-Smalltalk-Expression =
     ?Expression(_, _)
@@ -3141,6 +3230,43 @@ strategies
              ws := ""
            case ?2 :
              ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-ExpressionRest :
+    EREmpty() -> [ H(
+                     []
+                   , [S("")]
+                   )
+                 ]
+
+  is-Smalltalk-ExpressionRest =
+    ?EREmpty()
+
+  Smalltalk-get-indent :
+    (t@EREmpty(), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"ExpressionRest"> sort
+    with switch !index
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@EREmpty(), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"ExpressionRest"> sort
+    with switch !index
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@EREmpty(), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"ExpressionRest"> sort
+    with switch !index
            otherwise :
              ws := ""
          end
@@ -5493,16 +5619,6 @@ strategies
 
   is-Smalltalk-ExecutableCode =
     ?ExecutableCode-Plhdr(_)
-
-  prettyprint-Smalltalk-BinarySelectorChar :
-    BinarySelectorChar-Opt-Plhdr() -> [ H(
-                                          []
-                                        , [S("")]
-                                        )
-                                      ]
-
-  is-Smalltalk-BinarySelectorChar =
-    ?BinarySelectorChar-Opt-Plhdr()
 
   prettyprint-Smalltalk-LiteralArrayElement :
     LiteralArrayElement-Opt-Plhdr() -> [ H(

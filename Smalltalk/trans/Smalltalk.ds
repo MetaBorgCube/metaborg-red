@@ -8,25 +8,67 @@ src-gen/ds-signatures/Common-sig
 signature
   sorts
   	V
+  	O
+  	N
+  	E
   constructors
     NumV: Int -> V
+    OP: String -> O    
+    OP: String * String -> O    
+    ExpRest: O * V -> E
   arrows
+    Prog -init-> V
   	Expression --> V
+  	Literal --> V
+  	Operand --> V
+  	BinaryMessage --> E
+  	MessageChain --> E
+  	ExpressionRest --> E
+  	BinaryMessageOperand --> V
+  	BinaryMessageSelector --> O
   variables
   	v : V
+  	o : O
   native operators
     parseI: String -> Int
+    binOpI: Int * Int * String -> Int
+  sort aliases
+    Env = Map(String, V)
+    Heap = Map(Int, V)
+  components
+    H : Heap
+    E : Env
     
 rules
 	
-//	Program(e) -init-> v
-//	  where
-//	    E {} |- e :: H {} --> v :: H _.
+	Program(Temp(e)) -init-> v
+	  where
+	    E {} |- e :: H {} --> v :: H _.
 //	    
 	    
-	Expression(_,_) --> NumV(parseI("5")).
+	Expression(e1, EREmpty()) --> NumV(i1)
+		where e1 --> NumV(i1).
 //    
-//	Lit(s) --> NumV(parseI(s)).
+	Expression(e1, e2) --> NumV(binOpI(i1, i2, op))
+	where 
+		e1 --> NumV(i1);
+		e2 --> ExpRest(OP(op), NumV(i2)).
+		
+	Literal2(e1) --> NumV(i1)
+		where e1 --> NumV(i1).
+		
+	IntegerLiteral(s) --> NumV(parseI(s)).
+	
+	BinaryMessage1(selector, operand) --> ExpRest(selector, operand).
+		
+	UnarySelector(op) --> OP(op).
+	BinarySelector(op1, op2) --> OP(op1, op2).
+	
+	BinaryMessage2(message, chain) --> message.
+	ExpressionRest(message, cascaded) --> message.
+	EREmpty() --> ExpRest(OP("+"), NumV(0)).
+	
+	BinaryMessageOperand(literal, chain) --> literal.
 //	
 //	Plus(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
 //	Minus(NumV(i1), NumV(i2)) --> NumV(subI(i1, i2)).

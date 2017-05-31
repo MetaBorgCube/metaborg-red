@@ -71,7 +71,8 @@ signature
       UnaryMessageSelector1 : Identifier -> UnaryMessageSelector 
       Keyword : Identifier -> Keyword 
       KeywordMessageSelector1 : List(Keyword) -> KeywordMessageSelector 
-      BinaryMessageSelector1 : BinarySelectorChar * BinarySelectorChar -> BinaryMessageSelector 
+      UnarySelector : BinarySelectorChar -> BinaryMessageSelector 
+      BinarySelector : BinarySelectorChar * BinarySelectorChar -> BinaryMessageSelector 
       UnaryMessageSelector2 : UnaryMessageSelector -> SymbolInArrayLiteral 
       KeywordMessageSelector2 : KeywordMessageSelector -> SymbolInArrayLiteral 
       BinaryMessageSelector2 : BinaryMessageSelector -> SymbolInArrayLiteral 
@@ -112,10 +113,12 @@ signature
       KeywordMessageSegment : Keyword * KeywordMessageArgument -> KeywordMessageSegment 
       KeywordMessage : KeywordMessageSegment * List(KeywordMessageSegment) -> KeywordMessage 
       KeywordMessage : KeywordMessage -> MessageChain 
-      BinaryMessage2 : BinaryMessage * BinaryMessageChain * KeywordMessage -> MessageChain 
+      BinaryMessage2 : BinaryMessage * BinaryMessageChain -> MessageChain 
+      KeywordMessage : BinaryMessage * BinaryMessageChain * KeywordMessage -> MessageChain 
       UnaryMessage : UnaryMessage * UnaryMessageChain * BinaryMessageChain * KeywordMessage -> MessageChain 
       CascadedMessage : MessageChain -> CascadedMessage 
       Expression : Operand * ExpressionRest -> Expression 
+      EREmpty : ExpressionRest 
       ExpressionRest : MessageChain * List(CascadedMessage) -> ExpressionRest 
       AssignmentOperation : BindableIdentifier -> AssignmentOperation 
       Statement : List(AssignmentOperation) * Expression -> Statement 

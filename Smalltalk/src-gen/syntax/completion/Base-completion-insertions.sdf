@@ -1,6 +1,0 @@
-module completion/Base-completion-insertions
-imports Base
-
-exports
-  lexical syntax
-     -> COMPLETION-INSERTION 

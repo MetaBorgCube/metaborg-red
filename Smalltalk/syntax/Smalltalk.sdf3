@@ -94,9 +94,8 @@ context-free syntax
 	
 	CascadedMessage.CascadedMessage = <; <MessageChain>>
 	
-	Expression.Expression = <<Operand> <ExpressionRest>>
-	ExpressionRest.EREmpty = <>
-	ExpressionRest.ExpressionRest = <<MessageChain> <CascadedMessage*>>
+	Expression.SingletonExpression = Operand
+	Expression.Expression = <<Operand> <MessageChain> <CascadedMessage*>>
 	
 	AssignmentOperation.AssignmentOperation = <<BindableIdentifier> :=>
 	Statement.Statement = <<AssignmentOperation*> <Expression>>

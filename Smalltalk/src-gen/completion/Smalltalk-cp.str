@@ -606,28 +606,25 @@ rules
 
   suggest-completions(|completions):
     Expression-Plhdr() -> <add-completions(
-                           | ( "Expression"
-                             , Expression(
+                           | ( "SingletonExpression"
+                             , SingletonExpression(
                                  <try(inline-completions(|Expression-Plhdr()))> Operand-Plhdr()
-                               , <try(inline-completions(|Expression-Plhdr()))> ExpressionRest-Plhdr()
                                )
                              )
                            )
                            ; fail> completions
 
-  null-constructor-completion-sort :
-    "ExpressionRest" -> EREmpty()
-
   suggest-completions(|completions):
-    ExpressionRest-Plhdr() -> <add-completions(
-                               | ( "ExpressionRest"
-                                 , ExpressionRest(
-                                     <try(inline-completions(|ExpressionRest-Plhdr()))> MessageChain-Plhdr()
-                                   , CURSOR_ELEMENT()
-                                   )
-                                 )
+    Expression-Plhdr() -> <add-completions(
+                           | ( "Expression"
+                             , Expression(
+                                 <try(inline-completions(|Expression-Plhdr()))> Operand-Plhdr()
+                               , <try(inline-completions(|Expression-Plhdr()))> MessageChain-Plhdr()
+                               , CURSOR_ELEMENT()
                                )
-                               ; fail> completions
+                             )
+                           )
+                           ; fail> completions
 
   suggest-completions(|completions):
     AssignmentOperation-Plhdr() -> <add-completions(
@@ -1148,6 +1145,17 @@ rules
     "KeywordMessage" -> <id>
 
   is-left-recursive :
+    "Operand" -> <is-left-recursive> "Expression"
+    where <not(is-lexical-completion-sort)> "Operand"
+
+  is-right-recursive :
+    "Operand" -> <is-right-recursive> "Expression"
+    where <not(is-lexical-completion-sort)> "Operand"
+
+  is-Expression-completion-sort :
+    "Operand" -> <id>
+
+  is-left-recursive :
     "UnaryMessageSelector" -> <is-left-recursive> "UnaryMethodHeader"
     where <not(is-lexical-completion-sort)> "UnaryMessageSelector"
 
@@ -1301,9 +1309,6 @@ rules
 
   is-SDF-placeholder =
     ?Operand-Plhdr()
-
-  is-SDF-placeholder =
-    ?ExpressionRest-Plhdr()
 
   is-SDF-placeholder =
     ?MessageChain-Plhdr()

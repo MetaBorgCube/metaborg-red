@@ -9,23 +9,26 @@ signature
   sorts
   	V
   	O
-  	N
   	E
+  	Chain
   constructors
     NumV: Int -> V
     OP: String -> O    
     OP: String * String -> O    
     ExpRest: O * V -> E
+    Exp: Int * List(BinaryMessage) -> V
+//    Chain: E * List(E) -> List(Chain)
   arrows
     Prog -init-> V
   	Expression --> V
   	Literal --> V
   	Operand --> V
   	BinaryMessage --> E
-  	MessageChain --> E
-  	ExpressionRest --> E
+  	MessageChain --> MessageChain
   	BinaryMessageOperand --> V
   	BinaryMessageSelector --> O
+  	BinaryMessageChain --> List(BinaryMessage)
+  	V --> V
   variables
   	v : V
   	o : O
@@ -45,14 +48,25 @@ rules
 	  where
 	    E {} |- e :: H {} --> v :: H _.
 //	    
-	    
-	Expression(e1, EREmpty()) --> NumV(i1)
-		where e1 --> NumV(i1).
-//    
-	Expression(e1, e2) --> NumV(binOpI(i1, i2, op))
+	    //    
+	SingletonExpression(e1) --> NumV(i)
+	where
+		e1 --> NumV(i).
+	
+	Expression(e1, e2, cascaded) --> e4
 	where 
 		e1 --> NumV(i1);
-		e2 --> ExpRest(OP(op), NumV(i2)).
+		e2 --> BinaryMessage2(ExpRest(OP(op), NumV(i2)), messageChain);
+		binOpI(i1, i2, op) => e3;
+		Exp(e3, messageChain) --> e4.
+		
+	Exp(e3, [binMessage1 | rest]) --> NumV(i1)
+		where
+			binMessage1 --> ExpRest(OP(op), NumV(i2));
+			binOpI(e3, i2, op) => i3;
+			Exp(i3, rest) --> NumV(i1).
+			
+	Exp(e3, []) --> NumV(e3).		
 		
 	Literal2(e1) --> NumV(i1)
 		where e1 --> NumV(i1).
@@ -63,12 +77,12 @@ rules
 		
 	UnarySelector(op) --> OP(op).
 	BinarySelector(op1, op2) --> OP(op1, op2).
-	
-	BinaryMessage2(message, chain) --> message.
-	ExpressionRest(message, cascaded) --> message.
-	EREmpty() --> ExpRest(OP("+"), NumV(0)).
+			
+	BinaryMessage2(binMessage, messageChain) --> BinaryMessage2(binMessage, messageChain).
 	
 	BinaryMessageOperand(literal, chain) --> literal.
+	
+	BinaryMessageChain(list) --> list.
 //	
 //	Plus(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
 //	Minus(NumV(i1), NumV(i2)) --> NumV(subI(i1, i2)).

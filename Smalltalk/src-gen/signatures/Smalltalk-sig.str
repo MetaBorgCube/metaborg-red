@@ -68,9 +68,8 @@ signature
     KeywordMessage                                      : BinaryMessage * BinaryMessageChain * KeywordMessage -> MessageChain
     UnaryMessage                                        : UnaryMessage * UnaryMessageChain * BinaryMessageChain * Option(KeywordMessage) -> MessageChain
     CascadedMessage                                     : MessageChain -> CascadedMessage
-    Expression                                          : Operand * ExpressionRest -> Expression
-    EREmpty                                             : ExpressionRest
-    ExpressionRest                                      : MessageChain * List(CascadedMessage) -> ExpressionRest
+    SingletonExpression                                 : Operand -> Expression
+    Expression                                          : Operand * MessageChain * List(CascadedMessage) -> Expression
     AssignmentOperation                                 : BindableIdentifier -> AssignmentOperation
     Statement                                           : List(AssignmentOperation) * Expression -> Statement
     MethodReturnOperator                                : MethodReturnOperator
@@ -124,7 +123,6 @@ signature
     BinaryMessageChain-Plhdr                            : BinaryMessageChain
     KeywordMessage-Plhdr                                : KeywordMessage
     Operand-Plhdr                                       : Operand
-    ExpressionRest-Plhdr                                : ExpressionRest
     MessageChain-Plhdr                                  : MessageChain
     CascadedMessage-Plhdr                               : CascadedMessage
     AssignmentOperation-Plhdr                           : AssignmentOperation
@@ -183,7 +181,6 @@ signature
     BinaryMessageChain-Plhdr                            : COMPLETION-INSERTION -> BinaryMessageChain
     KeywordMessage-Plhdr                                : COMPLETION-INSERTION -> KeywordMessage
     Operand-Plhdr                                       : COMPLETION-INSERTION -> Operand
-    ExpressionRest-Plhdr                                : COMPLETION-INSERTION -> ExpressionRest
     MessageChain-Plhdr                                  : COMPLETION-INSERTION -> MessageChain
     CascadedMessage-Plhdr                               : COMPLETION-INSERTION -> CascadedMessage
     AssignmentOperation-Plhdr                           : COMPLETION-INSERTION -> AssignmentOperation
@@ -213,7 +210,6 @@ signature
     BinaryMessage-Opt-Plhdr                             : BinaryMessage
     KeywordMessageSegment-Opt-Plhdr                     : KeywordMessageSegment
     KeywordMessage-Opt-Plhdr                            : KeywordMessage
-    ExpressionRest-Opt-Plhdr                            : ExpressionRest
     CascadedMessage-Opt-Plhdr                           : CascadedMessage
     AssignmentOperation-Opt-Plhdr                       : AssignmentOperation
     MethodReturnOperator-Opt-Plhdr                      : MethodReturnOperator

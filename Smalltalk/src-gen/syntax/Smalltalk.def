@@ -110,9 +110,8 @@ exports
     BinaryMessage BinaryMessageChain KeywordMessage                   -> MessageChain                              {cons("KeywordMessage")}
     UnaryMessage UnaryMessageChain BinaryMessageChain KeywordMessage? -> MessageChain                              {cons("UnaryMessage")}
     ";" MessageChain                                                  -> CascadedMessage                           {cons("CascadedMessage")}
-    Operand ExpressionRest                                            -> Expression                                {cons("Expression")}
-                                                                      -> ExpressionRest                            {cons("EREmpty")}
-    MessageChain CascadedMessage*                                     -> ExpressionRest                            {cons("ExpressionRest")}
+    Operand                                                           -> Expression                                {cons("SingletonExpression")}
+    Operand MessageChain CascadedMessage*                             -> Expression                                {cons("Expression")}
     BindableIdentifier ":="                                           -> AssignmentOperation                       {cons("AssignmentOperation")}
     AssignmentOperation* Expression                                   -> Statement                                 {cons("Statement")}
     "^"                                                               -> MethodReturnOperator                      {cons("MethodReturnOperator")}
@@ -171,7 +170,6 @@ exports
     "$BinaryMessageChain"                        -> BinaryMessageChain                        {cons("BinaryMessageChain-Plhdr"), placeholder}
     "$KeywordMessage"                            -> KeywordMessage                            {cons("KeywordMessage-Plhdr"), placeholder}
     "$Operand"                                   -> Operand                                   {cons("Operand-Plhdr"), placeholder}
-    "$ExpressionRest"                            -> ExpressionRest                            {cons("ExpressionRest-Plhdr"), placeholder}
     "$MessageChain"                              -> MessageChain                              {cons("MessageChain-Plhdr"), placeholder}
     "$CascadedMessage"                           -> CascadedMessage                           {cons("CascadedMessage-Plhdr"), placeholder}
     "$AssignmentOperation"                       -> AssignmentOperation                       {cons("AssignmentOperation-Plhdr"), placeholder}

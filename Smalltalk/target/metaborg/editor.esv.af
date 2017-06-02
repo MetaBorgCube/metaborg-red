@@ -165,7 +165,6 @@ Module(
       , ColorRule(ConstructorOnly(Constructor("BinaryMessageChain-Plhdr")), AttributeRef("gray"))
       , ColorRule(ConstructorOnly(Constructor("KeywordMessage-Plhdr")), AttributeRef("gray"))
       , ColorRule(ConstructorOnly(Constructor("Operand-Plhdr")), AttributeRef("gray"))
-      , ColorRule(ConstructorOnly(Constructor("ExpressionRest-Plhdr")), AttributeRef("gray"))
       , ColorRule(ConstructorOnly(Constructor("MessageChain-Plhdr")), AttributeRef("gray"))
       , ColorRule(ConstructorOnly(Constructor("CascadedMessage-Plhdr")), AttributeRef("gray"))
       , ColorRule(ConstructorOnly(Constructor("AssignmentOperation-Plhdr")), AttributeRef("gray"))

@@ -1,0 +1,15 @@
+
+/target/
+src/main/resources/specification.aterm
+src/main/resources/parsetable.tbl
+src/main/java/org/metaborg/Smalltalk/interpreter/generated
+src/main/java/org/metaborg/Smalltalk/interpreter/generated/terms
+src/main/java/org/metaborg/Smalltalk/interpreter/generated/terms/build
+src/main/java/org/metaborg/Smalltalk/interpreter/generated/terms/match
+src/test/java/org/metaborg/Smalltalk/interpreter/generated/test
+/Smalltalk.launch
+/TestSmalltalk.launch
+/Smalltalk (Daemon).launch
+/Smalltalk-server
+/Smalltalk-client
+/Smalltalk

@@ -1,18 +1,18 @@
 module Base
 exports
   lexical syntax
-    ~[]                                                                                            -> Character              
+    ~[\"]                                                                                          -> Character              
     [\ \t\n\r]                                                                                     -> WhitespaceCharacter    
     [0-9]                                                                                          -> DecimalDigit           
     [a-zA-Z]                                                                                       -> Letter                 
-    ~[\"]                                                                                          -> CommentCharacter       
-    [\\\"]                                                                                         -> CommentCharacter       
-    "\"" CommentCharacter* "\""                                                                    -> Comment                
-    ( WhitespaceCharacter | Comment )+                                                             -> Whitespace             
     WhitespaceCharacter                                                                            -> LAYOUT                 
-    Comment                                                                                        -> LAYOUT                 
+    "\"" CommentChar* "\""                                                                         -> LAYOUT                 
+    ~[\"]                                                                                          -> CommentChar            
+    "\\\""                                                                                         -> CommentChar            
+    BackSlashChar                                                                                  -> CommentChar            
+    "\\"                                                                                           -> BackSlashChar          
     DecimalDigit | Letter                                                                          -> LetterOrDigit          
-    ( DecimalDigit | Letter | "_" )+                                                               -> Identifier             
+    Letter | "_" ( DecimalDigit | Letter | "_" )*                                                  -> Identifier             
     "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/" -> BinarySelectorChar     
     "-"? UnsignedIntegerLiteral                                                                    -> IntegerLiteral         
     DecimalIntegerLiteral | ( Radix "r" BaseNIntegerLiteral )                                      -> UnsignedIntegerLiteral 
@@ -25,11 +25,14 @@ exports
     "$" Character                                                                                  -> CharacterLiteral       
     "'" ( StringLiteralCharacter | "''" )* "'"                                                     -> StringLiteral          
     ~[\']                                                                                          -> StringLiteralCharacter 
+    "\\"                                                                                           -> BackSlashChar          
+    "\\'"                                                                                          -> StringLiteralCharacter 
+    "\\"                                                                                           -> StringLiteralCharacter 
 
   lexical restrictions
-    CommentCharacter -/- [\"]
     DecimalDigit -/- [0-9]
     Identifier -/- [a-zA-Z0-9\_]
+    BackSlashChar -/- [\']
 
   context-free restrictions
     LAYOUT? -/- [\ \t\n\r]

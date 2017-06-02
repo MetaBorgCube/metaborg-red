@@ -2,20 +2,20 @@ module Base
 
 lexical syntax
 
-	Character = ~[]
+	Character = ~[\"]
 	WhitespaceCharacter = [\ \t\n\r]
 	DecimalDigit = [0-9]
 	Letter = [a-zA-Z]
-	CommentCharacter = ~[\"]
-	CommentCharacter = [\\\"]
-	Comment = "\"" CommentCharacter* "\""
-	Whitespace = (WhitespaceCharacter | Comment)+
-	
+
 	LAYOUT = WhitespaceCharacter
-	LAYOUT = Comment
+	LAYOUT         = "\"" CommentChar* "\"" 
+	CommentChar     = ~[\"] 
+	CommentChar     = "\\\"" 
+	CommentChar     = BackSlashChar 
+	BackSlashChar  = "\\" 
 	
 	LetterOrDigit = DecimalDigit|Letter
-	Identifier = (DecimalDigit|Letter|"_")+
+	Identifier = (Letter|"_")(DecimalDigit|Letter|"_")*
 
 	
 	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
@@ -33,13 +33,21 @@ lexical syntax
 	StringLiteral = "'" (StringLiteralCharacter|"''")* "'"
 	StringLiteralCharacter = ~[\']
 	
+	BackSlashChar  = "\\"
+	StringLiteralCharacter = "\\'"
+	StringLiteralCharacter = "\\"
+	
 lexical restrictions
 
   // Ensure greedy matching for lexicals
   
-  CommentCharacter   -/- [\"]
+//  CommentChar   -/- [\"]
   DecimalDigit       -/- [0-9]
   Identifier         -/- [a-zA-Z0-9\_]
+  
+  // Backslash chars in strings may not be followed by ' 
+  
+  BackSlashChar -/- [\']
 
 context-free restrictions
 
@@ -47,3 +55,4 @@ context-free restrictions
   
   LAYOUT? -/- [\ \t\n\r]
   LAYOUT? -/- [\"]
+  

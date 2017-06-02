@@ -6,9 +6,7 @@ signature
      : String -> WhitespaceCharacter
      : String -> DecimalDigit
      : String -> Letter
-     : String -> CommentCharacter
-     : String -> Comment
-     : String -> Whitespace
+     : String -> CommentChar
      : String -> LetterOrDigit
      : String -> Identifier
      : String -> BinarySelectorChar
@@ -22,4 +20,5 @@ signature
      : String -> Exponent
      : String -> CharacterLiteral
      : String -> StringLiteral
+     : String -> BackSlashChar
      : String -> StringLiteralCharacter

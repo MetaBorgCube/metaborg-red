@@ -38,7 +38,6 @@ signature
       MessageChain
       CascadedMessage
       Expression
-      ExpressionRest
       AssignmentOperation
       Statement
       MethodReturnOperator
@@ -56,7 +55,8 @@ signature
       MethodDeclaration
     constructors
       MethodDeclaration : MethodDeclaration -> Start 
-      ExecutableCode : ExecutableCode -> Start 
+      ExecutableCode : ExecutableCodeRest -> Start 
+      Empty : Start 
       Reference : Identifier -> Reference 
       Null : ConstantReference 
       False : ConstantReference 
@@ -112,8 +112,8 @@ signature
       BinaryMessage : BinaryMessage * BinaryMessageChain * KeywordMessage -> MessageChain 
       UnaryMessage : UnaryMessage * UnaryMessageChain * BinaryMessageChain * KeywordMessage -> MessageChain 
       CascadedMessage : MessageChain -> CascadedMessage 
-      Expression : Operand * ExpressionRest -> Expression 
-      ExpressionRest : MessageChain * List(CascadedMessage) -> ExpressionRest 
+      SingletonExpression : Operand -> Expression 
+      Expression : Operand * MessageChain * List(CascadedMessage) -> Expression 
       AssignmentOperation : BindableIdentifier -> AssignmentOperation 
       Statement : List(AssignmentOperation) * Expression -> Statement 
       MethodReturnOperator : MethodReturnOperator 

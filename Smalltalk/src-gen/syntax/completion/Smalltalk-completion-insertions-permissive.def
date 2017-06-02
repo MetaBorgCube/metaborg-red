@@ -33,10 +33,10 @@ exports
   lexical syntax
     %% Lexical insertion recovery rules                                                                         
     "\""                                                        -> INSERTOPENQUOTE                              {recover}
-    INSERTOPENQUOTE CommentCharacter* "\n"                      -> Comment                                      {cons("INSERTEND")}
-    INSERTOPENQUOTE CommentCharacter* WATEREOF                  -> Comment                                      {cons("INSERTEND")}
+    INSERTOPENQUOTE CommentChar* "\n"                           -> LAYOUT                                       {cons("INSERTEND")}
+    INSERTOPENQUOTE CommentChar* WATEREOF                       -> LAYOUT                                       {cons("INSERTEND")}
     "\""                                                        -> INSERTSTART                                  {recover}
-    INSERTSTART CommentCharacter* WATEREOF                      -> Comment                                      {cons("INSERTEND")}
+    INSERTSTART CommentChar* WATEREOF                           -> LAYOUT                                       {cons("INSERTEND")}
                                                                 -> "_"                                          {recover, cons("INSERTION")}
                                                                 -> "~"                                          {recover, cons("INSERTION")}
                                                                 -> "!"                                          {recover, cons("INSERTION")}
@@ -81,7 +81,6 @@ exports
                                                                 -> "$Identifier"                                {recover, cons("INSERTION")}
                                                                 -> "$BinarySelectorChar"                        {recover, cons("INSERTION")}
                                                                 -> "$KeywordMessageSelector"                    {recover, cons("INSERTION")}
-                                                                -> "$ObjectArrayLiteral"                        {recover, cons("INSERTION")}
                                                                 -> "$SymbolInArrayLiteral"                      {recover, cons("INSERTION")}
                                                                 -> "$ByteArrayLiteral"                          {recover, cons("INSERTION")}
                                                                 -> "$UnsignedIntegerLiteral"                    {recover, cons("INSERTION")}
@@ -95,7 +94,6 @@ exports
                                                                 -> "$CharacterLiteral"                          {recover, cons("INSERTION")}
                                                                 -> "$StringLiteral"                             {recover, cons("INSERTION")}
                                                                 -> "$SymbolLiteral"                             {recover, cons("INSERTION")}
-                                                                -> "$ArrayLiteral"                              {recover, cons("INSERTION")}
                                                                 -> "$Reference"                                 {recover, cons("INSERTION")}
                                                                 -> "$UnaryMessage"                              {recover, cons("INSERTION")}
                                                                 -> "$UnaryMessageChain"                         {recover, cons("INSERTION")}
@@ -125,18 +123,18 @@ exports
 module Base
 exports
   lexical syntax
-    ~[]                                                                                            -> Character              
+    ~[\"]                                                                                          -> Character              
     [\ \t\n\r]                                                                                     -> WhitespaceCharacter    
     [0-9]                                                                                          -> DecimalDigit           
     [a-zA-Z]                                                                                       -> Letter                 
-    ~[\"]                                                                                          -> CommentCharacter       
-    [\\\"]                                                                                         -> CommentCharacter       
-    "\"" CommentCharacter* "\""                                                                    -> Comment                
-    ( WhitespaceCharacter | Comment )+                                                             -> Whitespace             
     WhitespaceCharacter                                                                            -> LAYOUT                 
-    Comment                                                                                        -> LAYOUT                 
+    "\"" CommentChar* "\""                                                                         -> LAYOUT                 
+    ~[\"]                                                                                          -> CommentChar            
+    "\\\""                                                                                         -> CommentChar            
+    BackSlashChar                                                                                  -> CommentChar            
+    "\\"                                                                                           -> BackSlashChar          
     DecimalDigit | Letter                                                                          -> LetterOrDigit          
-    ( DecimalDigit | Letter | "_" )+                                                               -> Identifier             
+    Letter | "_" ( DecimalDigit | Letter | "_" )*                                                  -> Identifier             
     "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/" -> BinarySelectorChar     
     "-"? UnsignedIntegerLiteral                                                                    -> IntegerLiteral         
     DecimalIntegerLiteral | ( Radix "r" BaseNIntegerLiteral )                                      -> UnsignedIntegerLiteral 
@@ -149,11 +147,14 @@ exports
     "$" Character                                                                                  -> CharacterLiteral       
     "'" ( StringLiteralCharacter | "''" )* "'"                                                     -> StringLiteral          
     ~[\']                                                                                          -> StringLiteralCharacter 
+    "\\"                                                                                           -> BackSlashChar          
+    "\\'"                                                                                          -> StringLiteralCharacter 
+    "\\"                                                                                           -> StringLiteralCharacter 
 
   lexical restrictions
-    CommentCharacter -/- [\"]
     DecimalDigit -/- [0-9]
     Identifier -/- [a-zA-Z0-9\_]
+    BackSlashChar -/- [\']
 
   context-free restrictions
     LAYOUT? -/- [\ \t\n\r]
@@ -168,7 +169,8 @@ exports
 
   context-free syntax
     MethodDeclaration                                                 -> Start                                     {cons("MethodDeclaration")}
-    ExecutableCode                                                    -> Start                                     {cons("ExecutableCode")}
+    ExecutableCodeRest                                                -> Start                                     {cons("ExecutableCode")}
+                                                                      -> Start                                     {cons("Empty")}
     Identifier                                                        -> Reference                                 {cons("Reference")}
     "nil"                                                             -> ConstantReference                         {cons("Null")}
     "false"                                                           -> ConstantReference                         {cons("False")}
@@ -194,6 +196,8 @@ exports
     ByteArrayLiteral                                                  -> ArrayLiteral                              {cons("ByteArrayLiteral")}
     "#" NestedObjectArrayLiteral                                      -> ObjectArrayLiteral                        {cons("ObjectArrayLiteral")}
     "(" LiteralArrayElement* ")"                                      -> NestedObjectArrayLiteral                  {cons("NestedObjectArrayLiteral")}
+    Literal                                                           -> LiteralArrayElement                       {cons("Literal")}
+    BlockLiteral                                                      -> LiteralArrayElement                       {cons("BlockLiteral"), reject}
     NestedObjectArrayLiteral                                          -> LiteralArrayElement                       {cons("NestedObjectArrayLiteral")}
     SymbolInArrayLiteral                                              -> LiteralArrayElement                       {cons("SymbolInArrayLiteral")}
     ConstantReference                                                 -> LiteralArrayElement                       {cons("ConstantReference")}
@@ -227,12 +231,12 @@ exports
     BinaryMessage BinaryMessageChain KeywordMessage?                  -> MessageChain                              {cons("BinaryMessage")}
     UnaryMessage UnaryMessageChain BinaryMessageChain KeywordMessage? -> MessageChain                              {cons("UnaryMessage")}
     ";" MessageChain                                                  -> CascadedMessage                           {cons("CascadedMessage")}
-    Operand ExpressionRest?                                           -> Expression                                {cons("Expression")}
-    MessageChain CascadedMessage*                                     -> ExpressionRest                            {cons("ExpressionRest")}
+    Operand                                                           -> Expression                                {cons("SingletonExpression")}
+    Operand MessageChain CascadedMessage*                             -> Expression                                {cons("Expression")}
     BindableIdentifier ":="                                           -> AssignmentOperation                       {cons("AssignmentOperation")}
     AssignmentOperation* Expression                                   -> Statement                                 {cons("Statement")}
     "^"                                                               -> MethodReturnOperator                      {cons("MethodReturnOperator")}
-    MethodReturnOperator? "," Statement                               -> FinalStatement                            {cons("FinalStatement")}
+    MethodReturnOperator? Statement                                   -> FinalStatement                            {cons("FinalStatement")}
     "|" BindableIdentifier* "|"                                       -> LocalVariableDeclarationList              {cons("LocalVariableDeclarationList")}
     LocalVariableDeclarationList? ExecutableCodeRest?                 -> ExecutableCode                            {cons("ExecutableCode")}
     DottedStatement* FinalStatement Dot?                              -> ExecutableCodeRest                        {cons("ExecutableCodeRest")}
@@ -286,7 +290,6 @@ exports
     "$BinaryMessageChain"                        -> BinaryMessageChain                        {cons("BinaryMessageChain-Plhdr"), placeholder}
     "$KeywordMessage"                            -> KeywordMessage                            {cons("KeywordMessage-Plhdr"), placeholder}
     "$Operand"                                   -> Operand                                   {cons("Operand-Plhdr"), placeholder}
-    "$ExpressionRest"                            -> ExpressionRest                            {cons("ExpressionRest-Plhdr"), placeholder}
     "$MessageChain"                              -> MessageChain                              {cons("MessageChain-Plhdr"), placeholder}
     "$CascadedMessage"                           -> CascadedMessage                           {cons("CascadedMessage-Plhdr"), placeholder}
     "$AssignmentOperation"                       -> AssignmentOperation                       {cons("AssignmentOperation-Plhdr"), placeholder}
@@ -310,6 +313,8 @@ exports
     "$MethodHeader"                              -> MethodHeader                              {cons("MethodHeader-Plhdr"), placeholder}
     "$ExecutableCode"                            -> ExecutableCode                            {cons("ExecutableCode-Plhdr"), placeholder}
 
+  context-free priorities
+
 module completion/Smalltalk-completion-insertions
 imports Smalltalk
 
@@ -326,13 +331,13 @@ exports
     CharacterLiteral StringLiteral SymbolLiteral ArrayLiteral BlockLiteral
     Literal Reference NestedExpression BinaryMessageOperand
     KeywordMessageArgument KeywordMessageSegment BinaryMessage UnaryMessage
-    UnaryMessageChain BinaryMessageChain KeywordMessage Operand ExpressionRest
-    MessageChain CascadedMessage AssignmentOperation Expression
-    MethodReturnOperator LocalVariableDeclarationList ExecutableCodeRest
-    FinalStatement DottedStatement Statement Dot UnaryMessageSelector
-    BinaryMessageSelector Keyword BindableIdentifier KeywordMethodHeaderSegment
-    UnaryMethodHeader BinaryMethodHeader KeywordMethodHeader MethodDeclaration
-    MethodHeader ExecutableCode
+    UnaryMessageChain BinaryMessageChain KeywordMessage Operand MessageChain
+    CascadedMessage AssignmentOperation Expression MethodReturnOperator
+    LocalVariableDeclarationList ExecutableCodeRest FinalStatement
+    DottedStatement Statement Dot UnaryMessageSelector BinaryMessageSelector
+    Keyword BindableIdentifier KeywordMethodHeaderSegment UnaryMethodHeader
+    BinaryMethodHeader KeywordMethodHeader MethodDeclaration MethodHeader
+    ExecutableCode
 
   context-free syntax
     COMPLETION-INSERTION -> Start                                     {cons("Start-Plhdr"), placeholder-insertion}
@@ -370,7 +375,6 @@ exports
     COMPLETION-INSERTION -> BinaryMessageChain                        {cons("BinaryMessageChain-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> KeywordMessage                            {cons("KeywordMessage-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> Operand                                   {cons("Operand-Plhdr"), placeholder-insertion}
-    COMPLETION-INSERTION -> ExpressionRest                            {cons("ExpressionRest-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> MessageChain                              {cons("MessageChain-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> CascadedMessage                           {cons("CascadedMessage-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> AssignmentOperation                       {cons("AssignmentOperation-Plhdr"), placeholder-insertion}
@@ -411,7 +415,6 @@ exports
     COMPLETION-INSERTION -> ";"           {literal-completion}
     COMPLETION-INSERTION -> ":="          {literal-completion}
     COMPLETION-INSERTION -> "^"           {literal-completion}
-    COMPLETION-INSERTION -> ","           {literal-completion}
     COMPLETION-INSERTION -> "|"           {literal-completion}
     COMPLETION-INSERTION -> "."           {literal-completion}
 

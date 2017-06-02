@@ -11,7 +11,9 @@ context-free start-symbols
 context-free syntax
   
 	Start.MethodDeclaration = MethodDeclaration
-	Start.ExecutableCode = ExecutableCode
+	Start.ExecutableCode = ExecutableCodeRest
+//	Start.Start = Expression
+	Start.Empty = <>
 	
 	Reference.Reference = Identifier
 	
@@ -89,13 +91,13 @@ context-free syntax
 	
 	CascadedMessage.CascadedMessage = <; <MessageChain>>
 	
-	Expression.Expression = <<Operand> <ExpressionRest?>>
-	ExpressionRest.ExpressionRest = <<MessageChain> <CascadedMessage*>>
+	Expression.SingletonExpression = Operand
+	Expression.Expression = <<Operand> <MessageChain> <CascadedMessage*>>
 	
 	AssignmentOperation.AssignmentOperation = <<BindableIdentifier> :=>
 	Statement.Statement = <<AssignmentOperation*> <Expression>>
 	MethodReturnOperator.MethodReturnOperator = <^>
-	FinalStatement.FinalStatement = <<MethodReturnOperator?>, <Statement>>
+	FinalStatement.FinalStatement = <<MethodReturnOperator?> <Statement>>
 	
 	LocalVariableDeclarationList.LocalVariableDeclarationList = <| <BindableIdentifier*> |>
 	ExecutableCode.ExecutableCode = <<LocalVariableDeclarationList?> <ExecutableCodeRest?>>
@@ -112,3 +114,7 @@ context-free syntax
 	MethodHeader.KeywordMethodHeader = KeywordMethodHeader 
 	MethodDeclaration.MethodDeclaration = <<MethodHeader> <ExecutableCode>>
 	
+context-free priorities
+	
+
+

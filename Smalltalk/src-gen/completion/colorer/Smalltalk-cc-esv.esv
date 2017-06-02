@@ -39,7 +39,6 @@ colorer
   _.BinaryMessageChain-Plhdr                        : gray   
   _.KeywordMessage-Plhdr                            : gray   
   _.Operand-Plhdr                                   : gray   
-  _.ExpressionRest-Plhdr                            : gray   
   _.MessageChain-Plhdr                              : gray   
   _.CascadedMessage-Plhdr                           : gray   
   _.AssignmentOperation-Plhdr                       : gray   

@@ -144,9 +144,6 @@ strategies
     prettyprint-Smalltalk-Expression
 
   prettyprint-Smalltalk =
-    prettyprint-Smalltalk-ExpressionRest
-
-  prettyprint-Smalltalk =
     prettyprint-Smalltalk-AssignmentOperation
 
   prettyprint-Smalltalk =
@@ -328,10 +325,6 @@ strategies
     where <?"Expression"> sort
 
   prettyprint-Smalltalk(|sort):
-    t -> <prettyprint-Smalltalk-ExpressionRest>
-    where <?"ExpressionRest"> sort
-
-  prettyprint-Smalltalk(|sort):
     t -> <prettyprint-Smalltalk-AssignmentOperation>
     where <?"AssignmentOperation"> sort
 
@@ -441,7 +434,7 @@ strategies
                               , [t1__']
                               )
                             ]
-    with t1__' := <pp-one-Z(prettyprint-Smalltalk-ExecutableCode) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-ExecutableCodeRest) <+ pp-one-Z(prettyprint-completion-aux)> t1__
 
   is-Smalltalk-Start =
     ?ExecutableCode(_)
@@ -475,6 +468,43 @@ strategies
     with switch !index
            case ?1 :
              ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Start :
+    Empty() -> [ H(
+                   []
+                 , [S("")]
+                 )
+               ]
+
+  is-Smalltalk-Start =
+    ?Empty()
+
+  Smalltalk-get-indent :
+    (t@Empty(), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    (t@Empty(), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@Empty(), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Start"> sort
+    with switch !index
            otherwise :
              ws := ""
          end
@@ -2998,34 +3028,88 @@ strategies
          end
 
   prettyprint-Smalltalk-Expression :
-    Expression(t1__, t2__) -> [ H(
-                                  [SOpt(HS(), "0")]
-                                , [t1__', S(" "), t2__']
-                                )
-                              ]
+    SingletonExpression(t1__) -> [ H(
+                                     [SOpt(HS(), "0")]
+                                   , [t1__']
+                                   )
+                                 ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-Operand) <+ pp-one-Z(prettyprint-completion-aux)> t1__
-    with t2__' := <pp-option(
-                     pp-one-Z(prettyprint-Smalltalk-ExpressionRest) <+ pp-one-Z(prettyprint-completion-aux)
-                   )> t2__
 
   is-Smalltalk-Expression =
-    ?Expression(_, _)
+    ?SingletonExpression(_)
 
   Smalltalk-get-indent :
-    (t@Expression(t1__, t2__), index) -> indent
+    (t@SingletonExpression(t1__), index) -> indent
     where sort := <ia-get-sort> t
           ; <?"Expression"> sort
     with switch !index
            case ?1 :
-             indent := ""
-           case ?2 :
              indent := ""
            otherwise :
              indent := ""
          end
 
   Smalltalk-get-separator :
-    (t@Expression(t1__, t2__), index) -> separator
+    (t@SingletonExpression(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Expression"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  Smalltalk-get-leading-ws :
+    (t@SingletonExpression(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Expression"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-Smalltalk-Expression :
+    Expression(t1__, t2__, t3__) -> [ H(
+                                        [SOpt(HS(), "0")]
+                                      , [ t1__'
+                                        , S(" ")
+                                        , t2__'
+                                        , S(" ")
+                                        , t3__'
+                                        ]
+                                      )
+                                    ]
+    with t1__' := <pp-one-Z(prettyprint-Smalltalk-Operand) <+ pp-one-Z(prettyprint-completion-aux)> t1__
+    with t2__' := <pp-one-Z(prettyprint-Smalltalk-MessageChain) <+ pp-one-Z(prettyprint-completion-aux)> t2__
+    with t3__' := <pp-H-list(prettyprint-Smalltalk-CascadedMessage) <+ pp-one-Z(prettyprint-completion-aux)> t3__
+
+  is-Smalltalk-Expression =
+    ?Expression(_, _, _)
+
+  Smalltalk-get-indent :
+    ( t@Expression(t1__, t2__, t3__)
+    , index
+    ) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Expression"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           case ?3 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  Smalltalk-get-separator :
+    ( t@Expression(t1__, t2__, t3__)
+    , index
+    ) -> separator
     where sort := <ia-get-sort> t
           ; <?"Expression"> sort
     with switch !index
@@ -3033,12 +3117,16 @@ strategies
              separator := ""
            case ?2 :
              separator := ""
+           case ?3 :
+             separator := ""
            otherwise :
              separator := ""
          end
 
   Smalltalk-get-leading-ws :
-    (t@Expression(t1__, t2__), index) -> ws
+    ( t@Expression(t1__, t2__, t3__)
+    , index
+    ) -> ws
     where sort := <ia-get-sort> t
           ; <?"Expression"> sort
     with switch !index
@@ -3046,56 +3134,7 @@ strategies
              ws := ""
            case ?2 :
              ws := " "
-           otherwise :
-             ws := ""
-         end
-
-  prettyprint-Smalltalk-ExpressionRest :
-    ExpressionRest(t1__, t2__) -> [ H(
-                                      [SOpt(HS(), "0")]
-                                    , [t1__', S(" "), t2__']
-                                    )
-                                  ]
-    with t1__' := <pp-one-Z(prettyprint-Smalltalk-MessageChain) <+ pp-one-Z(prettyprint-completion-aux)> t1__
-    with t2__' := <pp-H-list(prettyprint-Smalltalk-CascadedMessage) <+ pp-one-Z(prettyprint-completion-aux)> t2__
-
-  is-Smalltalk-ExpressionRest =
-    ?ExpressionRest(_, _)
-
-  Smalltalk-get-indent :
-    (t@ExpressionRest(t1__, t2__), index) -> indent
-    where sort := <ia-get-sort> t
-          ; <?"ExpressionRest"> sort
-    with switch !index
-           case ?1 :
-             indent := ""
-           case ?2 :
-             indent := ""
-           otherwise :
-             indent := ""
-         end
-
-  Smalltalk-get-separator :
-    (t@ExpressionRest(t1__, t2__), index) -> separator
-    where sort := <ia-get-sort> t
-          ; <?"ExpressionRest"> sort
-    with switch !index
-           case ?1 :
-             separator := ""
-           case ?2 :
-             separator := ""
-           otherwise :
-             separator := ""
-         end
-
-  Smalltalk-get-leading-ws :
-    (t@ExpressionRest(t1__, t2__), index) -> ws
-    where sort := <ia-get-sort> t
-          ; <?"ExpressionRest"> sort
-    with switch !index
-           case ?1 :
-             ws := ""
-           case ?2 :
+           case ?3 :
              ws := " "
            otherwise :
              ws := ""
@@ -3236,7 +3275,7 @@ strategies
   prettyprint-Smalltalk-FinalStatement :
     FinalStatement(t1__, t2__) -> [ H(
                                       [SOpt(HS(), "0")]
-                                    , [t1__', S(", "), t2__']
+                                    , [t1__', S(" "), t2__']
                                     )
                                   ]
     with t1__' := <pp-option(
@@ -4015,9 +4054,6 @@ strategies
   is-Smalltalk-Expression =
     fail
 
-  is-Smalltalk-ExpressionRest =
-    fail
-
   is-Smalltalk-AssignmentOperation =
     fail
 
@@ -4164,9 +4200,6 @@ strategies
 
   prettyprint-Smalltalk-Expression :
     amb([h|hs]) -> <prettyprint-Smalltalk-Expression> h
-
-  prettyprint-Smalltalk-ExpressionRest :
-    amb([h|hs]) -> <prettyprint-Smalltalk-ExpressionRest> h
 
   prettyprint-Smalltalk-AssignmentOperation :
     amb([h|hs]) -> <prettyprint-Smalltalk-AssignmentOperation> h
@@ -4562,16 +4595,6 @@ strategies
 
   is-Smalltalk-Operand =
     ?Operand-Plhdr()
-
-  prettyprint-Smalltalk-ExpressionRest :
-    ExpressionRest-Plhdr() -> [ H(
-                                  [SOpt(HS(), "0")]
-                                , [S("$ExpressionRest")]
-                                )
-                              ]
-
-  is-Smalltalk-ExpressionRest =
-    ?ExpressionRest-Plhdr()
 
   prettyprint-Smalltalk-MessageChain :
     MessageChain-Plhdr() -> [ H(
@@ -5143,16 +5166,6 @@ strategies
   is-Smalltalk-Operand =
     ?Operand-Plhdr(_)
 
-  prettyprint-Smalltalk-ExpressionRest :
-    ExpressionRest-Plhdr(_) -> [ H(
-                                   [SOpt(HS(), "0")]
-                                 , [S("$ExpressionRest")]
-                                 )
-                               ]
-
-  is-Smalltalk-ExpressionRest =
-    ?ExpressionRest-Plhdr(_)
-
   prettyprint-Smalltalk-MessageChain :
     MessageChain-Plhdr(_) -> [ H(
                                  [SOpt(HS(), "0")]
@@ -5373,6 +5386,16 @@ strategies
   is-Smalltalk-ExecutableCode =
     ?ExecutableCode-Plhdr(_)
 
+  prettyprint-Smalltalk-Start :
+    Start-Opt-Plhdr() -> [ H(
+                             []
+                           , [S("")]
+                           )
+                         ]
+
+  is-Smalltalk-Start =
+    ?Start-Opt-Plhdr()
+
   prettyprint-Smalltalk-BinarySelectorChar :
     BinarySelectorChar-Opt-Plhdr() -> [ H(
                                           []
@@ -5452,16 +5475,6 @@ strategies
 
   is-Smalltalk-KeywordMessage =
     ?KeywordMessage-Opt-Plhdr()
-
-  prettyprint-Smalltalk-ExpressionRest :
-    ExpressionRest-Opt-Plhdr() -> [ H(
-                                      []
-                                    , [S("")]
-                                    )
-                                  ]
-
-  is-Smalltalk-ExpressionRest =
-    ?ExpressionRest-Opt-Plhdr()
 
   prettyprint-Smalltalk-CascadedMessage :
     CascadedMessage-Opt-Plhdr() -> [ H(

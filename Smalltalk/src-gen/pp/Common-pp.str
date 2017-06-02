@@ -35,9 +35,6 @@ strategies
     prettyprint-Smalltalk-INT
 
   prettyprint-Smalltalk =
-    prettyprint-Smalltalk-STRING
-
-  prettyprint-Smalltalk =
     prettyprint-Smalltalk-StringChar
 
   prettyprint-Smalltalk =
@@ -62,10 +59,6 @@ strategies
   prettyprint-Smalltalk(|sort):
     t -> <prettyprint-Smalltalk-INT>
     where <?"INT"> sort
-
-  prettyprint-Smalltalk(|sort):
-    t -> <prettyprint-Smalltalk-STRING>
-    where <?"STRING"> sort
 
   prettyprint-Smalltalk(|sort):
     t -> <prettyprint-Smalltalk-StringChar>
@@ -97,9 +90,6 @@ strategies
   prettyprint-Smalltalk-INT =
     ![S(<is-string>)]
 
-  prettyprint-Smalltalk-STRING =
-    ![S(<is-string>)]
-
   prettyprint-Smalltalk-StringChar =
     ![S(<is-string>)]
 
@@ -123,9 +113,6 @@ strategies
 
   prettyprint-Smalltalk-INT :
     amb([h|hs]) -> <prettyprint-Smalltalk-INT> h
-
-  prettyprint-Smalltalk-STRING :
-    amb([h|hs]) -> <prettyprint-Smalltalk-STRING> h
 
   prettyprint-Smalltalk-StringChar :
     amb([h|hs]) -> <prettyprint-Smalltalk-StringChar> h

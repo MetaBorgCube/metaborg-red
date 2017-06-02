@@ -24,13 +24,7 @@ rules
     "Letter" -> <id>
 
   is-lexical-completion-sort :
-    "CommentCharacter" -> <id>
-
-  is-lexical-completion-sort :
-    "Comment" -> <id>
-
-  is-lexical-completion-sort :
-    "Whitespace" -> <id>
+    "CommentChar" -> <id>
 
   is-lexical-completion-sort :
     "LetterOrDigit" -> <id>
@@ -70,6 +64,9 @@ rules
 
   is-lexical-completion-sort :
     "StringLiteral" -> <id>
+
+  is-lexical-completion-sort :
+    "BackSlashChar" -> <id>
 
   is-lexical-completion-sort :
     "StringLiteralCharacter" -> <id>

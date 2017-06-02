@@ -5,7 +5,6 @@ signature
     sort aliases
       ID = String
       INT = String
-      STRING = String
       StringChar = String
       BackSlashChar = String
       CommentChar = String

@@ -14,13 +14,13 @@ exports
     CharacterLiteral StringLiteral SymbolLiteral ArrayLiteral BlockLiteral
     Literal Reference NestedExpression BinaryMessageOperand
     KeywordMessageArgument KeywordMessageSegment BinaryMessage UnaryMessage
-    UnaryMessageChain BinaryMessageChain KeywordMessage Operand ExpressionRest
-    MessageChain CascadedMessage AssignmentOperation Expression
-    MethodReturnOperator LocalVariableDeclarationList ExecutableCodeRest
-    FinalStatement DottedStatement Statement Dot UnaryMessageSelector
-    BinaryMessageSelector Keyword BindableIdentifier KeywordMethodHeaderSegment
-    UnaryMethodHeader BinaryMethodHeader KeywordMethodHeader MethodDeclaration
-    MethodHeader ExecutableCode
+    UnaryMessageChain BinaryMessageChain KeywordMessage Operand MessageChain
+    CascadedMessage AssignmentOperation Expression MethodReturnOperator
+    LocalVariableDeclarationList ExecutableCodeRest FinalStatement
+    DottedStatement Statement Dot UnaryMessageSelector BinaryMessageSelector
+    Keyword BindableIdentifier KeywordMethodHeaderSegment UnaryMethodHeader
+    BinaryMethodHeader KeywordMethodHeader MethodDeclaration MethodHeader
+    ExecutableCode
 
   context-free syntax
     COMPLETION-INSERTION -> Start                                     {cons("Start-Plhdr"), placeholder-insertion}
@@ -58,7 +58,6 @@ exports
     COMPLETION-INSERTION -> BinaryMessageChain                        {cons("BinaryMessageChain-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> KeywordMessage                            {cons("KeywordMessage-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> Operand                                   {cons("Operand-Plhdr"), placeholder-insertion}
-    COMPLETION-INSERTION -> ExpressionRest                            {cons("ExpressionRest-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> MessageChain                              {cons("MessageChain-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> CascadedMessage                           {cons("CascadedMessage-Plhdr"), placeholder-insertion}
     COMPLETION-INSERTION -> AssignmentOperation                       {cons("AssignmentOperation-Plhdr"), placeholder-insertion}
@@ -99,7 +98,6 @@ exports
     COMPLETION-INSERTION -> ";"           {literal-completion}
     COMPLETION-INSERTION -> ":="          {literal-completion}
     COMPLETION-INSERTION -> "^"           {literal-completion}
-    COMPLETION-INSERTION -> ","           {literal-completion}
     COMPLETION-INSERTION -> "|"           {literal-completion}
     COMPLETION-INSERTION -> "."           {literal-completion}
 

@@ -41,13 +41,7 @@ strategies
     prettyprint-Smalltalk-Letter
 
   prettyprint-Smalltalk =
-    prettyprint-Smalltalk-CommentCharacter
-
-  prettyprint-Smalltalk =
-    prettyprint-Smalltalk-Comment
-
-  prettyprint-Smalltalk =
-    prettyprint-Smalltalk-Whitespace
+    prettyprint-Smalltalk-CommentChar
 
   prettyprint-Smalltalk =
     prettyprint-Smalltalk-LetterOrDigit
@@ -89,6 +83,9 @@ strategies
     prettyprint-Smalltalk-StringLiteral
 
   prettyprint-Smalltalk =
+    prettyprint-Smalltalk-BackSlashChar
+
+  prettyprint-Smalltalk =
     prettyprint-Smalltalk-StringLiteralCharacter
 
   prettyprint-Smalltalk(|sort):
@@ -108,16 +105,8 @@ strategies
     where <?"Letter"> sort
 
   prettyprint-Smalltalk(|sort):
-    t -> <prettyprint-Smalltalk-CommentCharacter>
-    where <?"CommentCharacter"> sort
-
-  prettyprint-Smalltalk(|sort):
-    t -> <prettyprint-Smalltalk-Comment>
-    where <?"Comment"> sort
-
-  prettyprint-Smalltalk(|sort):
-    t -> <prettyprint-Smalltalk-Whitespace>
-    where <?"Whitespace"> sort
+    t -> <prettyprint-Smalltalk-CommentChar>
+    where <?"CommentChar"> sort
 
   prettyprint-Smalltalk(|sort):
     t -> <prettyprint-Smalltalk-LetterOrDigit>
@@ -172,6 +161,10 @@ strategies
     where <?"StringLiteral"> sort
 
   prettyprint-Smalltalk(|sort):
+    t -> <prettyprint-Smalltalk-BackSlashChar>
+    where <?"BackSlashChar"> sort
+
+  prettyprint-Smalltalk(|sort):
     t -> <prettyprint-Smalltalk-StringLiteralCharacter>
     where <?"StringLiteralCharacter"> sort
 
@@ -187,13 +180,7 @@ strategies
   prettyprint-Smalltalk-Letter =
     ![S(<is-string>)]
 
-  prettyprint-Smalltalk-CommentCharacter =
-    ![S(<is-string>)]
-
-  prettyprint-Smalltalk-Comment =
-    ![S(<is-string>)]
-
-  prettyprint-Smalltalk-Whitespace =
+  prettyprint-Smalltalk-CommentChar =
     ![S(<is-string>)]
 
   prettyprint-Smalltalk-LetterOrDigit =
@@ -235,6 +222,9 @@ strategies
   prettyprint-Smalltalk-StringLiteral =
     ![S(<is-string>)]
 
+  prettyprint-Smalltalk-BackSlashChar =
+    ![S(<is-string>)]
+
   prettyprint-Smalltalk-StringLiteralCharacter =
     ![S(<is-string>)]
 
@@ -250,14 +240,8 @@ strategies
   prettyprint-Smalltalk-Letter :
     amb([h|hs]) -> <prettyprint-Smalltalk-Letter> h
 
-  prettyprint-Smalltalk-CommentCharacter :
-    amb([h|hs]) -> <prettyprint-Smalltalk-CommentCharacter> h
-
-  prettyprint-Smalltalk-Comment :
-    amb([h|hs]) -> <prettyprint-Smalltalk-Comment> h
-
-  prettyprint-Smalltalk-Whitespace :
-    amb([h|hs]) -> <prettyprint-Smalltalk-Whitespace> h
+  prettyprint-Smalltalk-CommentChar :
+    amb([h|hs]) -> <prettyprint-Smalltalk-CommentChar> h
 
   prettyprint-Smalltalk-LetterOrDigit :
     amb([h|hs]) -> <prettyprint-Smalltalk-LetterOrDigit> h
@@ -297,6 +281,9 @@ strategies
 
   prettyprint-Smalltalk-StringLiteral :
     amb([h|hs]) -> <prettyprint-Smalltalk-StringLiteral> h
+
+  prettyprint-Smalltalk-BackSlashChar :
+    amb([h|hs]) -> <prettyprint-Smalltalk-BackSlashChar> h
 
   prettyprint-Smalltalk-StringLiteralCharacter :
     amb([h|hs]) -> <prettyprint-Smalltalk-StringLiteralCharacter> h

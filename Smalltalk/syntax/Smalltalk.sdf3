@@ -13,7 +13,9 @@ context-free syntax
   	Prog.Program = Start
   	Start.Temp = Expression
 	Start.MethodDeclaration = MethodDeclaration
-	Start.ExecutableCode = ExecutableCode
+	Start.ExecutableCode = ExecutableCodeRest
+//	Start.Start = Expression
+	Start.Empty = <>
 	
 	Reference.ReferenceID = Identifier
 	
@@ -55,7 +57,7 @@ context-free syntax
 	LiteralArrayElement.ConstantReference3 = ConstantReference
 	ByteArrayLiteral.ByteArrayLiteral2 = <#[ <{UnsignedIntegerLiteral ""}*> ]>
 	
-	FormalBlockArgumentDeclaration.FormalBlockArgumentDeclaration = BindableIdentifier
+	FormalBlockArgumentDeclaration.FormalBlockArgumentDeclaration = <: <BindableIdentifier>>
 	FormalBlockArgumentDeclarationList.FormalBlockArgumentDeclarationList = FormalBlockArgumentDeclaration+
 	FormalBlockArgumentDeclarationListWithSep = <<FormalBlockArgumentDeclarationList> |>
 	BlockLiteral.BlockLiteral1 = <[ <FormalBlockArgumentDeclarationListWithSep?> <ExecutableCode> ]> //duplicate
@@ -100,7 +102,7 @@ context-free syntax
 	AssignmentOperation.AssignmentOperation = <<BindableIdentifier> :=>
 	Statement.Statement = <<AssignmentOperation*> <Expression>>
 	MethodReturnOperator.MethodReturnOperator = <^>
-	FinalStatement.FinalStatement = <<MethodReturnOperator?>, <Statement>>
+	FinalStatement.FinalStatement = <<MethodReturnOperator?> <Statement>>
 	
 	LocalVariableDeclarationList.LocalVariableDeclarationList = <| <BindableIdentifier*> |>
 	ExecutableCode.ExecutableCode = <<LocalVariableDeclarationList?> <ExecutableCodeRest?>>
@@ -117,3 +119,7 @@ context-free syntax
 	MethodHeader.KeywordMethodHeader2 = KeywordMethodHeader 
 	MethodDeclaration.MethodDeclaration = <<MethodHeader> <ExecutableCode>>
 	
+context-free priorities
+	
+
+

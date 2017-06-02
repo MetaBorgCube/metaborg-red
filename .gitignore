@@ -7,3 +7,8 @@
 .project
 *.dep
 *.cache
+*.des.st
+*.pp.st
+store.core.ds
+Smalltalk/src-gen/
+Smalltalk/target/

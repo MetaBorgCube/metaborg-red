@@ -909,17 +909,6 @@ rules
     "ConstantReference" -> <id>
 
   is-left-recursive :
-    "BindableIdentifier" -> <is-left-recursive> "FormalBlockArgumentDeclaration"
-    where <not(is-lexical-completion-sort)> "BindableIdentifier"
-
-  is-right-recursive :
-    "BindableIdentifier" -> <is-right-recursive> "FormalBlockArgumentDeclaration"
-    where <not(is-lexical-completion-sort)> "BindableIdentifier"
-
-  is-FormalBlockArgumentDeclaration-completion-sort :
-    "BindableIdentifier" -> <id>
-
-  is-left-recursive :
     "ConstantReference" -> <is-left-recursive> "Literal"
     where <not(is-lexical-completion-sort)> "ConstantReference"
 

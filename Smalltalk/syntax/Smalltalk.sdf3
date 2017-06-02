@@ -53,7 +53,7 @@ context-free syntax
 	LiteralArrayElement.ConstantReference = ConstantReference
 	ByteArrayLiteral.ByteArrayLiteral = <#[ <{UnsignedIntegerLiteral ""}*> ]>
 	
-	FormalBlockArgumentDeclaration.FormalBlockArgumentDeclaration = BindableIdentifier
+	FormalBlockArgumentDeclaration.FormalBlockArgumentDeclaration = <: <BindableIdentifier>>
 	FormalBlockArgumentDeclarationList.FormalBlockArgumentDeclarationList = FormalBlockArgumentDeclaration+
 	FormalBlockArgumentDeclarationListWithSep = <<FormalBlockArgumentDeclarationList> |>
 	BlockLiteral.BlockLiteral = <[ <FormalBlockArgumentDeclarationListWithSep?> <ExecutableCode> ]>

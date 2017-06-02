@@ -88,9 +88,9 @@ exports
     COMPLETION-INSERTION -> "self"        {literal-completion}
     COMPLETION-INSERTION -> "super"       {literal-completion}
     COMPLETION-INSERTION -> "thisContext" {literal-completion}
-    COMPLETION-INSERTION -> ":"           {literal-completion}
     COMPLETION-INSERTION -> "#"           {literal-completion}
     COMPLETION-INSERTION -> "#["          {literal-completion}
+    COMPLETION-INSERTION -> ":"           {literal-completion}
     COMPLETION-INSERTION -> "["           {literal-completion}
     COMPLETION-INSERTION -> "]"           {literal-completion}
     COMPLETION-INSERTION -> "("           {literal-completion}

@@ -1674,7 +1674,7 @@ strategies
   prettyprint-Smalltalk-FormalBlockArgumentDeclaration :
     FormalBlockArgumentDeclaration(t1__) -> [ H(
                                                 [SOpt(HS(), "0")]
-                                              , [t1__']
+                                              , [S(": "), t1__']
                                               )
                                             ]
     with t1__' := <pp-one-Z(prettyprint-Smalltalk-BindableIdentifier) <+ pp-one-Z(prettyprint-completion-aux)> t1__
@@ -1710,7 +1710,7 @@ strategies
           ; <?"FormalBlockArgumentDeclaration"> sort
     with switch !index
            case ?1 :
-             ws := ""
+             ws := " "
            otherwise :
              ws := ""
          end

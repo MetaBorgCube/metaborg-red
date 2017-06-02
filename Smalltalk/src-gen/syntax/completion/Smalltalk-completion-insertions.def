@@ -88,7 +88,7 @@ exports
     SymbolInArrayLiteral                                              -> LiteralArrayElement                       {cons("SymbolInArrayLiteral")}
     ConstantReference                                                 -> LiteralArrayElement                       {cons("ConstantReference")}
     "#[" UnsignedIntegerLiteral* "]"                                  -> ByteArrayLiteral                          {cons("ByteArrayLiteral")}
-    BindableIdentifier                                                -> FormalBlockArgumentDeclaration            {cons("FormalBlockArgumentDeclaration")}
+    ":" BindableIdentifier                                            -> FormalBlockArgumentDeclaration            {cons("FormalBlockArgumentDeclaration")}
     FormalBlockArgumentDeclaration+                                   -> FormalBlockArgumentDeclarationList        {cons("FormalBlockArgumentDeclarationList")}
     FormalBlockArgumentDeclarationList "|"                            -> FormalBlockArgumentDeclarationListWithSep 
     "[" FormalBlockArgumentDeclarationListWithSep? ExecutableCode "]" -> BlockLiteral                              {cons("BlockLiteral")}
@@ -291,9 +291,9 @@ exports
     COMPLETION-INSERTION -> "self"        {literal-completion}
     COMPLETION-INSERTION -> "super"       {literal-completion}
     COMPLETION-INSERTION -> "thisContext" {literal-completion}
-    COMPLETION-INSERTION -> ":"           {literal-completion}
     COMPLETION-INSERTION -> "#"           {literal-completion}
     COMPLETION-INSERTION -> "#["          {literal-completion}
+    COMPLETION-INSERTION -> ":"           {literal-completion}
     COMPLETION-INSERTION -> "["           {literal-completion}
     COMPLETION-INSERTION -> "]"           {literal-completion}
     COMPLETION-INSERTION -> "("           {literal-completion}

@@ -16,6 +16,7 @@ lexical syntax
 	
 	LetterOrDigit = DecimalDigit|Letter
 	Identifier = (Letter|"_")(DecimalDigit|Letter|"_")*
+	Identifier = KEYWORD {reject}
 
 	
 	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
@@ -36,6 +37,13 @@ lexical syntax
 	BackSlashChar  = "\\"
 	StringLiteralCharacter = "\\'"
 	StringLiteralCharacter = "\\"
+	
+	  KEYWORD        = "true"
+	  KEYWORD        = "false"
+	  KEYWORD        = "nil"
+	  KEYWORD        = "self"
+	  KEYWORD        = "thisContext"
+	  KEYWORD        = "super"
 	
 lexical restrictions
 

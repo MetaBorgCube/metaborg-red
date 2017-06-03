@@ -13,7 +13,7 @@ context-free syntax
   	Prog.Program = Start
   	Start.Temp = Expression
 	Start.MethodDeclaration = MethodDeclaration
-	Start.ExecutableCode = ExecutableCodeRest
+//	Start.ExecutableCode = ExecutableCodeRest
 //	Start.Start = Expression
 	Start.Empty = <>
 	
@@ -72,11 +72,10 @@ context-free syntax
 	Literal.ArrayLiteral = ArrayLiteral 
 	Literal.BlockLiteral2 = BlockLiteral
 	
-	NestedExpression.NestedExpression1 = <( <Statement> )>  //duplicate
 	
 	Operand.Literal2 = Literal
 	Operand.Reference = Reference
-	Operand.NestedExpression2 = NestedExpression
+	Operand.NestedExpression = <( <Statement> )>
 	
 	UnaryMessage.UnaryMessage = UnaryMessageSelector
 	UnaryMessageChain.UnaryMessageChain = UnaryMessage*

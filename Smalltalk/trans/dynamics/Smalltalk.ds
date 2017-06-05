@@ -1,16 +1,13 @@
-module trans/Smalltalk
+module trans/dynamics/Smalltalk
 
 imports 
 src-gen/ds-signatures/Smalltalk-sig
 src-gen/ds-signatures/Base-sig
-src-gen/ds-signatures/Common-sig
+trans/runtime/values
+trans/runtime/store
+trans/environment/environment
 
 signature
-  sorts
-  	V
-  	O
-  	N
-  	E
   constructors
     NumV: Int -> V
     OP: String -> O    
@@ -18,7 +15,16 @@ signature
     ExpRest: O * V -> E
   arrows
     Prog -init-> V
+    ExecutableCodeRest --> V
+    FinalStatement --> V
+    
+    StatementExecutor(List(Statement)) --> Env
+    DotRemover(List(DottedStatement)) --> List(Statement)
+    Statement --> V
+    AssignmentOperation --> E
+    
   	Expression --> V
+  	
   	Literal --> V
   	Operand --> V
   	BinaryMessage --> E
@@ -26,35 +32,55 @@ signature
   	ExpressionRest --> E
   	BinaryMessageOperand --> V
   	BinaryMessageSelector --> O
-  variables
-  	v : V
-  	o : O
+  	ExecutableCodeRest --> V
   native operators
     parseI: String -> Int
     binOpI: Int * Int * String -> Int
-  sort aliases
-    Env = Map(String, V)
-    Heap = Map(Int, V)
   components
     H : Heap
     E : Env
     
 rules
 	
-	Program(Temp(e)) -init-> v
-	  where
-	    E {} |- e :: H {} --> v :: H _.
-//	    
+	Program(ExecutableCode(rest)) -init-> v
+		where
+			E {} |- rest :: H {} --> v :: H _.
+
+	ExecutableCodeRest(statements, finalstmt) --> v
+		where
+			StatementExecutor(DotRemover(statements)) --> E1;
+			E1 |- finalstmt --> v.
+
+
+
+	DotRemover([]) --> [].
+	DotRemover([DottedStatement(head) | tail]) --> [head | rest]
+	where
+		DotRemover(tail) --> rest.
+			
+	E |- StatementExecutor([]) --> E.
+	StatementExecutor([Statement(assignments, expression) | tail]) --> E2
+	where
+		expression --> v;
+		bindVar(assignments, v) --> E1;
+		E1 |- StatementExecutor(tail) --> E2.
+			
 	    
+	FinalStatement(Statement(_, expression)) --> v
+		where
+			expression --> v.
+
+
+
 	Expression(e1, EREmpty()) --> NumV(i1)
 		where e1 --> NumV(i1).
-//    
+
 	Expression(e1, e2) --> NumV(binOpI(i1, i2, op))
 	where 
 		e1 --> NumV(i1);
 		e2 --> ExpRest(OP(op), NumV(i2)).
 		
-	Literal2(e1) --> NumV(i1)
+	Literal(e1) --> NumV(i1)
 		where e1 --> NumV(i1).
 		
 	IntegerLiteral(s) --> NumV(parseI(s)).
@@ -68,29 +94,5 @@ rules
 	ExpressionRest(message, cascaded) --> message.
 	EREmpty() --> ExpRest(OP("+"), NumV(0)).
 	
-	BinaryMessageOperand(literal, chain) --> literal.
-//	
-//	Plus(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
-//	Minus(NumV(i1), NumV(i2)) --> NumV(subI(i1, i2)).
-//	Times(NumV(i1), NumV(i2)) --> NumV(mulI(i1, i2)).	
-//	
-//   Let(x, v1, e2) --> v2
-//  where
-//    E bindVar(x, v1) |- e2 --> v2.
-//
-//  Var(x) --> readVar(x).
-//  
-//  Box(v) --> BoxV(allocate(v)).
-//
-//  Unbox(BoxV(addr)) --> read(addr).
-//
-//  Setbox(BoxV(addr), v) --> write(addr,v).
-//  
-//  E |- Fun(x, e) --> ClosV(x, e, E).
-//
-//  App(ClosV(x, e, E), v1) --> v2
-//  where
-//    E  |- bindVar(x, v1) --> E';
-//    E' |- e --> v2.
-//    
+	BinaryMessageOperand(literal, chain) --> literal. 
     

@@ -2,7 +2,10 @@ module trans/runtime/values
 
 signature
   sorts
-    V
+    V // Values
+  	O // Operand
+  	E // Expression
 
   variables
     v : V
+    o : O

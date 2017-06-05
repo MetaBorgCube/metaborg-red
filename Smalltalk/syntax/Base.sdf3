@@ -18,8 +18,12 @@ lexical syntax
 	Identifier = (Letter|"_")(DecimalDigit|Letter|"_")*
 	Identifier = KEYWORD {reject}
 
-	
-	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
+	IntIntSelectorChar = "+" | "-" | "*" | "/" | "//" | "\\"
+	IntBoolSelectorChar = "<" | "<=" | ">" | "=>"
+	ObjectBoolSelectorChar = "==" | "~~" | "=" | "~="
+	BoolBoolSelectorChar = "&" | "|"
+	StringStringSelectorChar = ","
+//	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
 
 	IntegerLiteral = "-"? UnsignedIntegerLiteral
 	UnsignedIntegerLiteral = DecimalIntegerLiteral | (Radix "r" BaseNIntegerLiteral)
@@ -50,7 +54,8 @@ lexical restrictions
   // Ensure greedy matching for lexicals
   
 //  CommentChar   -/- [\"]
-  DecimalDigit       -/- [0-9]
+  DecimalIntegerLiteral       -/- [0-9]
+  BaseNIntegerLiteral       -/- [a-zA-Z0-9]
   Identifier         -/- [a-zA-Z0-9\_]
   
   // Backslash chars in strings may not be followed by ' 

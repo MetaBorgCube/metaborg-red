@@ -11,9 +11,9 @@ import com.oracle.truffle.api.source.SourceSection;
 @NodeChildren({ @NodeChild(value = "left", type = TermBuild.class),
     @NodeChild(value = "right", type = TermBuild.class),
     @NodeChild(value = "op", type = TermBuild.class) })
-public abstract class binOpI_3 extends TermBuild {
+public abstract class binOpII_3 extends TermBuild {
 
-      public binOpI_3(SourceSection source) {
+      public binOpII_3(SourceSection source) {
               super(source);
       }
 
@@ -36,6 +36,6 @@ public abstract class binOpI_3 extends TermBuild {
       }
 
       public static TermBuild create(SourceSection source, TermBuild left, TermBuild right, TermBuild op) {
-              return binOpI_3NodeGen.create(source, left, right, op);
+              return binOpII_3NodeGen.create(source, left, right, op);
       }
 }

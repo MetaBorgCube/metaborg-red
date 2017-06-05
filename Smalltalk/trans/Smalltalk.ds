@@ -14,18 +14,16 @@ signature
   constructors
     NumV: Int -> V
     BoolV: Bool -> V
-    OP: String -> O    
-    OP: String * String -> O    
-    ExpRest: O * V -> E
-    ExpI: Int * List(BinaryMessage) -> V
-    ExpB: Bool * List(BinaryMessage) -> V
+	IntIntO: String -> O
+    ExpRest: BinaryMessageSelector * V -> E
+    ExpI: V * List(BinaryMessage) -> V
   arrows
     Prog -init-> V
   	Expression --> V
   	Literal --> V
   	Operand --> V
   	BinaryMessage --> E
-  	MessageChain --> MessageChain
+  	MessageChain -->  List(BinaryMessage)
   	BinaryMessageOperand --> V
   	BinaryMessageSelector --> O
   	BinaryMessageChain --> List(BinaryMessage)
@@ -37,8 +35,9 @@ signature
   	o : O
   native operators
     parseI: String -> Int
-    binOpI: Int * Int * String -> Int
-    binOpB: Bool * Bool * String -> Bool
+    binOpII: Int * Int * String -> Int
+    binOpIB: Int * Int * String -> Bool
+    binOpBB: Bool * Bool * String -> Bool
   sort aliases
     Env = Map(String, V)
     Heap = Map(Int, V)
@@ -55,35 +54,51 @@ rules
 	    //    
 	SingletonExpression(e1) --> e1.
 	
-	Expression(e1, e2, cascaded) --> e4
+	Expression(e1, e2, cascaded) --> e3
 	where 
-		e1 --> NumV(i1);
-		e2 --> BinaryMessage2(ExpRest(OP(op), NumV(i2)), messageChain);
-		binOpI(i1, i2, op) => i3;
-		ExpI(i3, messageChain) --> e4.
+		e2 --> [binMes | messageChain];
+		ExpI(e1, e2) --> e3.
 		
-	ExpI(i3, [binMessage1 | rest]) --> NumV(i1)
+	ExpI(e1, [binMessage1 | rest]) --> e4
 		where
-			binMessage1 --> ExpRest(OP(op), NumV(i2));
-			binOpI(i3, i2, op) => i4;
-			ExpI(i4, rest) --> NumV(i1).
+			binMessage1 --> ExpRest(ops, e2);
+		case ops of {
+			IntInt(op1) => 
+				e1 --> NumV(i1);
+				e2 --> NumV(i2);
+				binOpII(i1, i2, op1) => i3;
+				ExpI(NumV(i3), rest) --> e4
+			IntBool(op2) =>				
+				e1 --> NumV(i1);
+				e2 --> NumV(i2);
+				binOpIB(i1, i2, op2) => b1;
+				ExpI(BoolV(b1), rest) --> e4
+			BoolBool(op2) =>				
+				e1 --> BoolV(b1);
+				e2 --> BoolV(b2);
+				binOpBB(b1, b2, op2) => b3;
+				ExpI(BoolV(b3), rest) --> e4
+//			ObjectBool(op2) =>	
+//				case of e1 {
+//					NumV(i1) =>
+//						case of e2 {
+//							NumV(i1) => true --> b1
+//							NumV(i2) => false --> b1
+//						}
+//					BoolV(i1) =>
+//						case of e2 {
+//							BoolV(i1) => true --> b1
+//							BoolV(i2) => false --> b1
+//						}
+//				}			
+//				e1 --> NumV(i1);
+//				e2 --> NumV(i2);
+//				binOpOB(i1, i2, op2) => b1;
+//				ExpI(BoolV(b1), rest) --> e4
+		}
 			
-	ExpI(e3, []) --> NumV(e3).
+	ExpI(e3, []) --> e3.
 	
-	Expression(e1, e2, cascaded) --> e4
-	where 
-		e1 --> BoolV(b1);
-		e2 --> BinaryMessage2(ExpRest(OP(op), BoolV(b2)), messageChain);
-		binOpB(b1, b2, op) => b3;
-		ExpB(b3, messageChain) --> e4.
-		
-	ExpB(b1, [binMessage1 | rest]) --> b
-		where
-			binMessage1 --> ExpRest(OP(op), BoolV(b2));
-			binOpB(b1, b2, op) => b3;
-			ExpB(b3, rest) --> b
-			
-	ExpB(e3, []) --> BoolV(e3).
 		
 	Literal2(e1) --> e1.
 		
@@ -93,12 +108,13 @@ rules
 	True() --> BoolV(true).
 	False() --> BoolV(false).
 	
+	NumV(a) --> NumV(a).
+	BoolV(b) --> BoolV(b).
+	
 	BinaryMessage1(selector, operand) --> ExpRest(selector, operand).
-		
-	UnarySelector(op) --> OP(op).
-	BinarySelector(op1, op2) --> OP(op1, op2).
+
 			
-	BinaryMessage2(binMessage, messageChain) --> BinaryMessage2(binMessage, messageChain).
+	BinaryMessage2(binMessage, messageChain) --> [binMessage | messageChain].
 	
 	BinaryMessageOperand(literal, unarychain) --> literal.
 	

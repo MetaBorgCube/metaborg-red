@@ -31,11 +31,15 @@ context-free syntax
 	BindableIdentifier = ConstantReference {reject}
 	BindableIdentifier = PsuedoVariableReference {reject}
 	
+	BinaryMessageSelector.IntInt = IntIntSelectorChar
+	BinaryMessageSelector.IntBool = IntBoolSelectorChar
+	BinaryMessageSelector.ObjectBool = ObjectBoolSelectorChar
+	BinaryMessageSelector.BoolBool = BoolBoolSelectorChar
+	BinaryMessageSelector.StringString = StringStringSelectorChar
+	
 	UnaryMessageSelector.UnaryMessageSelector1 = Identifier  //duplicate constructor, can combine?
 	Keyword.Keyword = <<Identifier> :>
 	KeywordMessageSelector.KeywordMessageSelector1 = Keyword+  //duplicate, can combine?
-	BinaryMessageSelector.UnarySelector = <<BinarySelectorChar>>
-	BinaryMessageSelector.BinarySelector = <<BinarySelectorChar> <BinarySelectorChar>>  //duplicate, can combine?
 	
 	
 	SymbolInArrayLiteral.UnaryMessageSelector2 = UnaryMessageSelector

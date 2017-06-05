@@ -2,20 +2,25 @@ module trans/environment/environment
 
 imports
   trans/runtime/values
+  src-gen/ds-signatures/Smalltalk-sig
+  src-gen/ds-signatures/Base-sig
 
 signature
   sort aliases
-    Env = Map(String, V)
+    Env = Map(BindableIdentifier, V)
 
   components
     E : Env
 
   arrows
-    bindVar(String, V) --> Env
-    readVar(String) --> V
+    bindVar(List(AssignmentOperation), V) --> Env
+    readVar(BindableIdentifier) --> V
 
 rules
 
-  E |- bindVar(x, v) --> {x |--> v, E}.
+  E |- bindVar([], v) --> E.
+  bindVar([AssignmentOperation(head) | tail], v) --> {head |--> v, E}
+  where
+  	bindVar(tail, v) --> E.
 
   E |- readVar(x) --> E[x].

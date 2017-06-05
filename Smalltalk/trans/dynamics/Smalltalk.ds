@@ -1,16 +1,13 @@
-module trans/Smalltalk
+module trans/dynamics/Smalltalk
 
 imports 
 src-gen/ds-signatures/Smalltalk-sig
 src-gen/ds-signatures/Base-sig
-src-gen/ds-signatures/Common-sig
+trans/runtime/values
+trans/runtime/store
+trans/environment/environment
 
 signature
-  sorts
-  	V
-  	O
-  	E
-  	Chain
   constructors
     NumV: Int -> V
     BoolV: Bool -> V
@@ -19,20 +16,26 @@ signature
     ExpI: V * List(BinaryMessage) -> V
   arrows
     Prog -init-> V
+    ExecutableCodeRest --> V
+    FinalStatement --> V
+    
+    StatementExecutor(List(Statement)) --> Env
+    DotRemover(List(DottedStatement)) --> List(Statement)
+    Statement --> V
+    AssignmentOperation --> E
+    
   	Expression --> V
+  	
   	Literal --> V
   	Operand --> V
   	BinaryMessage --> E
   	MessageChain -->  List(BinaryMessage)
   	BinaryMessageOperand --> V
   	BinaryMessageSelector --> O
-  	BinaryMessageChain --> List(BinaryMessage)
   	Statement --> V
   	ConstantReference --> V
+  	ExecutableCodeRest --> V
   	V --> V
-  variables
-  	v : V
-  	o : O
   native operators
     parseI: String -> Int
     binOpII: Int * Int * String -> Int
@@ -41,18 +44,48 @@ signature
   sort aliases
     Env = Map(String, V)
     Heap = Map(Int, V)
+
   components
     H : Heap
     E : Env
     
 rules
 	
-	Program(Temp(e)) -init-> v
-	  where
-	    E {} |- e :: H {} --> v :: H _.
-//	    
-	    //    
-	SingletonExpression(e1) --> e1.
+//	Program(Temp(e)) -init-> v
+//	  where
+//	    E {} |- e :: H {} --> v :: H _.
+	       
+	
+	Program(ExecutableCode(rest)) -init-> v
+		where
+			E {} |- rest :: H {} --> v :: H _.
+
+	ExecutableCodeRest(statements, finalstmt) --> v
+		where
+			StatementExecutor(DotRemover(statements)) --> E1;
+			E1 |- finalstmt --> v.
+
+
+
+	DotRemover([]) --> [].
+	DotRemover([DottedStatement(head) | tail]) --> [head | rest]
+	where
+		DotRemover(tail) --> rest.
+			
+	E |- StatementExecutor([]) --> E.
+	StatementExecutor([Statement(assignments, expression) | tail]) --> E2
+	where
+		expression --> v;
+		bindVar(assignments, v) --> E1;
+		E1 |- StatementExecutor(tail) --> E2.
+			
+	    
+	FinalStatement(Statement(_, expression)) --> v
+		where
+			expression --> v.
+
+
+	SingletonExpression(e1) --> e1.	
 	
 	Expression(e1, e2, cascaded) --> e3
 	where 
@@ -100,10 +133,11 @@ rules
 	ExpI(e3, []) --> e3.
 	
 		
-	Literal2(e1) --> e1.
+	Literal(e1) --> e1.
 		
 	IntegerLiteral(s) --> NumV(parseI(s)).
-	ConstantReference4(bool) --> bool.
+	ConstantReference(bool) --> bool
+		where bool --> BoolV(b).
 	
 	True() --> BoolV(true).
 	False() --> BoolV(false).
@@ -111,39 +145,17 @@ rules
 	NumV(a) --> NumV(a).
 	BoolV(b) --> BoolV(b).
 	
-	BinaryMessage1(selector, operand) --> ExpRest(selector, operand).
+	BinaryMessage(selector, operand) --> ExpRest(selector, operand).
 
 			
-	BinaryMessage2(binMessage, messageChain) --> [binMessage | messageChain].
+//	BinaryMessage(binMessage, messageChain) --> [binMessage | messageChain].
 	
 	BinaryMessageOperand(literal, unarychain) --> literal.
 	
 	BinaryMessageChain(list) --> list.
 	
-	NestedExpression(statement) --> statement.
+//	NestedExpression(statement) --> statement.
 	Statement(assignmentOperations, expression) --> expression.
-//	
-//	Plus(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
-//	Minus(NumV(i1), NumV(i2)) --> NumV(subI(i1, i2)).
-//	Times(NumV(i1), NumV(i2)) --> NumV(mulI(i1, i2)).	
-//	
-//   Let(x, v1, e2) --> v2
-//  where
-//    E bindVar(x, v1) |- e2 --> v2.
-//
-//  Var(x) --> readVar(x).
-//  
-//  Box(v) --> BoxV(allocate(v)).
-//
-//  Unbox(BoxV(addr)) --> read(addr).
-//
-//  Setbox(BoxV(addr), v) --> write(addr,v).
-//  
-//  E |- Fun(x, e) --> ClosV(x, e, E).
-//
-//  App(ClosV(x, e, E), v1) --> v2
-//  where
-//    E  |- bindVar(x, v1) --> E';
-//    E' |- e --> v2.
-//    
+
+	BinaryMessageOperand(literal, chain) --> literal. 
     

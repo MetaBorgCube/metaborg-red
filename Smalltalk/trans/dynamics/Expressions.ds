@@ -1,0 +1,117 @@
+module trans/dynamics/Expressions
+
+imports
+src-gen/ds-signatures/Smalltalk-sig
+src-gen/ds-signatures/Base-sig
+
+trans/runtime/values
+trans/runtime/store
+
+signature
+
+  constructors
+    NumV: Int -> V
+    BoolV: Bool -> V
+	IntIntO: String -> O
+    ExpRest: BinaryMessageSelector * V -> Ex
+    ExpI: V * List(BinaryMessage) -> V
+    
+  arrows
+    Expression --> V
+  	
+  	Literal --> V
+  	Reference --> V
+  	Operand --> V
+  	BinaryMessage --> Ex
+  	MessageChain -->  List(BinaryMessage)
+  	BinaryMessageOperand --> V
+  	BinaryMessageSelector --> O
+  	Statement --> V
+  	ConstantReference --> V
+  	ExecutableCodeRest --> V
+  	V --> V
+  native operators
+    parseI: String -> Int
+    binOpII: Int * Int * String -> Int
+    binOpIB: Int * Int * String -> Bool
+    binOpBB: Bool * Bool * String -> Bool
+    printStr: String -> Int
+
+rules
+
+	SingletonExpression(e1) --> e1.	
+	
+	Expression(e1, e2, cascaded) --> e3
+	where 
+		e2 --> [binMes | messageChain];
+		ExpI(e1, e2) --> e3.
+		
+	ExpI(e1, [binMessage1 | rest]) --> e4
+		where
+			binMessage1 --> ExpRest(ops, e2);
+		case ops of {
+			IntInt(op1) => 
+				e1 --> NumV(i1);
+				e2 --> NumV(i2);
+				binOpII(i1, i2, op1) => i3;
+				ExpI(NumV(i3), rest) --> e4
+			IntBool(op2) =>				
+				e1 --> NumV(i1);
+				e2 --> NumV(i2);
+				binOpIB(i1, i2, op2) => b1;
+				ExpI(BoolV(b1), rest) --> e4
+			BoolBool(op2) =>				
+				e1 --> BoolV(b1);
+				e2 --> BoolV(b2);
+				binOpBB(b1, b2, op2) => b3;
+				ExpI(BoolV(b3), rest) --> e4
+//			ObjectBool(op2) =>	
+//				case of e1 {
+//					NumV(i1) =>
+//						case of e2 {
+//							NumV(i1) => true --> b1
+//							NumV(i2) => false --> b1
+//						}
+//					BoolV(i1) =>
+//						case of e2 {
+//							BoolV(i1) => true --> b1
+//							BoolV(i2) => false --> b1
+//						}
+//				}			
+//				e1 --> NumV(i1);
+//				e2 --> NumV(i2);
+//				binOpOB(i1, i2, op2) => b1;
+//				ExpI(BoolV(b1), rest) --> e4
+		}
+			
+	ExpI(e3, []) --> e3.
+	
+		
+	Literal(e1) --> e1.
+	ReferenceOperand(ref) --> ref.
+	
+	ReferenceID(id) --> readVar(id).
+		
+	IntegerLiteral(s) --> NumV(parseI(s)).
+	ConstantReference(bool) --> bool
+		where bool --> BoolV(b).
+	
+	True() --> BoolV(true).
+	False() --> BoolV(false).
+	
+	NumV(a) --> NumV(a).
+	BoolV(b) --> BoolV(b).
+	
+	BinaryMessage(selector, operand) --> ExpRest(selector, operand).
+
+			
+//	BinaryMessage(binMessage, messageChain) --> [binMessage | messageChain].
+	
+	BinaryMessageOperand(literal, unarychain) --> literal.
+	
+	BinaryMessageChain(list) --> list.
+	
+//	NestedExpression(statement) --> statement.
+
+	BinaryMessageOperand(literal, chain) --> literal. 
+    

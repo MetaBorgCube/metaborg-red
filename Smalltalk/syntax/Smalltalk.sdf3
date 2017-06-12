@@ -75,7 +75,7 @@ context-free syntax
 	Literal = BlockLiteral
 	
 	Operand.Literal = Literal
-	Operand = Reference
+	Operand.ReferenceOperand = Reference
 	Operand = <( <Statement> )> 
 	
 	UnaryMessage.UnaryMessage = UnaryMessageSelector

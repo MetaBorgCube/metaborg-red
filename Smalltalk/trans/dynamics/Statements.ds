@@ -1,0 +1,52 @@
+module trans/dynamics/Statements
+
+imports
+src-gen/ds-signatures/Smalltalk-sig
+src-gen/ds-signatures/Base-sig
+
+trans/runtime/values
+trans/runtime/store
+
+trans/dynamics/Expressions
+
+signature
+  arrows
+    FinalStatement --> Statement
+    MapStatements(List(Statement)) --> V
+    DotRemover(List(DottedStatement)) --> List(Statement)
+    StatementExecutor(List(Statement)) --> V
+    Statement --> V
+    
+    AssignmentOperation --> Ex
+    
+    StringsFromAssignmentOperations(List(AssignmentOperation)) --> List(String)
+
+rules
+
+	DotRemover([]) --> [].
+	DotRemover([DottedStatement(head) | tail]) --> [head | rest]
+	where
+		DotRemover(tail) --> rest.
+			
+	StatementExecutor([]) --> BoolV(false).
+	StatementExecutor([stmt]) --> v
+	where
+		stmt --> v.
+	StatementExecutor([stmt | tail]) --> v
+	where
+		stmt --> _;
+		StatementExecutor(tail) --> v.
+		
+	Statement(assignmentOperations, expression) --> v
+	where
+		expression --> v;
+//		printStr("wtf") => _;
+		bindVar(StringsFromAssignmentOperations(assignmentOperations), v) --> _.
+		
+	StringsFromAssignmentOperations([]) --> [].
+	StringsFromAssignmentOperations([AssignmentOperation(BindableIdentifier(id)) | tail]) --> [id | rest]
+	where
+		StringsFromAssignmentOperations(tail) --> rest.
+			
+	    
+	FinalStatement(stmt) --> stmt.

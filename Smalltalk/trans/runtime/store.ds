@@ -5,15 +5,20 @@ imports
 
 signature
   sort aliases
+    Scope = Map(String, V)
     Heap = Map(Int, V)
 
   components
     H : Heap
+    S : Scope
 
   arrows
     read(Int) --> V
     allocate(V) --> Int
     write(Int, V) --> V
+
+    bindVar(List(String), V) --> V
+    readVar(String) --> V
 
 rules
 
@@ -25,3 +30,10 @@ rules
     write(addr, v) --> _.
 
   write(addr, v) :: H --> v :: H {addr |--> v, H}.
+  
+  bindVar([], v) --> v.
+  bindVar([id | tail], v) :: S, H --> v :: S {id |--> v, S}, H
+  where
+  	bindVar(tail, v) --> E.
+
+  readVar(id) :: S, H --> S[id].

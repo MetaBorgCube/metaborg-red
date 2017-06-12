@@ -4,7 +4,7 @@ signature
   sorts
     V // Values
   	O // Operand
-  	E // Expression
+  	Ex // Expression
 
   variables
     v : V

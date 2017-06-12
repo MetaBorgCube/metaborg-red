@@ -12,3 +12,5 @@
 store.core.ds
 Smalltalk/src-gen/
 Smalltalk/target/
+Smalltalk.interpreter/bin/
+Smalltalk.interpreter/target\\generated-sources\\annotations/

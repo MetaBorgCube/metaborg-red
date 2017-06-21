@@ -3,9 +3,8 @@ module trans/runtime/values
 signature
   sorts
     V // Values
-  	O // Operand
-  	Ex // Expression
+  	C
+  	Message // Message
 
   variables
     v : V
-    o : O

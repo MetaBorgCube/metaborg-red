@@ -17,9 +17,11 @@ signature
     StatementExecutor(List(Statement)) --> V
     Statement --> V
     
-    AssignmentOperation --> Ex
+//    AssignmentOperation --> Ex
     
     StringsFromAssignmentOperations(List(AssignmentOperation)) --> List(String)
+    
+    UnaryMessageSelector --> String
 
 rules
 
@@ -50,3 +52,4 @@ rules
 			
 	    
 	FinalStatement(stmt) --> stmt.
+	

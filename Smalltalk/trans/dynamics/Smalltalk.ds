@@ -10,11 +10,11 @@ trans/dynamics/Statements
 
 signature
   constructors
-    NumV: Int -> V
-    BoolV: Bool -> V
-	IntIntO: String -> O
-    ExpRest: BinaryMessageSelector * V -> Ex
-    ExpI: V * List(BinaryMessage) -> V
+//    NumV: Int -> V
+//    BoolV: Bool -> V
+//	IntIntO: String -> O
+//    ExpRest: BinaryMessageSelector * V -> Ex
+//    ExpI: V * List(BinaryMessage) -> V
   arrows
     Prog -init-> V
     ExecutableCode --> V
@@ -27,21 +27,19 @@ signature
   	Literal --> V
   	Reference --> V
   	Operand --> V
-  	BinaryMessage --> Ex
-  	MessageChain -->  List(BinaryMessage)
+//  	MessageChain -->  List(BinaryMessage)
   	BinaryMessageOperand --> V
-  	BinaryMessageSelector --> O
   	Statement --> V
   	ConstantReference --> V
-  	ExecutableCodeRest --> V
-  	V --> V
+//  	ExecutableCodeRest --> V
+//  	V --> V
 
   native operators
-    parseI: String -> Int
-    binOpII: Int * Int * String -> Int
-    binOpIB: Int * Int * String -> Bool
-    binOpBB: Bool * Bool * String -> Bool
-    printStr: String -> Int
+//    parseI: String -> Int
+//    binOpII: Int * Int * String -> Int
+//    binOpIB: Int * Int * String -> Bool
+//    binOpBB: Bool * Bool * String -> Bool
+//    printStr: String -> Int
     
 rules      
 	
@@ -53,3 +51,6 @@ rules
 		where
 			StatementExecutor(DotRemover(statements)) --> _;
 			finalstmt --> v.
+			
+			
+//	KeywordMessageChain(chain) --> [].

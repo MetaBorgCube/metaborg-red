@@ -29,12 +29,6 @@ context-free syntax
 	BindableIdentifier.BindableIdentifier = Identifier
 	BindableIdentifier = ConstantReference {reject}
 	BindableIdentifier = PsuedoVariableReference {reject}
-	
-	BinaryMessageSelector.IntInt = IntIntSelectorChar
-	BinaryMessageSelector.IntBool = IntBoolSelectorChar
-	BinaryMessageSelector.ObjectBool = ObjectBoolSelectorChar
-	BinaryMessageSelector.BoolBool = BoolBoolSelectorChar
-	BinaryMessageSelector.StringString = StringStringSelectorChar
 
 	UnaryMessageSelector.UnaryMessageSelector = Identifier  //duplicate constructor, can combine?
 	Keyword.Keyword = <<Identifier> :>
@@ -44,7 +38,7 @@ context-free syntax
 	SymbolInArrayLiteral = UnaryMessageSelector
 	SymbolInArrayLiteral = ConstantReference {reject} //duplicate, can combine?
 	SymbolInArrayLiteral = KeywordMessageSelector
-	SymbolInArrayLiteral = BinaryMessageSelector
+	SymbolInArrayLiteral = BinarySelectorChar
 	
 	SymbolLiteral = <# <SymbolInArrayLiteral>>  
 	SymbolLiteral = <# <ConstantReference>> 
@@ -82,7 +76,7 @@ context-free syntax
 	UnaryMessageChain.UnaryMessageChain = UnaryMessage*
 	
 	BinaryMessageOperand.BinaryMessageOperand = <<Operand> <UnaryMessageChain>>
-	BinaryMessage.BinaryMessage = <<BinaryMessageSelector> <BinaryMessageOperand>> 
+	BinaryMessage.BinaryMessage = <<BinarySelectorChar> <BinaryMessageOperand>> 
 	
 	KeywordMessageArgument.KeywordMessageArgument = <<BinaryMessageOperand> <BinaryMessage*>>
 	KeywordMessageSegment.KeywordMessageSegment = <<Keyword> <KeywordMessageArgument>>
@@ -120,7 +114,7 @@ context-free syntax
 	
 	KeywordMethodHeaderSegment.KeywordMethodHeaderSegment = <<Keyword> <BindableIdentifier>>
 	MethodHeader.UnaryMethodHeader = UnaryMessageSelector 
-	MethodHeader.BinaryMethodHeader = <<BinaryMessageSelector> <BindableIdentifier>>
+	MethodHeader.BinaryMethodHeader = <<BinarySelectorChar> <BindableIdentifier>>
 	MethodHeader.KeywordMethodHeader = KeywordMethodHeaderSegment+
 	MethodDeclaration.MethodDeclaration = <<MethodHeader> <ExecutableCode>>
 	

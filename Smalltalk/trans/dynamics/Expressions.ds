@@ -10,11 +10,13 @@ trans/runtime/store
 signature
 
   constructors
+  	NoneV: V
     NumV: Int -> V
     BoolV: Bool -> V
-	IntIntO: String -> O
-    ExpRest: BinaryMessageSelector * V -> Ex
-    ExpI: V * List(BinaryMessage) -> V
+    StringV: String -> V
+  	MessageCall: String * V -> Message
+//    MessageCall: String -> Message
+    ExpI: V * List(Message) -> V
     
   arrows
     Expression --> V
@@ -22,20 +24,26 @@ signature
   	Literal --> V
   	Reference --> V
   	Operand --> V
-  	BinaryMessage --> Ex
-  	MessageChain -->  List(BinaryMessage)
+  	UnaryMessage --> Message
+  	BinaryMessage --> Message
+  	MessageChain -->  List(Message)
   	BinaryMessageOperand --> V
-  	BinaryMessageSelector --> O
+  	UnaryMessageSelector --> String
   	Statement --> V
   	ConstantReference --> V
   	ExecutableCodeRest --> V
   	V --> V
+  	Message --> Message
+  	List(BinaryMessage) --> List(Message)
+  	List(UnaryMessage) --> List(Message)
   native operators
     parseI: String -> Int
-    binOpII: Int * Int * String -> Int
-    binOpIB: Int * Int * String -> Bool
-    binOpBB: Bool * Bool * String -> Bool
-    printStr: String -> Int
+    num-call-native: String * V * V -> V
+    bool-call-native: String * V * V -> V
+    num-call-native: String * V -> V
+    bool-call-native: String * V -> V
+  components
+  	L : List(Message)
 
 rules
 
@@ -43,45 +51,32 @@ rules
 	
 	Expression(e1, e2, cascaded) --> e3
 	where 
-		e2 --> [binMes | messageChain];
-		ExpI(e1, e2) --> e3.
+		e2 --> [a | b];
+		a --> y;
+		ExpI(e1, [a | b]) --> e3.
 		
-	ExpI(e1, [binMessage1 | rest]) --> e4
+	ExpI(v1, [message | rest]) --> v4
 		where
-			binMessage1 --> ExpRest(ops, e2);
-		case ops of {
-			IntInt(op1) => 
-				e1 --> NumV(i1);
-				e2 --> NumV(i2);
-				binOpII(i1, i2, op1) => i3;
-				ExpI(NumV(i3), rest) --> e4
-			IntBool(op2) =>				
-				e1 --> NumV(i1);
-				e2 --> NumV(i2);
-				binOpIB(i1, i2, op2) => b1;
-				ExpI(BoolV(b1), rest) --> e4
-			BoolBool(op2) =>				
-				e1 --> BoolV(b1);
-				e2 --> BoolV(b2);
-				binOpBB(b1, b2, op2) => b3;
-				ExpI(BoolV(b3), rest) --> e4
-//			ObjectBool(op2) =>	
-//				case of e1 {
-//					NumV(i1) =>
-//						case of e2 {
-//							NumV(i1) => true --> b1
-//							NumV(i2) => false --> b1
-//						}
-//					BoolV(i1) =>
-//						case of e2 {
-//							BoolV(i1) => true --> b1
-//							BoolV(i2) => false --> b1
-//						}
-//				}			
-//				e1 --> NumV(i1);
-//				e2 --> NumV(i2);
-//				binOpOB(i1, i2, op2) => b1;
-//				ExpI(BoolV(b1), rest) --> e4
+		message --> reduced;
+		case reduced of {
+		MessageCall(messageName, NoneV()) =>
+			case v1 of {
+			NumV(i1) => 
+				num-call-native(messageName, v1) => v3;
+				ExpI(v3, rest) --> v4
+			BoolV(b1) =>		
+				bool-call-native(messageName, v1) => v3;
+				ExpI(v3, rest) --> v4
+			}	
+		MessageCall(messageName, v2) =>
+			case v1 of {
+			NumV(i1) => 
+				num-call-native(messageName, v1, v2) => v3;
+				ExpI(v3, rest) --> v4
+			BoolV(b1) =>		
+				bool-call-native(messageName, v1, v2) => v3;
+				ExpI(v3, rest) --> v4
+			}			
 		}
 			
 	ExpI(e3, []) --> e3.
@@ -102,14 +97,25 @@ rules
 	NumV(a) --> NumV(a).
 	BoolV(b) --> BoolV(b).
 	
-	BinaryMessage(selector, operand) --> ExpRest(selector, operand).
+	BinaryMessage(selector, operand) --> MessageCall(selector, operand).
 
-			
 //	BinaryMessage(binMessage, messageChain) --> [binMessage | messageChain].
 	
 	BinaryMessageOperand(literal, unarychain) --> literal.
 	
-	BinaryMessageChain(list) --> list.
+	BinaryMessageChain([a | b]) --> [y | BinaryMessageChain(b)]
+		where 
+		a --> y.
+	BinaryMessageChain([]) --> [].
+	
+	UnaryMessage(selector) --> MessageCall(selector, NoneV()).
+	
+	UnaryMessageSelector(identifier) --> identifier.
+	
+	UnaryMessageChain([u1 | urest], binaryMessages) --> [y | UnaryMessageChain(urest, binaryMessages)]
+		where
+		u1 --> y.
+//	KeywordMessageChain(keywordMessage) --> 
 	
 //	NestedExpression(statement) --> statement.
 

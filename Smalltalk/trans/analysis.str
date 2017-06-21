@@ -8,7 +8,7 @@ imports
   static-semantics
 
   pp
-
+  
 rules // Analysis
 
   editor-analyze = nabl2-analyze(id)

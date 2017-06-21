@@ -18,11 +18,8 @@ lexical syntax
 	Identifier = (Letter|"_")(DecimalDigit|Letter|"_")*
 	Identifier = KEYWORD {reject}
 
-	IntIntSelectorChar = "+" | "-" | "*" | "/" | "//" | "\\"
-	IntBoolSelectorChar = "<" | "<=" | ">" | "=>"
-	ObjectBoolSelectorChar = "==" | "~~" | "=" | "~="
-	BoolBoolSelectorChar = "&" | "|"
-	StringStringSelectorChar = ","
+	BinarySelectorChar = "+" | "-" | "*" | "/" | "//" | "\\" | "<" | "<=" | ">" | "=>" | "==" | "~~" | "=" | "~=" | "&" | "|" | ","
+	
 //	BinarySelectorChar = "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+" | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
 
 	IntegerLiteral = "-"? UnsignedIntegerLiteral

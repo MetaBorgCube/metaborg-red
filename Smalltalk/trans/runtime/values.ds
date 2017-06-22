@@ -3,8 +3,8 @@ module trans/runtime/values
 signature
   sorts
     V // Values
-  	C
   	Message // Message
+  	KeywordMessageElement
 
   variables
     v : V

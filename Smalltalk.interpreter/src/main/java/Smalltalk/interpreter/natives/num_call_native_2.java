@@ -43,10 +43,16 @@ public class num_call_native_2 extends TermBuild {
 			return doLn(left);
 		case "log":
 			return doLog(left);
+		case "atRandom":
+			return doRandom(left);
 		//everything else don't work with integers only (trigonimic functions, reciprocals)
 		default:
 			throw new IllegalArgumentException("operator: '" + op + "' not recognised as operator on number.");
 		}
+	}
+
+	private IVTerm doRandom(NumV_1_Term left) {
+		return new NumV_1_Term((int)(Math.random()*left.get_1() + 1));
 	}
 
 	private IVTerm doLog(NumV_1_Term left) {

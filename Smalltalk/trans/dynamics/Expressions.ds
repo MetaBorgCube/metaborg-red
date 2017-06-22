@@ -10,13 +10,14 @@ trans/runtime/store
 signature
 
   constructors
-  	NoneV: V
+  	NilV: V
     NumV: Int -> V
     BoolV: Bool -> V
     StringV: String -> V
-  	MessageCall: String * V -> Message
-//    MessageCall: String -> Message
-    ExpI: V * List(Message) -> V
+  	BinaryMessageCall: String * V -> Message
+    UnaryMessageCall: String -> Message
+    KeywordValuePair: String * V ->	KeywordMessageElement
+    KeywordMessageCall: List(String) * List(V) -> Message
     
   arrows
     Expression --> V
@@ -26,9 +27,14 @@ signature
   	Operand --> V
   	UnaryMessage --> Message
   	BinaryMessage --> Message
+  	KeywordMessageSegment --> KeywordMessageElement
+  	KeywordMessage --> List(Message)
   	MessageChain -->  List(Message)
+  	UnaryMessageChain --> List(Message)
   	BinaryMessageOperand --> V
   	UnaryMessageSelector --> String
+  	Keyword --> String
+  	KeywordMessageArgument --> V
   	Statement --> V
   	ConstantReference --> V
   	ExecutableCodeRest --> V
@@ -36,47 +42,61 @@ signature
   	Message --> Message
   	List(BinaryMessage) --> List(Message)
   	List(UnaryMessage) --> List(Message)
+  	KeywordMessageMap(List(KeywordMessageSegment), Message) --> Message
+  	ExpI(V, List(Message)) --> V
+//    DynamicDispatch: List(Message) -> V
   native operators
     parseI: String -> Int
     num-call-native: String * V * V -> V
     bool-call-native: String * V * V -> V
     num-call-native: String * V -> V
     bool-call-native: String * V -> V
+    num-calls-native: List(String) * List(V) * V -> V
+   	bool-calls-native: List(String) * List(V) * V -> V
+   	printV: V -> V
   components
   	L : List(Message)
 
 rules
 
-	SingletonExpression(e1) --> e1.	
+	SingletonExpression(operand) --> operand.	
 	
-	Expression(e1, e2, cascaded) --> e3
+	Expression(operand, chain, cascaded) --> result
 	where 
-		e2 --> [a | b];
-		a --> y;
-		ExpI(e1, [a | b]) --> e3.
+		ExpI(operand, chain) --> result.
 		
-	ExpI(v1, [message | rest]) --> v4
+	ExpI(operand, [headMessage | tailMessages]) --> v4
 		where
-		message --> reduced;
-		case reduced of {
-		MessageCall(messageName, NoneV()) =>
-			case v1 of {
-			NumV(i1) => 
-				num-call-native(messageName, v1) => v3;
-				ExpI(v3, rest) --> v4
-			BoolV(b1) =>		
-				bool-call-native(messageName, v1) => v3;
-				ExpI(v3, rest) --> v4
+		case headMessage of {
+		UnaryMessageCall(messageName) =>
+			case operand of {
+			NumV(_) => 
+				num-call-native(messageName, operand) => v3;
+				ExpI(v3, tailMessages) --> v4
+			BoolV(_) =>		
+				bool-call-native(messageName, operand) => v3;
+				ExpI(v3, tailMessages) --> v4
+//			RefV(r1) =>
+//				DynamicDispatch(r1, ["sad"]) => v4
 			}	
-		MessageCall(messageName, v2) =>
-			case v1 of {
-			NumV(i1) => 
-				num-call-native(messageName, v1, v2) => v3;
-				ExpI(v3, rest) --> v4
-			BoolV(b1) =>		
-				bool-call-native(messageName, v1, v2) => v3;
-				ExpI(v3, rest) --> v4
-			}			
+		BinaryMessageCall(messageName, v2) =>
+			case operand of {
+			NumV(_) => 
+				num-call-native(messageName, operand, v2) => v3;
+				ExpI(v3, tailMessages) --> v4
+			BoolV(_) =>		
+				bool-call-native(messageName, operand, v2) => v3;
+				ExpI(v3, tailMessages) --> v4
+			}
+		KeywordMessageCall(keywords, values) =>
+			case operand of {
+			NumV(_) => 
+				num-calls-native(keywords, values, operand) => v3;
+				ExpI(v3, tailMessages) --> v4
+			BoolV(_) =>		
+				bool-calls-native(keywords, values, operand) => v3;
+				ExpI(v3, tailMessages) --> v4
+			}
 		}
 			
 	ExpI(e3, []) --> e3.
@@ -97,27 +117,64 @@ rules
 	NumV(a) --> NumV(a).
 	BoolV(b) --> BoolV(b).
 	
-	BinaryMessage(selector, operand) --> MessageCall(selector, operand).
-
-//	BinaryMessage(binMessage, messageChain) --> [binMessage | messageChain].
-	
-	BinaryMessageOperand(literal, unarychain) --> literal.
-	
-	BinaryMessageChain([a | b]) --> [y | BinaryMessageChain(b)]
+	BinaryMessage(selector, operand) --> BinaryMessageCall(selector, operand).
+		
+	BinaryMessageChain([bHead | bTail]) --> [b1 | BinaryMessageChain(bTail)]
 		where 
-		a --> y.
+		bHead --> b1.
+		
 	BinaryMessageChain([]) --> [].
 	
-	UnaryMessage(selector) --> MessageCall(selector, NoneV()).
+	BinaryMessageOperand(operand, unarychain) --> ExpI(operand, unaryMessages)
+		where
+		unarychain --> unaryMessages. 
+	
+	BinaryMessageChainWithKeyword(binaryMessages, keywordMessage) --> binMessages ++ keyMessage
+		where
+			BinaryMessageChain(binaryMessages) --> binMessages;
+			keywordMessage --> keyMessage.
+		
+	UnaryMessageChain([uHead | uTail]) --> [u1 | UnaryMessageChain(uTail)]
+	where
+		uHead --> u1.
+		
+	UnaryMessageChain([]) --> [].
+	
+	UnaryMessage(selector) --> UnaryMessageCall(selector).
 	
 	UnaryMessageSelector(identifier) --> identifier.
 	
-	UnaryMessageChain([u1 | urest], binaryMessages) --> [y | UnaryMessageChain(urest, binaryMessages)]
-		where
-		u1 --> y.
-//	KeywordMessageChain(keywordMessage) --> 
+	UnaryBinaryMessageChain(unaryMessages, binaryMessages) --> uChain ++ bChain
+	where
+		UnaryMessageChain(unaryMessages) --> uChain;
+	 	BinaryMessageChain(binaryMessages) --> bChain.
+		
 	
-//	NestedExpression(statement) --> statement.
+	UnaryMessageChainWithKeyword(unaryMessages, binaryMessages, keywordMessage) --> uList ++ kList
+	where
+		UnaryBinaryMessageChain(unaryMessages, binaryMessages) --> uList;
+		keywordMessage --> kList.
+	
+	KeywordMessageChain(keywordMessage) --> keywordMessage.
+	
+	KeywordMessage(messageSegment) --> [KeywordMessageCall(values, keys)]
+		where
+			KeywordMessageMap(messageSegment, KeywordMessageCall([],[])) => KeywordMessageCall(values, keys).
+			
+	KeywordMessageMap([messageSegmentHead | messageSegmentTail], KeywordMessageCall(curKeys, curVals)) --> message
+		where
+		messageSegmentHead --> KeywordValuePair(key, value);
+		KeywordMessageMap(messageSegmentTail, KeywordMessageCall([key | curKeys], [value | curVals])) => message.
+		
+	KeywordMessageMap([], KeywordMessageCall(keys, vals)) --> KeywordMessageCall(keys, vals).
+	
+	KeywordMessageSegment(keyword, keywordMessageArgument) --> KeywordValuePair(key, argumentValue)
+		where
+		keyword --> key;
+		keywordMessageArgument --> argumentValue.
+		
+	KeywordMessageArgument(binaryMessageOperand, binaryMessages) --> ExpI(binaryMessageOperand, BinaryMessageChain(binaryMessages)).
+		
+	Keyword(key) --> key.	
 
-	BinaryMessageOperand(literal, chain) --> literal. 
     

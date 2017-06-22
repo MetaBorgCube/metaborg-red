@@ -80,11 +80,11 @@ context-free syntax
 	
 	KeywordMessageArgument.KeywordMessageArgument = <<BinaryMessageOperand> <BinaryMessage*>>
 	KeywordMessageSegment.KeywordMessageSegment = <<Keyword> <KeywordMessageArgument>>
-	KeywordMessage.KeywordMessage = <<KeywordMessageSegment> <KeywordMessageSegment*>>
+	KeywordMessage.KeywordMessage = KeywordMessageSegment+
 	
 	MessageChain.KeywordMessageChain = KeywordMessage
 	MessageChain.BinaryMessageChain = BinaryMessage+
-	MessageChain.UnaryMessageChain = <<UnaryMessage+> <BinaryMessage*>>
+	MessageChain.UnaryBinaryMessageChain = <<UnaryMessage+> <BinaryMessage*>>
 	MessageChain.BinaryMessageChainWithKeyword = <<BinaryMessage+> <KeywordMessage>>
 	MessageChain.UnaryMessageChainWithKeyword = <<UnaryMessage+> <BinaryMessage*> <KeywordMessage>>
 		

@@ -39,9 +39,6 @@ public class num_call_native_3 extends TermBuild {
 			return doTimes(left, right);
 		case "/":
 			return doDivide(left, right);
-		case "raisedTo":
-		case "raisedToInteger":
-			return doPow(left, right);
 		case "==":
 		case "=":
 			return doEq(left, right);

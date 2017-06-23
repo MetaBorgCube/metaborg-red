@@ -16,6 +16,7 @@ signature
     DotRemover(List(DottedStatement)) --> List(Statement)
     StatementExecutor(List(Statement)) --> V
     Statement --> V
+  	ExecutableCode --> V
     
 //    AssignmentOperation --> Ex
     
@@ -52,4 +53,12 @@ rules
 			
 	    
 	FinalStatement(stmt) --> stmt.
+	
+	LiteralBlock(blockLiteral) --> blockLiteral
+	
+	BlockLiteral(block) --> blockRed
+		where
+			block --> blockRed.
+			
+	ExecutableCodeStmtsOnly(executableCodeRest) --> executableCodeRest.
 	

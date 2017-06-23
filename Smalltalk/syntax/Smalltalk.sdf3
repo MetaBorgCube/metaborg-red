@@ -64,9 +64,9 @@ context-free syntax
 	Literal.FloatingPointLiteral = FloatingPointLiteral 
 	Literal.CharacterLiteral = CharacterLiteral 
 	Literal.StringLiteral = StringLiteral 
-	Literal = SymbolLiteral 
-	Literal = ArrayLiteral 
-	Literal = BlockLiteral
+	Literal.LiteralSymbol = SymbolLiteral 
+	Literal.LiteralArray = ArrayLiteral 
+	Literal.LiteralBlock = BlockLiteral
 	
 	Operand.Literal = Literal
 	Operand.ReferenceOperand = Reference

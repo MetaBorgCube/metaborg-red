@@ -35,11 +35,6 @@ signature
 //  	V --> V
 
   native operators
-//    parseI: String -> Int
-//    binOpII: Int * Int * String -> Int
-//    binOpIB: Int * Int * String -> Bool
-//    binOpBB: Bool * Bool * String -> Bool
-//    printStr: String -> Int
     
 rules      
 	

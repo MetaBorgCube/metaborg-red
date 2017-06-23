@@ -6,7 +6,6 @@ import org.metaborg.Smalltalk.interpreter.generated.terms.NilV_0_Term;
 import org.metaborg.meta.lang.dynsem.interpreter.nodes.building.TermBuild;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.Node.Child;
 import com.oracle.truffle.api.source.SourceSection;
 
 public class printV_1 extends TermBuild {
@@ -26,6 +25,11 @@ public class printV_1 extends TermBuild {
 	@Override
 	public IVTerm executeGeneric(VirtualFrame frame) {
 		Object term = value.executeGeneric(frame);
+		print(term);
+		return new NilV_0_Term();
+	}
+
+	public void print(Object term) {
 		switch(term.getClass().getSimpleName()) {
 		case "BoolV_1_Term":
 			System.out.println(TypesGen.asBoolV_1_Term(term).get_1());
@@ -33,8 +37,8 @@ public class printV_1 extends TermBuild {
 		case "NumV_1_Term":
 			System.out.println(TypesGen.asNumV_1_Term(term).get_1());
 			break;
+		case "MethodExpressionV_2_Term":
+			System.out.println("Method Expression V: " );
 		}
-		return new NilV_0_Term();
 	}
-
 }

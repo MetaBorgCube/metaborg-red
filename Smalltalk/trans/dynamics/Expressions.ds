@@ -18,6 +18,7 @@ signature
     UnaryMessageCall: String -> Message
     KeywordValuePair: String * V ->	KeywordMessageElement
     KeywordMessageCall: List(String) * List(V) -> Message
+    MethodExpressionV: BinaryMessageOperand * List(BinaryMessage) -> V
     
   arrows
     Expression --> V
@@ -38,10 +39,12 @@ signature
   	Statement --> V
   	ConstantReference --> V
   	ExecutableCodeRest --> V
-  	V --> V
   	Message --> Message
+  	BlockLiteral --> V
+  	V --> V
   	List(BinaryMessage) --> List(Message)
   	List(UnaryMessage) --> List(Message)
+  	List(String) --> List(String)
   	KeywordMessageMap(List(KeywordMessageSegment), Message) --> Message
   	ExpI(V, List(Message)) --> V
 //    DynamicDispatch: List(Message) -> V
@@ -52,7 +55,6 @@ signature
     num-call-native: String * V -> V
     bool-call-native: String * V -> V
     num-calls-native: List(String) * List(V) * V -> V
-   	bool-calls-native: List(String) * List(V) * V -> V
    	printV: V -> V
   components
   	L : List(Message)
@@ -76,8 +78,6 @@ rules
 			BoolV(_) =>		
 				bool-call-native(messageName, operand) => v3;
 				ExpI(v3, tailMessages) --> v4
-//			RefV(r1) =>
-//				DynamicDispatch(r1, ["sad"]) => v4
 			}	
 		BinaryMessageCall(messageName, v2) =>
 			case operand of {
@@ -93,9 +93,38 @@ rules
 			NumV(_) => 
 				num-calls-native(keywords, values, operand) => v3;
 				ExpI(v3, tailMessages) --> v4
-			BoolV(_) =>		
-				bool-calls-native(keywords, values, operand) => v3;
-				ExpI(v3, tailMessages) --> v4
+			BoolV(true) =>
+				keywords => [a, b];
+				case a of {
+					"ifTrue" =>
+						case b of {
+							"ifFalse" => 
+								values[0] => methodV;
+								methodV --> v4
+						}
+					"ifFalse" =>
+						case b of {
+							"ifTrue" =>
+								values[1] => methodV;
+								methodV --> v4
+						}
+				}
+			BoolV(false) =>
+				keywords => [a, b];
+				case a of {
+					"ifTrue" =>
+						case b of {
+							"ifFalse" => 
+								values[1] => methodV;
+								methodV --> v4
+						}
+					"ifFalse" =>
+						case b of {
+							"ifTrue" =>
+								values[0] => methodV;
+								methodV --> v4
+						}
+				}
 			}
 		}
 			
@@ -103,6 +132,7 @@ rules
 	
 		
 	Literal(e1) --> e1.
+	
 	ReferenceOperand(ref) --> ref.
 	
 	ReferenceID(id) --> readVar(id).
@@ -114,8 +144,8 @@ rules
 	True() --> BoolV(true).
 	False() --> BoolV(false).
 	
-	NumV(a) --> NumV(a).
-	BoolV(b) --> BoolV(b).
+//	NumV(a) --> NumV(a).
+//	BoolV(b) --> BoolV(b).
 	
 	BinaryMessage(selector, operand) --> BinaryMessageCall(selector, operand).
 		
@@ -157,9 +187,9 @@ rules
 	
 	KeywordMessageChain(keywordMessage) --> keywordMessage.
 	
-	KeywordMessage(messageSegment) --> [KeywordMessageCall(values, keys)]
+	KeywordMessage(messageSegment) --> [KeywordMessageCall(keys, values)]
 		where
-			KeywordMessageMap(messageSegment, KeywordMessageCall([],[])) => KeywordMessageCall(values, keys).
+			KeywordMessageMap(messageSegment, KeywordMessageCall([],[])) => KeywordMessageCall(keys, values).
 			
 	KeywordMessageMap([messageSegmentHead | messageSegmentTail], KeywordMessageCall(curKeys, curVals)) --> message
 		where
@@ -168,12 +198,14 @@ rules
 		
 	KeywordMessageMap([], KeywordMessageCall(keys, vals)) --> KeywordMessageCall(keys, vals).
 	
-	KeywordMessageSegment(keyword, keywordMessageArgument) --> KeywordValuePair(key, argumentValue)
+	KeywordMessageSegment(keyword, keywordMessageArgument) --> KeywordValuePair(key, MethodExpressionV(binOperand, binMessages))
 		where
 		keyword --> key;
-		keywordMessageArgument --> argumentValue.
+		keywordMessageArgument => MethodExpressionV(binOperand, binMessages).
 		
-	KeywordMessageArgument(binaryMessageOperand, binaryMessages) --> ExpI(binaryMessageOperand, BinaryMessageChain(binaryMessages)).
+		
+	KeywordMessageArgument(binaryMessageOperand, binaryMessages) --> MethodExpressionV(binaryMessageOperand, binaryMessages).
+	MethodExpressionV(binaryMessageOperand, binaryMessages) --> ExpI(binaryMessageOperand, BinaryMessageChain(binaryMessages)).
 		
 	Keyword(key) --> key.	
 

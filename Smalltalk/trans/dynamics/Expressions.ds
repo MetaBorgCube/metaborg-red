@@ -14,6 +14,7 @@ signature
     NumV: Int -> V
     BoolV: Bool -> V
     StringV: String -> V
+    ListStringV: List(String) -> V
   	BinaryMessageCall: String * V -> Message
     UnaryMessageCall: String -> Message
     KeywordValuePair: String * V ->	KeywordMessageElement
@@ -22,6 +23,12 @@ signature
     
   arrows
     Expression --> V
+    
+    UnaryMessageSelector --> String
+    KeywordMessageSelector --> List(String)
+    
+    SymbolInArrayLiteral --> V
+    SymbolLiteral --> V
   	
   	Literal --> V
   	Reference --> V
@@ -33,7 +40,6 @@ signature
   	MessageChain -->  List(Message)
   	UnaryMessageChain --> List(Message)
   	BinaryMessageOperand --> V
-  	UnaryMessageSelector --> String
   	Keyword --> String
   	KeywordMessageArgument --> V
   	Statement --> V
@@ -129,6 +135,15 @@ rules
 		}
 			
 	ExpI(e3, []) --> e3.
+	
+	
+	UnarySIAL(selector) --> StringV(selector).
+	KeywordSIAL(selector) --> ListStringV(selector).
+	BinarySIAL(selector) --> StringV(selector).
+	
+	SIALSymbolLiteral(sym) --> sym.
+	ConstantSymbolLiteral(sym) --> sym.
+	StringSymbolLiteral(str) --> StringV(str).
 	
 		
 	Literal(e1) --> e1.

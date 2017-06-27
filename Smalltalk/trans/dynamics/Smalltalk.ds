@@ -9,36 +9,15 @@ trans/runtime/store
 trans/dynamics/Statements
 
 signature
-  constructors
-//    NumV: Int -> V
-//    BoolV: Bool -> V
-//	IntIntO: String -> O
-//    ExpRest: BinaryMessageSelector * V -> Ex
-//    ExpI: V * List(BinaryMessage) -> V
   arrows
     Prog -init-> V
-    ExecutableCode --> V
     ExecutableCodeRest --> V
-    
-    Reference --> V
-    
-  	Expression --> V
-  	
-  	Literal --> V
-  	Reference --> V
-  	Operand --> V
-//  	MessageChain -->  List(BinaryMessage)
-  	BinaryMessageOperand --> V
-  	Statement --> V
-  	ConstantReference --> V
-//  	ExecutableCodeRest --> V
-//  	V --> V
 
   native operators
     
 rules      
 	
-	Program(ExecutableCode(rest)) -init-> v
+	Program(ExecutableCode(rest)) -init-> NilV()
 		where
 		rest :: S {}, H {} --> v :: S _, H _.
 

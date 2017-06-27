@@ -35,14 +35,14 @@ context-free syntax
 	KeywordMessageSelector.KeywordMessageSelector = Keyword+  //duplicate, can combine?
 		
 	
-	SymbolInArrayLiteral = UnaryMessageSelector
+	SymbolInArrayLiteral.UnarySIAL = UnaryMessageSelector
 	SymbolInArrayLiteral = ConstantReference {reject} //duplicate, can combine?
-	SymbolInArrayLiteral = KeywordMessageSelector
-	SymbolInArrayLiteral = BinarySelectorChar
+	SymbolInArrayLiteral.KeywordSIAL = KeywordMessageSelector
+	SymbolInArrayLiteral.BinarySIAL = BinarySelectorChar
 	
-	SymbolLiteral = <# <SymbolInArrayLiteral>>  
-	SymbolLiteral = <# <ConstantReference>> 
-	SymbolLiteral = <# <StringLiteral>> 
+	SymbolLiteral.SIALSymbolLiteral = <# <SymbolInArrayLiteral>>  
+	SymbolLiteral.ConstantSymbolLiteral = <# <ConstantReference>> 
+	SymbolLiteral.StringSymbolLiteral = <# <StringLiteral>> 
 	ArrayLiteral.ObjectAL = ObjectArrayLiteral 
 	ArrayLiteral.ByteArrayAL = <#[ <{UnsignedIntegerLiteral ""}*> ]>
 	ObjectArrayLiteral.ObjectArrayLiteral = <# <NestedObjectArrayLiteral>>

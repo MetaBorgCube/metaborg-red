@@ -32,6 +32,7 @@ signature
   	KeywordMessage --> List(Message)
   	MessageChain -->  List(Message)
   	UnaryMessageChain --> List(Message)
+  	CascadedMessage --> MessageChain
   	BinaryMessageOperand --> V
   	UnaryMessageSelector --> String
   	Keyword --> String
@@ -42,11 +43,14 @@ signature
   	Message --> Message
   	BlockLiteral --> V
   	V --> V
+  	List(V) --> List(V)
   	List(BinaryMessage) --> List(Message)
   	List(UnaryMessage) --> List(Message)
   	List(String) --> List(String)
   	KeywordMessageMap(List(KeywordMessageSegment), Message) --> Message
   	ExpI(V, List(Message)) --> V
+  	ExpressionCascaded(Operand, MessageChain, List(CascadedMessage)) --> V
+  	MethodVMap(List(V)) --> List(V)
 //    DynamicDispatch: List(Message) -> V
   native operators
     parseI: String -> Int
@@ -62,6 +66,17 @@ signature
 rules
 
 	SingletonExpression(operand) --> operand.	
+	
+	Expression(operand, chain, cascaded) --> ExpressionCascaded(operand, chain, cascaded).
+	
+	ExpressionCascaded(operand, chain, []) --> ExpI(operand, chain).
+	
+	ExpressionCascaded(operand, chain, [cascadedHead | cascadedTail]) --> result
+		where
+		ExpI(operand, chain) --> someValue;
+		ExpressionCascaded(operand, cascadedHead, cascadedTail) --> result.
+	
+	CascadedMessage(messageChain) --> messageChain.
 	
 	Expression(operand, chain, cascaded) --> result
 	where 
@@ -88,9 +103,10 @@ rules
 				bool-call-native(messageName, operand, v2) => v3;
 				ExpI(v3, tailMessages) --> v4
 			}
-		KeywordMessageCall(keywords, values) =>
+		KeywordMessageCall(keywords, methodVs) =>
 			case operand of {
 			NumV(_) => 
+				MethodVMap(methodVs) => values;
 				num-calls-native(keywords, values, operand) => v3;
 				ExpI(v3, tailMessages) --> v4
 			BoolV(true) =>
@@ -99,13 +115,13 @@ rules
 					"ifTrue" =>
 						case b of {
 							"ifFalse" => 
-								values[0] => methodV;
+								methodVs[0] => methodV;
 								methodV --> v4
 						}
 					"ifFalse" =>
 						case b of {
 							"ifTrue" =>
-								values[1] => methodV;
+								methodVs[1] => methodV;
 								methodV --> v4
 						}
 				}
@@ -115,13 +131,13 @@ rules
 					"ifTrue" =>
 						case b of {
 							"ifFalse" => 
-								values[1] => methodV;
+								methodVs[1] => methodV;
 								methodV --> v4
 						}
 					"ifFalse" =>
 						case b of {
 							"ifTrue" =>
-								values[0] => methodV;
+								methodVs[0] => methodV;
 								methodV --> v4
 						}
 				}
@@ -130,6 +146,12 @@ rules
 			
 	ExpI(e3, []) --> e3.
 	
+	MethodVMap([methodVHead | methodVTail]) --> [valueHead | valueTail]
+		where 
+		methodVHead --> valueHead;
+		MethodVMap(methodVTail) => valueTail.
+		
+	MethodVMap([]) --> [].
 		
 	Literal(e1) --> e1.
 	

@@ -1,0 +1,117 @@
+module test
+
+language Smalltalk
+
+test parse [[
+
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.ConstantReference.true [[
+	true.
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.ConstantReference.false [[
+	false.
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.ConstantReference.nil [[
+	nil.
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.IntegerLiteral [[
+	1.
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.CharcterLiteral [[
+		$a.
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.SymbolLiteral [[
+	#a.
+]] parse succeeds
+
+test Expression.SingletonExpression.Literal.Literalblock [[
+	[4. 1].
+]] parse succeeds
+
+test Expression.SingletonExpression.ReferenceOperand [[
+	a.
+]] parse succeeds
+
+test Expression.SingletonExpression.Brackets [[
+	(1 + 4).
+]] parse succeeds
+
+test Expression.Expression_single_chain1 [[
+ 	1 + 4.
+]] parse succeeds
+
+test Expression.Expression_single_chain2 [[
+ 	true | false.
+]] parse succeeds
+
+test Expression.Expression_multi_chain [[
+ 	1 + 4 * 3.
+]] parse succeeds
+
+test Expression.Expression_unary_chain [[
+ 	4 sqrt sqrt sqrt.
+]] parse succeeds
+
+test Expression.Expression_binary_chain [[
+ 	1 + 4.
+]] parse succeeds
+
+test Expression.Expression_unary_binary_chain [[
+ 	4 sqrt sqrt + 4 + 3.
+]] parse succeeds
+
+test Expression.Expression_binary_keyword_chain [[
+ 	1 + 4 raisedTo: 5.
+]] parse succeeds
+
+test Expression.Expression_unary_binary_keyword_chain [[
+ 	1 sqrt sqrt + 4 + 3 raisedTo: 4.
+]] parse succeeds
+
+test Expression.Expression_single_chain [[
+ 	1 + 4.
+]] parse succeeds
+
+//keyword messages
+
+test KeywordsMessageSegment [[
+	5 log10: 4.
+]]
+
+test KeywordMessage.KeywordMessage [[
+	true ifFalse: 2 ifTrue: 4.
+]] parse succeeds
+
+test KeywordMessageArgument [[
+	1 raisedTo: 4 + 3 + 1 sqrt.
+]] parse succeeds
+
+test KeywordMessageBlock [[
+	1 < 4 & true | false ifFalse: [a := 1. 5 + 4] ifTrue: [a].
+]] parse succeeds
+//Statements
+
+test Statement.AssignmentOperation [[
+	a := 1.
+]] parse succeeds
+test Statement.AssignmentOperation2 [[
+	a := 1.
+	b := 4.
+]] parse succeeds
+
+test Statement.AssignmentOperation3 [[
+	a := 1.
+	b := 4.
+	c := a + b.
+	c + 1.
+]] parse succeeds
+
+test cascadedMessage [[
+	1 + 4; + 1; sqrt; sqrt; raisedTo: 4 + 1; / 5.
+]] parse succeeds

@@ -156,6 +156,8 @@ rules
 	Literal(e1) --> e1.
 	
 	ReferenceOperand(ref) --> ref.
+		
+	Parenthesis(statement) --> statement.
 	
 	ReferenceID(id) --> readVar(id).
 		

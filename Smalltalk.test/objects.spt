@@ -1,0 +1,42 @@
+module test
+
+language Smalltalk
+
+test createObject [[
+	Object subclass: #newObject
+]] parse succeeds
+
+test createSubClass [[
+	newObject subclass: #subObject
+]] parse succeeds
+
+test methodDeclaration [[
+	keyword1: a keyword2: b
+]] parse succeeds
+
+test methodDeclarationSTMTSOnly [[
+	keyword1: a keyword2: b
+	a + b.
+	1 + 3.
+]] parse succeeds
+
+test methodDeclaration [[
+	keyword1: a keyword2: b
+	a + b.
+	1 + 3.
+	|a b c|
+]] parse fails
+
+test methodDeclaration [[
+	keyword1: a keyword2: b
+	|a b c|.
+	a + b.
+	1 + 3.
+]] parse fails
+
+test methodDeclaration [[
+	keyword1: a keyword2: b
+	|a b c|
+	a + b.
+	1 + 3.
+]] parse succeeds

@@ -1,0 +1,120 @@
+module trans/dynamics/Objects
+
+imports
+src-gen/ds-signatures/Smalltalk-sig
+src-gen/ds-signatures/Base-sig
+
+trans/runtime/values
+trans/runtime/store
+
+trans/dynamics/Expressions
+trans/dynamics/ExecutableCode
+
+signature
+
+	constructors
+		Class: V * Object * Map(String, V) * List(Method) -> Object
+			// parent * object * class attributes * class methods -> class object
+		Object: V * Map(String, V) * List(Method) -> Object
+			// class * attributes * methods -> object
+		Method: List(String) * List(String) * ExecutableCode -> Method
+			// selectors * bindings * code -> method
+			
+	arrows
+		allocateHelper() --> V
+	
+		initObjectSystem() --> V
+		addMethod(V, Method) --> Method
+		addClassMethod(V, Method) --> Method
+		
+		callKeywordMethod(V, List(String), List(V)) --> V
+		findMethod(List(String), List(Method)) --> Method
+		executeMethod(V, Object, Method, List(String), List(V)) --> V
+		mapFrom2Lists(List(String), List(V)) --> Map(String, V)
+		
+rules
+
+	allocateHelper() --> allocate(Class(RefV(0), Object(RefV(0), {}, []), {}, [])).
+	
+	initObjectSystem() :: S, H --> addr :: S S2, H H3
+	where
+//		printV(StringV("init system 0")) => _;
+		allocateHelper() :: S, H --> addr :: S, H H1;
+//		printV(StringV("init system 1")) => _;
+		write(addr, Class(addr, Object(addr, {}, []), {}, [])) :: S, H1 --> _ :: S, H H2;
+//		printV(StringV("init system 2")) => _;
+		bindToGlobal("Object", addr) :: S, H2 --> _ :: S S1, H H3;
+//		printV(StringV("init system 3")) => _;
+		{"isGlobal" |--> {} : Map(String, V), S1} => S2
+//		printV(StringV("init system 4")) => _.
+		
+	addMethod(classAddr, methodDecl) :: S, H --> methodDecl :: S S1, H H1
+	where
+		read(classAddr) --> Class(parentAddr, Object(classRef, objAttributes, objMethods), classAttributes, classMethods);
+		write(classAddr, Class(parentAddr, Object(classRef, objAttributes, [methodDecl | objMethods]), classAttributes, classMethods)) :: S, H --> _ :: S1, H1.
+		
+	addClassMethod(classAddr, methodDecl) :: S, H --> methodDecl :: S S1, H H1
+	where
+		read(classAddr) --> Class(parentAddr, obj, classAttributes, classMethods);
+		write(classAddr, Class(parentAddr, obj, classAttributes, [methodDecl | classMethods])) :: S, H --> _ :: S1, H1.
+		
+		
+	
+	findMethod(keywords, []) --> Method([], [],  ExecutableCodeEmpty()).
+	findMethod(keywords, [head | rest]) --> head
+	where
+		head => Method(selectors, _, _);
+		keywords == selectors.
+	findMethod(keywords, [head | rest]) --> method
+	where
+		head => Method(selectors, _, _);
+		keywords != selectors;
+		findMethod(keywords, rest) => method.
+			
+	callKeywordMethod(objAddr, keywords, values) :: S, H --> v :: S S1, H H1
+	where
+//		printV(StringV("cool2")) => _;
+		read(objAddr) --> object;
+//		printV(StringV("cool3")) => _;
+		case object of {
+			Class(className, obj, classAttributes, classMethods) =>
+	//			printV(StringV("cool4")) => _;
+				findMethod(keywords, classMethods) => method;
+	//			printV(StringV("cool5")) => _;
+				executeMethod(objAddr, Class(className, obj, classAttributes, classMethods), method, keywords, values) :: S, H --> v :: S S1, H H1
+			}
+		
+	executeMethod(objRef, incomingObject, _, ["subclass"], values) :: S, H --> newClassRef :: S S1, H H2
+	where
+		case incomingObject of {
+			Class(_, obj, classAttributes, classMethods) =>
+				values[0] => StringV(newClassName);
+				obj => Object(_, objAttributes, objMethods);
+				allocateHelper() :: S, H --> newClassRef :: S, H1;
+				Object(newClassRef, objAttributes, objMethods) => newObj;
+				Class(objRef, newObj, classAttributes, classMethods) => newClass;
+				write(newClassRef, newClass) :: S, H1 --> _ :: S, H2;
+				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H H3
+		}
+		
+	executeMethod(objRef, incomingObject, Method(_, bindings, code), _, values) :: S, H --> result :: S S, H H1
+	where
+		case incomingObject of {
+			Class(parentRef, obj, classAttributes, classMethods) =>
+				mapFrom2Lists(bindings, values) => newScope;
+				{"class" |--> objRef} => refs;
+				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				code :: S1, H --> result :: S, H H1
+			Object(classRef, objAttributes, objMethods) =>
+				mapFrom2Lists(bindings, values) => newScope;
+				{"object" |--> objRef} => refs;
+				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				code :: S1, H --> result :: S, H H1
+		}
+		
+	mapFrom2Lists([] : List(String), [] : List(V)) --> {} : Map(String, V).
+	mapFrom2Lists([varName | restNames], [varValue | restValues]) --> {varName |--> varValue, restMap}
+	where
+		mapFrom2Lists(restNames, restValues) => restMap : Map(String, V).
+	
+		

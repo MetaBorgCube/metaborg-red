@@ -7,6 +7,8 @@ src-gen/ds-signatures/Base-sig
 trans/runtime/values
 trans/runtime/store
 
+trans/dynamics/Objects
+
 signature
 
   constructors
@@ -46,13 +48,13 @@ signature
   	ConstantReference --> V
   	ExecutableCodeRest --> V
   	Message --> Message
-  	BlockLiteral --> V
   	V --> V
   	List(BinaryMessage) --> List(Message)
   	List(UnaryMessage) --> List(Message)
   	List(String) --> List(String)
   	KeywordMessageMap(List(KeywordMessageSegment), Message) --> Message
   	ExpI(V, List(Message)) --> V
+  	MethodVMap(List(V)) --> List(V)
 //    DynamicDispatch: List(Message) -> V
   native operators
     parseI: String -> Int
@@ -73,8 +75,10 @@ rules
 	where 
 		ExpI(operand, chain) --> result.
 		
-	ExpI(operand, [headMessage | tailMessages]) --> v4
+	ExpI(operand, [headMessage | tailMessages])  :: S, H --> v4 :: S S2, H H2
 		where
+		S => S2;
+		H => H2;
 		case headMessage of {
 		UnaryMessageCall(messageName) =>
 			case operand of {
@@ -122,19 +126,31 @@ rules
 						case b of {
 							"ifFalse" => 
 								values[1] => methodV;
-								methodV --> v4
+								methodV --> v4 :: S2, H2
 						}
 					"ifFalse" =>
 						case b of {
 							"ifTrue" =>
 								values[0] => methodV;
-								methodV --> v4
+								methodV --> v4 :: S2, H2
 						}
 				}
+			RefV(_) =>
+//				printV(StringV("cool1")) => _;
+				callKeywordMethod(operand, keywords, MethodVMap(values)) :: S, H --> v3 :: S1, H1;
+//				printV(BoolV(S1["Metaborg"?])) => _;
+				ExpI(v3, tailMessages) :: S1, H1 --> v4 :: S S2, H H2
 			}
 		}
 			
 	ExpI(e3, []) --> e3.
+	
+	MethodVMap([methodVHead | methodVTail]) --> [valueHead | valueTail]
+        where 
+        methodVHead --> valueHead;
+        MethodVMap(methodVTail) => valueTail.
+        
+    MethodVMap([]) --> [].
 	
 	
 	UnarySIAL(selector) --> StringV(selector).
@@ -155,6 +171,11 @@ rules
 	IntegerLiteral(s) --> NumV(parseI(s)).
 	ConstantReference(bool) --> bool
 		where bool --> BoolV(b).
+	StringLiteral(s) --> StringV(s).
+	LiteralSymbol(sym) --> sym.
+//	LiteralArray(arr) --> arr.
+	LiteralBlock(blk) --> blk.
+	
 	
 	True() --> BoolV(true).
 	False() --> BoolV(false).

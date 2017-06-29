@@ -30,15 +30,21 @@ public class printV_1 extends TermBuild {
 	}
 
 	public void print(Object term) {
-		switch(term.getClass().getSimpleName()) {
+		String className = term.getClass().getSimpleName();
+		switch(className) {
 		case "BoolV_1_Term":
 			System.out.println(TypesGen.asBoolV_1_Term(term).get_1());
 			break;
 		case "NumV_1_Term":
 			System.out.println(TypesGen.asNumV_1_Term(term).get_1());
 			break;
+		case "StringV_1_Term":
+			System.out.println(TypesGen.asStringV_1_Term(term).get_1());
+			break;
 		case "MethodExpressionV_2_Term":
 			System.out.println("Method Expression V: " );
+		default:
+			System.out.println(className);
 		}
 	}
 }

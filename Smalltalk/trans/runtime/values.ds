@@ -5,6 +5,9 @@ signature
     V // Values
   	Message // Message
   	KeywordMessageElement
+  	Object // Object
+  	Method // Method
+  	
 
   variables
     v : V

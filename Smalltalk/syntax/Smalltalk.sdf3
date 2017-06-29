@@ -11,10 +11,14 @@ context-free start-symbols
 context-free syntax
   
   	Prog.Program = Start
-	Start.MethodDeclaration = MethodDeclaration
-	Start.ExecutableCode = ExecutableCodeRest
+  	Start.ProgramSegments = ProgramSegment*
+  	// class method
+	ProgramSegment.ClassMethodDeclaration = <$M$ <Reference> \>\> <MethodDeclaration>>
+	// method
+	ProgramSegment.MethodDeclaration = <$M$ <Reference> <MethodDeclaration>>
+	ProgramSegment.ExecutableCode = <$E$ <ExecutableCodeRest>>
 //	Start.Start = Expression
-	Start.Empty = <>
+//	Start.Empty = <>
 	
 	Reference.ReferenceID = Identifier
 	
@@ -116,9 +120,9 @@ context-free syntax
 	MethodHeader.UnaryMethodHeader = UnaryMessageSelector 
 	MethodHeader.BinaryMethodHeader = <<BinarySelectorChar> <BindableIdentifier>>
 	MethodHeader.KeywordMethodHeader = KeywordMethodHeaderSegment+
-	MethodDeclaration.MethodDeclaration = <<MethodHeader> <ExecutableCode>>
+	MethodDeclaration.MethodDecl = <<MethodHeader> <ExecutableCode>>
 	
 context-free priorities
-	
+	ProgramSegment.MethodDeclaration > ProgramSegment.ExecutableCode
 
 

@@ -10,9 +10,9 @@ language
   table         : target/metaborg/sdf.tbl
   start symbols : Prog
 
-  line comment  : "//"
-  block comment : "/*" * "*/"
-  fences        : [ ] ( ) { }
+//  line comment  : "//"
+  block comment : "\"" * "\""
+  fences        : [ ] ( ) //{ }
 
 menus
   

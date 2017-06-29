@@ -1,0 +1,35 @@
+module trans/dynamics/ExecutableCode
+
+imports
+src-gen/ds-signatures/Smalltalk-sig
+src-gen/ds-signatures/Base-sig
+
+trans/runtime/values
+trans/runtime/store
+
+trans/dynamics/Statements
+
+signature
+  arrows
+    ExecutableCodeRest --> V
+    ExecutableCode --> V
+    BlockLiteral --> V
+    
+rules
+	ExecutableCodeRest(statements, finalstmt) :: S, H --> v :: S S2, H H2
+		where
+			StatementExecutor(DotRemover(statements)) :: S, H --> _ :: S1, H1;
+			finalstmt :: S1, H1 --> v :: S2, H2.
+			
+	BlockLiteral(block) --> blockRed
+		where
+			block --> blockRed.
+
+	BlockLiteralWithArgs(args, block) --> blockRed
+		where
+			block --> blockRed.
+			
+	ExecutableCodeStmtsOnly(executableCodeRest) --> executableCodeRest.
+	ExecutableCodeEmpty() --> NilV().
+	ExecutableCodeVarsOnly(vars) --> NilV().
+	ExecutableCodeVarsNStmts(vars, executableCodeRest) --> executableCodeRest.

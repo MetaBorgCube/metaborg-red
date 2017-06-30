@@ -2,25 +2,31 @@ module test
 
 language Smalltalk
 
+
 test createObject [[
+	$E$ 
 	Object subclass: #newObject
 ]] parse succeeds
 
 test createSubClass [[
+	$E$ 
 	newObject subclass: #subObject
 ]] parse succeeds
 
 test methodDeclaration [[
+	$M$ 
 	keyword1: a keyword2: b
 ]] parse succeeds
 
 test methodDeclarationSTMTSOnly [[
+	$M$ 
 	keyword1: a keyword2: b
 	a + b.
 	1 + 3.
 ]] parse succeeds
 
 test methodDeclaration [[
+	$M$ 
 	keyword1: a keyword2: b
 	a + b.
 	1 + 3.
@@ -28,6 +34,7 @@ test methodDeclaration [[
 ]] parse fails
 
 test methodDeclaration [[
+	$M$ 
 	keyword1: a keyword2: b
 	|a b c|.
 	a + b.
@@ -35,8 +42,14 @@ test methodDeclaration [[
 ]] parse fails
 
 test methodDeclaration [[
+	$M$ 
 	keyword1: a keyword2: b
 	|a b c|
 	a + b.
 	1 + 3.
+]] parse succeeds
+
+test unaryDeclaration [[
+	$M$ 
+	Object unarymessage ^true
 ]] parse succeeds

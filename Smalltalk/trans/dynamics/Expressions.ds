@@ -93,7 +93,7 @@ rules
 			BoolV(_) =>		
 				bool-call-native(messageName, operand) => v3;
 				ExpI(v3, tailMessages) --> v4
-			}	
+			}
 		BinaryMessageCall(messageName, v2) =>
 			case operand of {
 			NumV(_) => 
@@ -162,6 +162,9 @@ rules
 	ReferenceID(id) --> readVar(id).
 		
 	IntegerLiteral(s) --> NumV(parseI(s)).
+	
+	StringLiteral(s) --> StringV(s).
+	
 	ConstantReference(bool) --> bool
 		where bool --> BoolV(b).
 	

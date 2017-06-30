@@ -1,0 +1,1072 @@
+module trans/dynamics/Statements.core
+
+imports 
+
+signature
+    sorts
+      MapStatements_1_Meta
+      DotRemover_1_Meta
+      StatementExecutor_1_Meta
+      StringsFromAssignmentOperations_1_Meta
+      KeywordMessageMap_2_Meta
+      ExpI_2_Meta
+      MethodVMap_1_Meta
+      allocateHelper_0_Meta
+      initObjectSystem_0_Meta
+      addMethod_2_Meta
+      addClassMethod_2_Meta
+      callKeywordMethod_3_Meta
+      callUnaryMethod_2_Meta
+      findMethod_2_Meta
+      executeMethod_5_Meta
+      mapFrom2Lists_2_Meta
+      compare2Lists_2_Meta
+      read_1_Meta
+      allocate_1_Meta
+      write_2_Meta
+      bindToGlobalMap_2_Meta
+      bindToGlobal_2_Meta
+      bindVarMap_2_Meta
+      bindVar_2_Meta
+      bindVarToObject_2_Meta
+      bindVarToGlobal_2_Meta
+      readVar_1_Meta
+      readVarFromObject_1_Meta
+      readVarFromGlobal_1_Meta
+      V
+      Message
+      KeywordMessageElement
+      Object
+      Method
+      Prog
+      Start
+      ProgramSegment
+      Reference
+      StringLiteral
+      ConstantReference
+      PsuedoVariableReference
+      BindableIdentifier
+      UnaryMessageSelector
+      Keyword
+      KeywordMessageSelector
+      SymbolInArrayLiteral
+      SymbolLiteral
+      ArrayLiteral
+      ObjectArrayLiteral
+      NestedObjectArrayLiteral
+      LiteralArrayElement
+      FormalBlockArgumentDeclaration
+      FormalBlockArgumentDeclarationList
+      BlockLiteral
+      Literal
+      Operand
+      UnaryMessage
+      UnaryMessageChain
+      BinaryMessageOperand
+      BinaryMessage
+      KeywordMessageArgument
+      KeywordMessageSegment
+      KeywordMessage
+      MessageChain
+      CascadedMessage
+      Expression
+      AssignmentOperation
+      Statement
+      FinalStatement
+      LocalVariableDeclarationList
+      ExecutableCode
+      ExecutableCodeRest
+      DottedStatement
+      KeywordMethodHeaderSegment
+      MethodHeader
+      MethodDeclaration
+    constructors
+      MapStatements : List(Statement) -> MapStatements_1_Meta {meta-function}
+      DotRemover : List(DottedStatement) -> DotRemover_1_Meta {meta-function}
+      StatementExecutor : List(Statement) -> StatementExecutor_1_Meta {meta-function}
+      StringsFromAssignmentOperations : List(AssignmentOperation) -> StringsFromAssignmentOperations_1_Meta {meta-function}
+      KeywordMessageMap : List(KeywordMessageSegment) * Message -> KeywordMessageMap_2_Meta {meta-function}
+      ExpI : V * List(Message) -> ExpI_2_Meta {meta-function}
+      MethodVMap : List(V) -> MethodVMap_1_Meta {meta-function}
+      NilV : V 
+      NumV : Int -> V 
+      BoolV : Bool -> V 
+      StringV : String -> V 
+      ListStringV : List(String) -> V 
+      BinaryMessageCall : String * V -> Message 
+      UnaryMessageCall : String -> Message 
+      KeywordValuePair : String * V -> KeywordMessageElement 
+      KeywordMessageCall : List(String) * List(V) -> Message 
+      MethodExpressionV : BinaryMessageOperand * List(BinaryMessage) -> V 
+      allocateHelper : allocateHelper_0_Meta {meta-function}
+      initObjectSystem : initObjectSystem_0_Meta {meta-function}
+      addMethod : V * Method -> addMethod_2_Meta {meta-function}
+      addClassMethod : V * Method -> addClassMethod_2_Meta {meta-function}
+      callKeywordMethod : V * List(String) * List(V) -> callKeywordMethod_3_Meta {meta-function}
+      callUnaryMethod : V * String -> callUnaryMethod_2_Meta {meta-function}
+      findMethod : List(String) * List(Method) -> findMethod_2_Meta {meta-function}
+      executeMethod : V * Object * Method * List(String) * List(V) -> executeMethod_5_Meta {meta-function}
+      mapFrom2Lists : List(String) * List(V) -> mapFrom2Lists_2_Meta {meta-function}
+      compare2Lists : List(String) * List(String) -> compare2Lists_2_Meta {meta-function}
+      Class : V * Object * Map(String,V) * List(Method) -> Object 
+      Object : V * Map(String,V) * List(Method) -> Object 
+      Method : List(String) * List(String) * ExecutableCode -> Method 
+      read : V -> read_1_Meta {meta-function}
+      allocate : Object -> allocate_1_Meta {meta-function}
+      write : V * Object -> write_2_Meta {meta-function}
+      bindToGlobalMap : List(String) * V -> bindToGlobalMap_2_Meta {meta-function}
+      bindToGlobal : String * V -> bindToGlobal_2_Meta {meta-function}
+      bindVarMap : List(String) * V -> bindVarMap_2_Meta {meta-function}
+      bindVar : String * V -> bindVar_2_Meta {meta-function}
+      bindVarToObject : String * V -> bindVarToObject_2_Meta {meta-function}
+      bindVarToGlobal : String * V -> bindVarToGlobal_2_Meta {meta-function}
+      readVar : String -> readVar_1_Meta {meta-function}
+      readVarFromObject : String -> readVarFromObject_1_Meta {meta-function}
+      readVarFromGlobal : String -> readVarFromGlobal_1_Meta {meta-function}
+      RefV : Int -> V 
+      Program : Start -> Prog 
+      ProgramSegments : List(ProgramSegment) -> Start 
+      ClassMethodDeclaration : Reference * MethodDeclaration -> ProgramSegment 
+      MethodDeclaration : Reference * MethodDeclaration -> ProgramSegment 
+      ExecutableCode : ExecutableCodeRest -> ProgramSegment 
+      ReferenceID : String -> Reference 
+      StringLit : String -> StringLiteral 
+      Null : ConstantReference 
+      False : ConstantReference 
+      True : ConstantReference 
+      Self : PsuedoVariableReference 
+      Super : PsuedoVariableReference 
+      This : PsuedoVariableReference 
+      BindableIdentifier : String -> BindableIdentifier 
+      UnaryMessageSelector : String -> UnaryMessageSelector 
+      Keyword : String -> Keyword 
+      KeywordMessageSelector : List(Keyword) -> KeywordMessageSelector 
+      UnarySIAL : UnaryMessageSelector -> SymbolInArrayLiteral 
+      KeywordSIAL : KeywordMessageSelector -> SymbolInArrayLiteral 
+      BinarySIAL : String -> SymbolInArrayLiteral 
+      SIALSymbolLiteral : SymbolInArrayLiteral -> SymbolLiteral 
+      ConstantSymbolLiteral : ConstantReference -> SymbolLiteral 
+      StringSymbolLiteral : StringLiteral -> SymbolLiteral 
+      ObjectAL : ObjectArrayLiteral -> ArrayLiteral 
+      ByteArrayAL : List(String) -> ArrayLiteral 
+      ObjectArrayLiteral : NestedObjectArrayLiteral -> ObjectArrayLiteral 
+      NestedObjectArrayLiteral : List(LiteralArrayElement) -> NestedObjectArrayLiteral 
+      __Literal2LiteralArrayElement__ : Literal -> LiteralArrayElement {implicit}
+      __NestedObjectArrayLiteral2LiteralArrayElement__ : NestedObjectArrayLiteral -> LiteralArrayElement {implicit}
+      __SymbolInArrayLiteral2LiteralArrayElement__ : SymbolInArrayLiteral -> LiteralArrayElement {implicit}
+      __ConstantReference2LiteralArrayElement__ : ConstantReference -> LiteralArrayElement {implicit}
+      FormalBlockArgumentDeclaration : BindableIdentifier -> FormalBlockArgumentDeclaration 
+      FormalBlockArgumentDeclarationList : List(FormalBlockArgumentDeclaration) -> FormalBlockArgumentDeclarationList 
+      BlockLiteralWithArgs : FormalBlockArgumentDeclarationList * ExecutableCode -> BlockLiteral 
+      BlockLiteral : ExecutableCode -> BlockLiteral 
+      ConstantReference : ConstantReference -> Literal 
+      IntegerLiteral : String -> Literal 
+      ScaledDecimalLiteral : String -> Literal 
+      FloatingPointLiteral : String -> Literal 
+      CharacterLiteral : String -> Literal 
+      StringLiteral : StringLiteral -> Literal 
+      LiteralSymbol : SymbolLiteral -> Literal 
+      LiteralArray : ArrayLiteral -> Literal 
+      LiteralBlock : BlockLiteral -> Literal 
+      Literal : Literal -> Operand 
+      ReferenceOperand : Reference -> Operand 
+      UnaryMessage : UnaryMessageSelector -> UnaryMessage 
+      UnaryMessageChain : List(UnaryMessage) -> UnaryMessageChain 
+      BinaryMessageOperand : Operand * UnaryMessageChain -> BinaryMessageOperand 
+      BinaryMessage : String * BinaryMessageOperand -> BinaryMessage 
+      KeywordMessageArgument : BinaryMessageOperand * List(BinaryMessage) -> KeywordMessageArgument 
+      KeywordMessageSegment : Keyword * KeywordMessageArgument -> KeywordMessageSegment 
+      KeywordMessage : List(KeywordMessageSegment) -> KeywordMessage 
+      KeywordMessageChain : KeywordMessage -> MessageChain 
+      BinaryMessageChain : List(BinaryMessage) -> MessageChain 
+      UnaryBinaryMessageChain : List(UnaryMessage) * List(BinaryMessage) -> MessageChain 
+      BinaryMessageChainWithKeyword : List(BinaryMessage) * KeywordMessage -> MessageChain 
+      UnaryMessageChainWithKeyword : List(UnaryMessage) * List(BinaryMessage) * KeywordMessage -> MessageChain 
+      CascadedMessage : MessageChain -> CascadedMessage 
+      SingletonExpression : Operand -> Expression 
+      Expression : Operand * MessageChain * List(CascadedMessage) -> Expression 
+      AssignmentOperation : BindableIdentifier -> AssignmentOperation 
+      Statement : List(AssignmentOperation) * Expression -> Statement 
+      FinalStatement : Statement -> FinalStatement 
+      FinalStatement : Statement -> FinalStatement 
+      LocalVariableDeclarationList : List(BindableIdentifier) -> LocalVariableDeclarationList 
+      ExecutableCodeVarsOnly : LocalVariableDeclarationList -> ExecutableCode 
+      ExecutableCodeStmtsOnly : ExecutableCodeRest -> ExecutableCode 
+      ExecutableCodeEmpty : ExecutableCode 
+      ExecutableCodeVarsNStmts : LocalVariableDeclarationList * ExecutableCodeRest -> ExecutableCode 
+      ExecutableCodeRest : List(DottedStatement) * FinalStatement -> ExecutableCodeRest 
+      ExecutableCodeRest : List(DottedStatement) * FinalStatement -> ExecutableCodeRest 
+      DottedStatement : Statement -> DottedStatement 
+      KeywordMethodHeaderSegment : Keyword * BindableIdentifier -> KeywordMethodHeaderSegment 
+      UnaryMethodHeader : UnaryMessageSelector -> MethodHeader 
+      BinaryMethodHeader : String * BindableIdentifier -> MethodHeader 
+      KeywordMethodHeader : List(KeywordMethodHeaderSegment) -> MethodHeader 
+      MethodDecl : MethodHeader * ExecutableCode -> MethodDeclaration 
+    native constructors
+    native operators
+      parseI : String -> Int
+      num-call-native : String * V * V -> V
+      bool-call-native : String * V * V -> V
+      num-call-native : String * V -> V
+      bool-call-native : String * V -> V
+      num-calls-native : List(String) * List(V) * V -> V
+      printV : V -> V
+      errorV : String -> V
+    arrows
+       FinalStatement  --> Statement 
+       MapStatements_1_Meta  --> V 
+       DotRemover_1_Meta  --> List(Statement) 
+       StatementExecutor_1_Meta :: S, H --> V :: S, H
+       Statement :: S, H --> V :: S, H
+       StringsFromAssignmentOperations_1_Meta  --> List(String) 
+       Expression :: S, H --> V :: S, H
+       UnaryMessageSelector  --> String 
+       KeywordMessageSelector  --> List(String) 
+       SymbolInArrayLiteral  --> V 
+       SymbolLiteral  --> V 
+       StringLiteral  --> String 
+       Literal :: S, H --> V :: S, H
+       Reference :: S, H --> V :: S, H
+       Operand :: S, H --> V :: S, H
+       UnaryMessage  --> Message 
+       BinaryMessage :: S, H --> Message :: S, H
+       KeywordMessageSegment  --> KeywordMessageElement 
+       KeywordMessage  --> List(Message) 
+       MessageChain :: S, H --> List(Message) :: S, H
+       UnaryMessageChain  --> List(Message) 
+       BinaryMessageOperand :: S, H --> V :: S, H
+       Keyword  --> String 
+       KeywordMessageArgument  --> V 
+       Statement :: S, H --> V :: S, H
+       ConstantReference  --> V 
+       ExecutableCodeRest :: S, H --> V :: S, H
+       Message  --> Message 
+       V :: S, H --> V :: S, H
+       List(BinaryMessage)  --> List(Message) 
+       List(UnaryMessage)  --> List(Message) 
+       List(String)  --> List(String) 
+       KeywordMessageMap_2_Meta  --> Message 
+       ExpI_2_Meta :: S, H --> V :: S, H
+       MethodVMap_1_Meta :: S, H --> List(V) :: S, H
+       ExecutableCodeRest :: S, H --> V :: S, H
+       ExecutableCode :: S, H --> V :: S, H
+       BlockLiteral :: S, H --> V :: S, H
+       allocateHelper_0_Meta :: S, H --> V :: S, H
+       initObjectSystem_0_Meta :: S, H --> V :: S, H
+       addMethod_2_Meta :: S, H --> Method :: S, H
+       addClassMethod_2_Meta :: S, H --> Method :: S, H
+       callKeywordMethod_3_Meta :: S, H --> V :: S, H
+       callUnaryMethod_2_Meta :: S, H --> V :: S, H
+       findMethod_2_Meta  --> Method 
+       executeMethod_5_Meta :: S, H --> V :: S, H
+       mapFrom2Lists_2_Meta  --> Map(String,V) 
+       compare2Lists_2_Meta  --> Bool 
+       read_1_Meta :: S, H --> Object :: S, H
+       allocate_1_Meta :: S, H --> V :: S, H
+       write_2_Meta :: S, H --> Object :: S, H
+       bindToGlobalMap_2_Meta :: S, H --> V :: S, H
+       bindToGlobal_2_Meta :: S, H --> V :: S, H
+       bindVarMap_2_Meta :: S, H --> V :: S, H
+       bindVar_2_Meta :: S, H --> V :: S, H
+       bindVarToObject_2_Meta :: S, H --> V :: S, H
+       bindVarToGlobal_2_Meta :: S, H --> V :: S, H
+       readVar_1_Meta :: S, H --> V :: S, H
+       readVarFromObject_1_Meta :: S, H --> V :: S, H
+       readVarFromGlobal_1_Meta :: S, H --> V :: S, H
+    native datatypes
+    components
+      L : List(Message)
+      H : Map(V,Object)
+      S : Map(String,Map(String,V))
+    variables
+      v : V
+
+rules
+
+  write(addr, o) :: S S, H H --> o :: S S, H {addr |--> o} + H
+
+  UnarySIAL(selector) --> StringV(s1)
+  where
+    selector --> s1
+
+  UnaryMessageSelector(identifier) --> identifier
+
+  UnaryMessageChainWithKeyword(unaryMessages, binaryMessages, keywordMessage) :: S S1, H H1 --> uList ++ kList :: S S2, H H2
+  where
+    UnaryBinaryMessageChain(unaryMessages, binaryMessages) :: S S1, H H1 --> uList :: S S2, H H2;
+    keywordMessage --> kList
+
+  UnaryMessageChain([ uHead | uTail ]) --> [ u1 | L1 ]
+  where
+    uHead --> u1;
+    UnaryMessageChain(uTail) --> L1
+
+  UnaryMessageChain([  ] : List(UnaryMessage)) --> [  ] : List(Message)
+
+  UnaryMessage(selector) --> UnaryMessageCall(s1)
+  where
+    selector --> s1
+
+  UnaryBinaryMessageChain(unaryMessages, binaryMessages) :: S S1, H H1 --> uChain ++ bChain :: S S2, H H2
+  where
+    UnaryMessageChain(unaryMessages) --> uChain;
+    BinaryMessageChain(binaryMessages) :: S S1, H H1 --> bChain :: S S2, H H2
+
+  True() --> BoolV(true)
+
+  StringSymbolLiteral(str) --> StringV(strv)
+  where
+    str --> strv
+
+  StringsFromAssignmentOperations([  ] : List(AssignmentOperation)) --> [  ] : List(String)
+
+  StringsFromAssignmentOperations([ AssignmentOperation(BindableIdentifier(id)) | tail ]) --> [ id | rest ]
+  where
+    StringsFromAssignmentOperations(tail) --> rest
+
+  StringLiteral(str) :: S S1, H H1 --> StringV(strv) :: S S1, H H1
+  where
+    str --> strv
+
+  StringLit(str) --> str
+
+  StatementExecutor([  ] : List(Statement)) :: S S, H H --> BoolV(false) :: S S, H H
+
+  StatementExecutor([ stmt | [  ] : List(Statement) ]) :: S S, H H --> v :: S S1, H H1
+  where
+    printV(StringV("stmtexec 3")) => _;
+    stmt :: S S, H H --> v : V :: S S1, H H1;
+    printV(StringV("stmtexec 4")) => _
+
+  StatementExecutor([ stmt | tail ]) :: S S, H H --> v :: S S2, H H2
+  where
+    tail != [  ] : List(Statement);
+    printV(StringV("stmtexec 1")) => _;
+    stmt :: S S, H H --> _ :: S S1, H H1;
+    StatementExecutor(tail) :: S S1, H H1 --> v : V :: S S2 : Map(String,Map(String,V)), H H2 : Map(V,Object);
+    printV(StringV("stmtexec 2")) => _
+
+  Statement(assignmentOperations, expression) :: S S, H H --> v :: S S2, H H2
+  where
+    expression :: S S, H H --> v : V :: S S1, H H1;
+    S1 + S => S1 : Map(String,Map(String,V));
+    case S1["isGlobal"?] of {
+      true =>
+        StringsFromAssignmentOperations(assignmentOperations) => s1;
+        s1 --> l1;
+        bindVarMap(l1, v) :: S S1, H H1 --> _ :: S S3, H H3;
+        S3 => S2 : Map(String,Map(String,V));
+        H3 => H2 : Map(V,Object);
+        S3 => _;
+        H3 => _
+      otherwise =>
+        StringsFromAssignmentOperations(assignmentOperations) => s2;
+        s2 --> l2;
+        bindToGlobalMap(l2, v) :: S S1, H H1 --> _ :: S S4, H H4;
+        S4 => S2 : Map(String,Map(String,V));
+        H4 => H2 : Map(V,Object);
+        S4 => _;
+        H4 => _
+    }
+
+  SingletonExpression(operand) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    operand :: S S1, H H1 --> v1 :: S S2, H H2
+
+  SIALSymbolLiteral(sym) --> v1
+  where
+    sym --> v1
+
+  ReferenceOperand(ref) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    ref :: S S1, H H1 --> v1 :: S S2, H H2
+
+  ReferenceID(id) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    readVar(id) :: S S1, H H1 --> v1 :: S S2, H H2
+
+  readVarFromObject(id) :: S S, H H --> v :: S S1, H H1
+  where
+    case S["refs"?] of {
+      true =>
+        "refs" => s1;
+        S[s1] => objectReferences;
+        objectReferences["object"?] => b1;
+        case b1 of {
+          true =>
+            "object" => s2;
+            objectReferences[s2] => v1;
+            case v1 of {
+              RefV(addr) =>
+                RefV(addr) => v2;
+                read(v2) => r1;
+                case r1 of {
+                  Object(_, attributes, _) =>
+                    attributes[id?] => b2;
+                    case b2 of {
+                      true =>
+                        attributes[id] => v : V;
+                        S => S1;
+                        H => H1
+                      otherwise =>
+                        readVarFromGlobal(id) :: S S, H H --> v : V :: S S1, H H1
+                    }
+                }
+            }
+          otherwise =>
+            objectReferences["class"?] => b3;
+            case b3 of {
+              true =>
+                "class" => s3;
+                objectReferences[s3] => v3;
+                case v3 of {
+                  RefV(addr) =>
+                    RefV(addr) => v4;
+                    read(v4) => r2;
+                    case r2 of {
+                      Class(_, _, attributes, _) =>
+                        attributes[id?] => b4;
+                        case b4 of {
+                          true =>
+                            attributes[id] => v : V;
+                            S => S1;
+                            H => H1
+                          otherwise =>
+                            readVarFromGlobal(id) :: S S, H H --> v : V :: S S1, H H1
+                        }
+                    }
+                }
+              otherwise =>
+                "variable not found to read: object/class not found" => s4;
+                errorV(s4) => v : V;
+                S => S1;
+                H => H1
+            }
+        }
+      otherwise =>
+        readVarFromGlobal(id) :: S S, H H --> v : V :: S S1, H H1
+    }
+
+  readVarFromGlobal(id) :: S S, H H --> v :: S S1, H H1
+  where
+    S["global"] => globalScope;
+    case globalScope[id?] of {
+      true =>
+        globalScope[id] => v : V;
+        S => S1;
+        H => H1
+      otherwise =>
+        "variable not found to read: local/object/class/global not found" => s1;
+        errorV(s1) => v : V;
+        S => S1;
+        H => H1
+    }
+
+  readVar(id) :: S S, H H --> v :: S S1, H H1
+  where
+    case S["local"?] of {
+      true =>
+        "local" => s1;
+        S[s1] => localScope;
+        localScope[id?] => b1;
+        case b1 of {
+          true =>
+            localScope[id] => v : V;
+            S => S1;
+            H => H1
+          otherwise =>
+            readVarFromObject(id) :: S S, H H --> v : V :: S S1, H H1
+        }
+      otherwise =>
+        readVarFromObject(id) :: S S, H H --> v : V :: S S1, H H1
+    }
+
+  read(addr) :: S S, H H --> H[addr] :: S S, H H
+
+  MethodVMap([ methodVHead | methodVTail ]) :: S S1, H H1 --> [ valueHead | l1 ] :: S S3, H H3
+  where
+    methodVHead :: S S1, H H1 --> valueHead :: S S2, H H2;
+    MethodVMap(methodVTail) :: S S2, H H2 --> l1 :: S S3, H H3
+
+  MethodVMap([  ] : List(V)) :: S S1, H H1 --> [  ] : List(V) :: S S1, H H1
+
+  MethodExpressionV(binaryMessageOperand, binaryMessages) :: S S1, H H1 --> v2 :: S S4, H H4
+  where
+    binaryMessageOperand :: S S1, H H1 --> v1 :: S S2, H H2;
+    BinaryMessageChain(binaryMessages) :: S S2, H H2 --> L1 :: S S3, H H3;
+    ExpI(v1, L1) :: S S3, H H3 --> v2 :: S S4, H H4
+
+  mapFrom2Lists([  ] : List(String), [  ] : List(V)) --> {}
+
+  mapFrom2Lists([ varName | restNames ], [ varValue | restValues ]) --> {varName |--> varValue} + restMap
+  where
+    mapFrom2Lists(restNames, restValues) --> restMap : Map(String,V)
+
+  LiteralSymbol(sym) :: S S1, H H1 --> v1 :: S S1, H H1
+  where
+    sym --> v1
+
+  LiteralBlock(blk) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    blk :: S S1, H H1 --> v1 :: S S2, H H2
+
+  Literal(e1) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    e1 :: S S1, H H1 --> v1 :: S S2, H H2
+
+  KeywordSIAL(selector) --> ListStringV(l1)
+  where
+    selector --> l1
+
+  KeywordMessageSegment(keyword, keywordMessageArgument) --> KeywordValuePair(key, MethodExpressionV(binOperand, binMessages))
+  where
+    keyword --> key;
+    keywordMessageArgument --> MethodExpressionV(binOperand, binMessages)
+
+  KeywordMessageMap([ messageSegmentHead | messageSegmentTail ], KeywordMessageCall(curKeys, curVals)) --> m1
+  where
+    messageSegmentHead --> KeywordValuePair(key, value);
+    KeywordMessageMap(messageSegmentTail, KeywordMessageCall([ key | curKeys ], [ value | curVals ])) --> m1
+
+  KeywordMessageMap([  ] : List(KeywordMessageSegment), KeywordMessageCall(keys, vals)) --> KeywordMessageCall(keys, vals)
+
+  KeywordMessageChain(keywordMessage) :: S S1, H H1 --> L1 :: S S1, H H1
+  where
+    keywordMessage --> L1
+
+  KeywordMessageArgument(binaryMessageOperand, binaryMessages) --> MethodExpressionV(binaryMessageOperand, binaryMessages)
+
+  KeywordMessage(messageSegment) --> [ KeywordMessageCall(keys, values) | [  ] ]
+  where
+    KeywordMessageMap(messageSegment, KeywordMessageCall([  ] : List(String), [  ] : List(V))) --> KeywordMessageCall(keys, values)
+
+  Keyword(key) --> key
+
+  IntegerLiteral(s) :: S S1, H H1 --> NumV(parseI(s)) :: S S1, H H1
+
+  initObjectSystem() :: S S, H H --> addr :: S S2, H H3
+  where
+    allocateHelper() :: S S, H H --> addr :: S S, H H1 : Map(V,Object);
+    write(addr, Class(addr, Object(addr, {}, [  ] : List(Method)), {}, [  ] : List(Method))) :: S S, H H1 --> _ :: S S, H H2 : Map(V,Object);
+    bindToGlobal("Object", addr) :: S S, H H2 --> _ :: S S1 : Map(String,Map(String,V)), H H3 : Map(V,Object);
+    {"isGlobal" |--> {}} + S1 => S2 : Map(String,Map(String,V))
+
+  findMethod(_, [  ] : List(Method)) --> Method([  ] : List(String), [  ] : List(String), ExecutableCodeEmpty())
+
+  findMethod(keywords, [ head | tail ]) --> m
+  where
+    head => Method(selectors, _, _);
+    compare2Lists(keywords, selectors) --> b1;
+    case b1 of {
+      true =>
+        "method found" => s1;
+        StringV(s1) => v1;
+        printV(v1) => _;
+        head => m
+      otherwise =>
+        "method not found" => s2;
+        StringV(s2) => v2;
+        printV(v2) => _;
+        findMethod(keywords, tail) --> m
+    }
+
+  FinalStatement(stmt) --> stmt
+
+  False() --> BoolV(false)
+
+  Expression(operand, chain, _) :: S S1, H H1 --> result :: S S4, H H4
+  where
+    operand :: S S1, H H1 --> v1 :: S S2, H H2;
+    chain :: S S2, H H2 --> L1 :: S S3, H H3;
+    ExpI(v1, L1) :: S S3, H H3 --> result :: S S4, H H4
+
+  ExpI(operand, [ headMessage | tailMessages ]) :: S S, H H --> v4 :: S S2, H H2
+  where
+    S => S2 : Map(String,Map(String,V));
+    H => H2 : Map(V,Object);
+    case headMessage of {
+      UnaryMessageCall(messageName) =>
+        case operand of {
+          NumV(_) =>
+            num-call-native(messageName, operand) => v3 : V;
+            ExpI(v3, tailMessages) :: S S, H H --> v4 : V :: S _, H _
+          BoolV(_) =>
+            bool-call-native(messageName, operand) => v3 : V;
+            ExpI(v3, tailMessages) :: S S, H H --> v4 : V :: S _, H _
+          RefV(_) =>
+            callUnaryMethod(operand, messageName) :: S S, H H --> v3 : V :: S S1, H H1;
+            ExpI(v3, tailMessages) :: S S1, H H1 --> v4 : V :: S S3, H H3;
+            S3 => S2 : Map(String,Map(String,V));
+            H3 => H2 : Map(V,Object);
+            S3 => _;
+            H3 => _
+        }
+      BinaryMessageCall(messageName, v2 : V) =>
+        case operand of {
+          NumV(_) =>
+            num-call-native(messageName, operand, v2) => v3 : V;
+            ExpI(v3, tailMessages) :: S S, H H --> v4 : V :: S _, H _
+          BoolV(_) =>
+            bool-call-native(messageName, operand, v2) => v3 : V;
+            ExpI(v3, tailMessages) :: S S, H H --> v4 : V :: S _, H _
+        }
+      KeywordMessageCall(keywords, values) =>
+        case operand of {
+          NumV(_) =>
+            num-calls-native(keywords, values, operand) => v3 : V;
+            ExpI(v3, tailMessages) :: S S, H H --> v4 : V :: S _, H _
+          BoolV(true) =>
+            keywords => [ a | [ b | [  ] : List(String) ] ];
+            case a of {
+              "ifTrue" =>
+                case b of {
+                  "ifFalse" =>
+                    0 => i1;
+                    values[i1] => methodV;
+                    methodV :: S S, H H --> v4 : V :: S _, H _
+                }
+              "ifFalse" =>
+                case b of {
+                  "ifTrue" =>
+                    1 => i2;
+                    values[i2] => methodV;
+                    methodV :: S S, H H --> v4 : V :: S _, H _
+                }
+            }
+          BoolV(false) =>
+            keywords => [ a | [ b | [  ] : List(String) ] ];
+            case a of {
+              "ifTrue" =>
+                case b of {
+                  "ifFalse" =>
+                    1 => i3;
+                    values[i3] => methodV;
+                    methodV :: S S, H H --> v4 : V :: S _, H _
+                }
+              "ifFalse" =>
+                case b of {
+                  "ifTrue" =>
+                    0 => i4;
+                    values[i4] => methodV;
+                    methodV :: S S, H H --> v4 : V :: S _, H _
+                }
+            }
+          RefV(_) =>
+            MethodVMap(values) => m1;
+            m1 :: S S, H H --> l1 :: S _, H _;
+            callKeywordMethod(operand, keywords, l1) :: S S, H H --> v3 : V :: S S1, H H1;
+            ExpI(v3, tailMessages) :: S S1, H H1 --> v4 : V :: S S4, H H4;
+            S4 => S2 : Map(String,Map(String,V));
+            H4 => H2 : Map(V,Object);
+            S4 => _;
+            H4 => _
+        }
+    }
+
+  ExpI(e3, [  ] : List(Message)) :: S S1, H H1 --> e3 :: S S1, H H1
+
+  executeMethod(objRef, incomingObject, Method([  ] : List(String), [  ] : List(String), ExecutableCodeEmpty()), [ "subclass" | [  ] : List(String) ], values) :: S S, H H --> newClassRef :: S S1, H H2
+  where
+    case incomingObject of {
+      Class(_, obj, classAttributes, classMethods) =>
+        0 => i1;
+        values[i1] => StringV(newClassName);
+        obj => Object(_, objAttributes, objMethods);
+        allocateHelper() :: S S, H H --> newClassRef :: S S, H H1 : Map(V,Object);
+        Object(newClassRef, objAttributes, objMethods) => newObj;
+        Class(objRef, newObj, classAttributes, classMethods) => newClass;
+        write(newClassRef, newClass) :: S S, H H1 --> _ :: S S, H H2 : Map(V,Object);
+        bindToGlobal(newClassName, newClassRef) :: S S, H H2 --> _ :: S S2, H _;
+        S2 => S1 : Map(String,Map(String,V));
+        S2 => _
+    }
+
+  executeMethod(_, incomingObject, Method([  ] : List(String), [  ] : List(String), ExecutableCodeEmpty()), [ "new" | [  ] : List(String) ], _) :: S S, H H --> newRef :: S S1, H H1
+  where
+    case incomingObject of {
+      Class(_, Object(classRef, objAttributes, objMethods), _, _) =>
+        Object(classRef, objAttributes, objMethods) => newObj;
+        allocate(newObj) :: S S, H H --> newRef :: S S2, H H2;
+        S2 => S1 : Map(String,Map(String,V));
+        H2 => H1 : Map(V,Object);
+        S2 => _;
+        H2 => _
+    }
+
+  executeMethod(objRef, incomingObject, Method(_, bindings, code), _, values) :: S S, H H --> result :: S S, H H1
+  where
+    case incomingObject of {
+      Class(parentRef, _, _, _) =>
+        mapFrom2Lists(bindings, values) => m1;
+        m1 --> newScope : Map(String,V);
+        "self" => s1;
+        {s1 |--> objRef} => m2;
+        "super" => s2;
+        {s2 |--> parentRef} => m3;
+        m3 + newScope => m4;
+        m2 + m4 => newScope;
+        "class" => s3;
+        {s3 |--> objRef} => refs;
+        "local" => s4;
+        {s4 |--> newScope} => S2;
+        "refs" => s5;
+        {s5 |--> refs} => S3;
+        S3 + S => S4;
+        S2 + S4 => S1 : Map(String,Map(String,V));
+        code :: S S1, H H --> result :: S S, H H2;
+        H2 => H1 : Map(V,Object);
+        S => _;
+        H2 => _
+      Object(classRef, _, _) =>
+        read(classRef) :: S S, H H --> Class(parentRef, _, _, _) :: S _, H _;
+        mapFrom2Lists(bindings, values) => m5;
+        m5 --> newScope : Map(String,V);
+        "self" => s6;
+        {s6 |--> objRef} => m6;
+        "super" => s7;
+        {s7 |--> parentRef} => m7;
+        m7 + newScope => m8;
+        m6 + m8 => newScope;
+        "object" => s8;
+        {s8 |--> objRef} => refs;
+        "local" => s9;
+        {s9 |--> newScope} => S5;
+        "refs" => s10;
+        {s10 |--> refs} => S6;
+        S6 + S => S7;
+        S5 + S7 => S1 : Map(String,Map(String,V));
+        code :: S S1, H H --> result :: S S, H H3;
+        H3 => H1 : Map(V,Object);
+        S => _;
+        H3 => _
+    }
+
+  ExecutableCodeVarsOnly(_) :: S S1, H H1 --> NilV() :: S S1, H H1
+
+  ExecutableCodeVarsNStmts(_, executableCodeRest) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    executableCodeRest :: S S1, H H1 --> v1 :: S S2, H H2
+
+  ExecutableCodeStmtsOnly(executableCodeRest) :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    executableCodeRest :: S S1, H H1 --> v1 :: S S2, H H2
+
+  ExecutableCodeRest(statements, finalstmt) :: S S, H H --> v :: S S2, H H2
+  where
+    DotRemover(statements) --> l1;
+    StatementExecutor(l1) :: S S, H H --> _ :: S S1 : Map(String,Map(String,V)), H H1 : Map(V,Object);
+    printV(StringV("finalstmt 1")) => _;
+    finalstmt --> stmt;
+    printV(StringV("finalstmt 2")) => _;
+    stmt :: S S1, H H1 --> v : V :: S S2 : Map(String,Map(String,V)), H H2 : Map(V,Object);
+    printV(StringV("finalstmt 3")) => _
+
+  ExecutableCodeEmpty() :: S S1, H H1 --> NilV() :: S S1, H H1
+
+  DotRemover([  ] : List(DottedStatement)) --> [  ] : List(Statement)
+
+  DotRemover([ DottedStatement(head) | tail ]) --> [ head | rest ]
+  where
+    DotRemover(tail) --> rest
+
+  ConstantSymbolLiteral(sym) --> v1
+  where
+    sym --> v1
+
+  ConstantReference(bool) :: S S1, H H1 --> v1 :: S S1, H H1
+  where
+    bool --> BoolV(_);
+    bool --> v1
+
+  compare2Lists([ head1 | _ ], [ head2 | _ ]) --> false
+  where
+    head1 != head2
+
+  compare2Lists([ head1 | tail1 ], [ head2 | tail2 ]) --> b1
+  where
+    head1 == head2;
+    compare2Lists(tail1, tail2) --> b1
+
+  compare2Lists([  ] : List(String), [  ] : List(String)) --> true
+
+  compare2Lists([ _ | _ ], [  ] : List(String)) --> false
+
+  compare2Lists([  ] : List(String), [ _ | _ ]) --> false
+
+  callUnaryMethod(objAddr, selector) :: S S, H H --> v :: S S1, H H1
+  where
+    read(objAddr) :: S S, H H --> object :: S _, H _;
+    printV(StringV("unary method call")) => _;
+    printV(StringV(selector)) => _;
+    case object of {
+      Class(className, obj, classAttributes, classMethods) =>
+        [  ] : List(String) => l1;
+        [ selector | l1 ] => l2;
+        findMethod(l2, classMethods) --> method;
+        Class(className, obj, classAttributes, classMethods) => o1;
+        [  ] : List(String) => l3;
+        [ selector | l3 ] => l4;
+        [  ] : List(V) => l5;
+        executeMethod(objAddr, o1, method, l4, l5) :: S S, H H --> v : V :: S S2, H H2;
+        S2 => S1 : Map(String,Map(String,V));
+        H2 => H1 : Map(V,Object);
+        S2 => _;
+        H2 => _
+      Object(classRef, objAttributes, objMethods) =>
+        [  ] : List(String) => l6;
+        [ selector | l6 ] => l7;
+        findMethod(l7, classMethods) --> method;
+        Object(classRef, objAttributes, objMethods) => o2;
+        [  ] : List(String) => l8;
+        [ selector | l8 ] => l9;
+        [  ] : List(V) => l10;
+        executeMethod(objAddr, o2, method, l9, l10) :: S S, H H --> v : V :: S S3, H H3;
+        S3 => S1 : Map(String,Map(String,V));
+        H3 => H1 : Map(V,Object);
+        S3 => _;
+        H3 => _
+    }
+
+  callKeywordMethod(objAddr, keywords, values) :: S S, H H --> v :: S S1, H H1
+  where
+    read(objAddr) :: S S, H H --> object :: S _, H _;
+    printV(StringV("keyword method call")) => _;
+    printV(StringV(keywords[0])) => _;
+    case object of {
+      Class(className, obj, classAttributes, classMethods) =>
+        findMethod(keywords, classMethods) --> method;
+        Class(className, obj, classAttributes, classMethods) => o1;
+        executeMethod(objAddr, o1, method, keywords, values) :: S S, H H --> v : V :: S S2, H H2;
+        S2 => S1 : Map(String,Map(String,V));
+        H2 => H1 : Map(V,Object);
+        S2 => _;
+        H2 => _
+      Object(classRef, objAttributes, objMethods) =>
+        findMethod(keywords, classMethods) --> method;
+        Object(classRef, objAttributes, objMethods) => o2;
+        executeMethod(objAddr, o2, method, keywords, values) :: S S, H H --> v : V :: S S3, H H3;
+        S3 => S1 : Map(String,Map(String,V));
+        H3 => H1 : Map(V,Object);
+        S3 => _;
+        H3 => _
+    }
+
+  BlockLiteralWithArgs(_, block) :: S S1, H H1 --> blockRed :: S S2, H H2
+  where
+    block :: S S1, H H1 --> blockRed :: S S2, H H2
+
+  BlockLiteral(block) :: S S1, H H1 --> blockRed :: S S2, H H2
+  where
+    block :: S S1, H H1 --> blockRed :: S S2, H H2
+
+  bindVarToObject(id, value) :: S S, H H --> value :: S S1, H H1
+  where
+    case S["refs"?] of {
+      true =>
+        "refs" => s1;
+        S[s1] => objectReferences;
+        objectReferences["object"?] => b1;
+        case b1 of {
+          true =>
+            "object" => s2;
+            objectReferences[s2] => v1;
+            case v1 of {
+              RefV(addr) =>
+                RefV(addr) => v2;
+                read(v2) => r1;
+                case r1 of {
+                  Object(classRef, attributes, methods) =>
+                    attributes[id?] => b2;
+                    case b2 of {
+                      true =>
+                        {id |--> value} => m1;
+                        m1 + attributes => newAttributes;
+                        RefV(addr) => v3;
+                        Object(classRef, newAttributes, methods) => o1;
+                        write(v3, o1) :: S S, H H --> _ :: S S2, H H2;
+                        S2 => S1 : Map(String,Map(String,V));
+                        H2 => H1 : Map(V,Object);
+                        S2 => _;
+                        H2 => _
+                      otherwise =>
+                        bindVarToGlobal(id, value) :: S S, H H --> _ : V :: S S3, H H3;
+                        S3 => S1 : Map(String,Map(String,V));
+                        H3 => H1 : Map(V,Object);
+                        S3 => _;
+                        H3 => _
+                    }
+                }
+            }
+          otherwise =>
+            objectReferences["class"?] => b3;
+            case b3 of {
+              true =>
+                "class" => s3;
+                objectReferences[s3] => v4;
+                case v4 of {
+                  RefV(addr) =>
+                    RefV(addr) => v5;
+                    read(v5) => r2;
+                    case r2 of {
+                      Class(parentRef, obj, attributes, methods) =>
+                        attributes[id?] => b4;
+                        case b4 of {
+                          true =>
+                            {id |--> value} => m2;
+                            m2 + attributes => newAttributes;
+                            RefV(addr) => v6;
+                            Class(parentRef, obj, newAttributes, methods) => o2;
+                            write(v6, o2) :: S S, H H --> _ :: S S4, H H4;
+                            S4 => S1 : Map(String,Map(String,V));
+                            H4 => H1 : Map(V,Object);
+                            S4 => _;
+                            H4 => _
+                          otherwise =>
+                            bindVarToGlobal(id, value) :: S S, H H --> _ : V :: S S5, H H5;
+                            S5 => S1 : Map(String,Map(String,V));
+                            H5 => H1 : Map(V,Object);
+                            S5 => _;
+                            H5 => _
+                        }
+                    }
+                }
+              otherwise =>
+                "variable not found to write: object/class not found" => s4;
+                errorV(s4) => _ : V;
+                S => S1 : Map(String,Map(String,V));
+                H => H1 : Map(V,Object);
+                S => _;
+                H => _
+            }
+        }
+      otherwise =>
+        bindVarToGlobal(id, value) :: S S, H H --> _ :: S S6, H H6;
+        S6 => S1 : Map(String,Map(String,V));
+        H6 => H1 : Map(V,Object);
+        S6 => _;
+        H6 => _
+    }
+
+  bindVarToGlobal(id, value) :: S S, H H --> value :: S S1, H H
+  where
+    S["global"] => globalScope;
+    case globalScope[id?] of {
+      true =>
+        {id |--> value} => m1;
+        m1 + globalScope => newScope;
+        "global" => s1;
+        {s1 |--> newScope} => S2;
+        S2 + S => S1 : Map(String,Map(String,V));
+        S => _;
+        H => _
+      otherwise =>
+        "variable not found to write: local/object/class/global not found" => s2;
+        errorV(s2) => _;
+        S => S1 : Map(String,Map(String,V));
+        S => _;
+        H => _
+    }
+
+  bindVarMap([  ] : List(String), v : V) :: S S1, H H1 --> v :: S S1, H H1
+
+  bindVarMap([ id | tail ], v : V) :: S S, H H --> v :: S S2, H H2
+  where
+    bindVar(id, v) :: S S, H H --> _ :: S S1, H H1;
+    bindVarMap(tail, v) :: S S1, H H1 --> _ :: S S2, H H2
+
+  bindVar(id, value) :: S S, H H --> value :: S S1, H H1
+  where
+    case S["local"?] of {
+      true =>
+        "local" => s1;
+        S[s1] => localScope;
+        localScope[id?] => b1;
+        case b1 of {
+          true =>
+            {id |--> value} => m1;
+            m1 + localScope => localScope;
+            "local" => s2;
+            {s2 |--> localScope} => S1 : Map(String,Map(String,V));
+            H => H1 : Map(V,Object);
+            S => _;
+            H => _
+          otherwise =>
+            bindVarToObject(id, value) :: S S, H H --> _ :: S S2, H H2;
+            S2 => S1 : Map(String,Map(String,V));
+            H2 => H1 : Map(V,Object);
+            S2 => _;
+            H2 => _
+        }
+      otherwise =>
+        bindVarToObject(id, value) :: S S, H H --> _ :: S S3, H H3;
+        S3 => S1 : Map(String,Map(String,V));
+        H3 => H1 : Map(V,Object);
+        S3 => _;
+        H3 => _
+    }
+
+  bindToGlobalMap([  ] : List(String), v : V) :: S S1, H H1 --> v :: S S1, H H1
+
+  bindToGlobalMap([ id | tail ], v : V) :: S S, H H --> v :: S S2, H H2
+  where
+    bindToGlobal(id, v) :: S S, H H --> _ :: S S1, H H1;
+    bindToGlobalMap(tail, v) :: S S1, H H1 --> _ :: S S2, H H2
+
+  bindToGlobal(id, value) :: S S, H H --> value :: S S1, H H
+  where
+    case S["global"?] of {
+      true =>
+        "global" => s1;
+        S[s1] => globalScope;
+        S => _;
+        H => _
+      otherwise =>
+        {} => globalScope;
+        S => _;
+        H => _
+    };
+    {id |--> value} + globalScope => globalScope;
+    {"global" |--> globalScope} + S => S1 : Map(String,Map(String,V))
+
+  BinarySIAL(selector) --> StringV(selector)
+
+  BinaryMessageOperand(operand, unarychain) :: S S1, H H1 --> v2 :: S S3, H H3
+  where
+    unarychain --> unaryMessages;
+    operand :: S S1, H H1 --> v1 :: S S2, H H2;
+    ExpI(v1, unaryMessages) :: S S2, H H2 --> v2 :: S S3, H H3
+
+  BinaryMessageChainWithKeyword(binaryMessages, keywordMessage) :: S S1, H H1 --> binMessages ++ keyMessage :: S S2, H H2
+  where
+    BinaryMessageChain(binaryMessages) :: S S1, H H1 --> binMessages :: S S2, H H2;
+    keywordMessage --> keyMessage
+
+  BinaryMessageChain([ bHead | bTail ]) :: S S1, H H1 --> [ b1 | L1 ] :: S S3, H H3
+  where
+    bHead :: S S1, H H1 --> b1 :: S S2, H H2;
+    BinaryMessageChain(bTail) :: S S2, H H2 --> L1 :: S S3, H H3
+
+  BinaryMessageChain([  ] : List(BinaryMessage)) :: S S1, H H1 --> [  ] : List(Message) :: S S1, H H1
+
+  BinaryMessage(selector, operand) :: S S1, H H1 --> BinaryMessageCall(selector, v1) :: S S2, H H2
+  where
+    operand :: S S1, H H1 --> v1 :: S S2, H H2
+
+  allocateHelper() :: S S1, H H1 --> v1 :: S S2, H H2
+  where
+    allocate(Class(RefV(0), Object(RefV(0), {}, [  ] : List(Method)), {}, [  ] : List(Method))) :: S S1, H H1 --> v1 :: S S2, H H2
+
+  allocate(o) :: S S, H H --> addr :: S S, H H1
+  where
+    RefV(fresh) => addr;
+    write(addr, o) :: S S, H H --> _ :: S S, H H1
+
+  addMethod(classAddr, methodDecl) :: S S, H H --> methodDecl :: S S1, H H1
+  where
+    read(classAddr) :: S S, H H --> Class(parentAddr, Object(classRef, objAttributes, objMethods), classAttributes, classMethods) :: S _, H _;
+    write(classAddr, Class(parentAddr, Object(classRef, objAttributes, [ methodDecl | objMethods ]), classAttributes, classMethods)) :: S S, H H --> _ :: S S1, H H1
+
+  addClassMethod(classAddr, methodDecl) :: S S, H H --> methodDecl :: S S1, H H1
+  where
+    read(classAddr) :: S S, H H --> Class(parentAddr, obj, classAttributes, classMethods) :: S _, H _;
+    write(classAddr, Class(parentAddr, obj, classAttributes, [ methodDecl | classMethods ])) :: S S, H H --> _ :: S S1, H H1

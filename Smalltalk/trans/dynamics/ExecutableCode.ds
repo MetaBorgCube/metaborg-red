@@ -18,9 +18,12 @@ signature
 rules
 	ExecutableCodeRest(statements, finalstmt) :: S, H --> v :: S S2, H H2
 		where
-			StatementExecutor(DotRemover(statements)) :: S, H --> _ :: S1, H1;
+			StatementExecutor(DotRemover(statements)) :: S, H --> _ :: S S1, H H1;
+			printV(StringV("finalstmt 1")) => _;
 			finalstmt --> stmt;
-			stmt :: S1, H1 --> v :: S2, H2.
+			printV(StringV("finalstmt 2")) => _;
+			stmt :: S1, H1 --> v :: S S2, H H2;
+			printV(StringV("finalstmt 3")) => _.
 			
 	BlockLiteral(block) --> blockRed
 		where

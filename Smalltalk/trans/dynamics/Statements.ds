@@ -27,25 +27,32 @@ rules
 		DotRemover(tail) --> rest.
 			
 	StatementExecutor([]) :: S, H --> BoolV(false) :: S, H.
-	StatementExecutor([stmt]) :: S, H --> v :: S1, H1
+	StatementExecutor([stmt]) :: S, H --> v :: S S1, H H1
 	where
-		stmt :: S, H --> v :: S1, H1.
+		printV(StringV("stmtexec 3")) => _;
+		stmt :: S, H --> v :: S1, H1;
+		printV(StringV("stmtexec 4")) => _.
 	StatementExecutor([stmt | tail]) :: S, H --> v :: S S2, H H2
 	where
 		tail != [] : List(Statement);
+		printV(StringV("stmtexec 1")) => _;
 		stmt :: S, H --> _ :: S1, H1;
-		StatementExecutor(tail) :: S {S1, S}, H H1 --> v :: S S2, H H2.
+		StatementExecutor(tail) :: S S1, H H1 --> v :: S S2, H H2;
+		printV(StringV("stmtexec 2")) => _.
 		
 	Statement(assignmentOperations, expression) :: S, H --> v :: S S2, H H2
 	where
 		expression :: S, H --> v :: S1, H1;
-//		printV(BoolV(S1["Metaborg"?])) => _;
+		{S1, S} => S1;
+//		printV(StringV("in statement after expressions")) => _;
+//		printV(BoolV(S1["isGlobal"?])) => _;
 		case S1["isGlobal"?] of {
 			true =>
-				bindVarMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
-			otherwise =>
+				printV(StringV("bind global map")) => _;
 				bindToGlobalMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
-				
+			otherwise =>
+				printV(StringV("bind var map")) => _;
+				bindVarMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
 		}
 		
 	StringsFromAssignmentOperations([]) --> [].

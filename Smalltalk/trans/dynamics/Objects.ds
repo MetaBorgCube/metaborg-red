@@ -31,6 +31,7 @@ signature
 		findMethod(List(String), List(Method)) --> Method
 		executeMethod(V, Object, Method, List(String), List(V)) --> V
 		mapFrom2Lists(List(String), List(V)) --> Map(String, V)
+		compare2Lists(List(String), List(String)) --> Bool
 		
 rules
 
@@ -59,27 +60,41 @@ rules
 		write(classAddr, Class(parentAddr, obj, classAttributes, [methodDecl | classMethods])) :: S, H --> _ :: S1, H1.
 		
 		
+		
+	compare2Lists([head1 | tail1], [head2 | tail2]) --> false : Bool
+	where
+		head1 != head2
+	compare2Lists([head1 | tail1], [head2 | tail2]) --> compare2Lists(tail1, tail2) : Bool
+	where
+		head1 == head2
+	compare2Lists([], []) --> true : Bool
+	compare2Lists([_ | _], []) --> false : Bool
+	compare2Lists([], [_ | _]) --> false : Bool
 	
-	findMethod(keywords, []) --> Method([], [],  ExecutableCodeEmpty()).
-	findMethod(keywords, [head | rest]) --> head
+	findMethod(keywords, []) --> Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()).
+	findMethod(keywords, [head | tail]) --> m
 	where
 		head => Method(selectors, _, _);
-		keywords == selectors.
-	findMethod(keywords, [head | rest]) --> method
-	where
-		head => Method(selectors, _, _);
-		keywords != selectors;
-		findMethod(keywords, rest) => method.
+		
+		case compare2Lists(keywords, selectors) : Bool of {
+			true =>
+				printV(StringV("method found")) => _;
+				head => m
+			otherwise =>
+				printV(StringV("method not found")) => _;
+				findMethod(keywords, tail) --> m
+		}
 			
 	callKeywordMethod(objAddr, keywords, values) :: S, H --> v :: S S1, H H1
 	where
 //		printV(StringV("cool2")) => _;
 		read(objAddr) --> object;
-//		printV(StringV("cool3")) => _;
+		printV(StringV("keyword method call")) => _;
+		printV(StringV(keywords[0])) => _;
 		case object of {
 			Class(className, obj, classAttributes, classMethods) =>
-	//			printV(StringV("cool4")) => _;
-				findMethod(keywords, classMethods) => method;
+//				printV(StringV("cool4")) => _;
+				findMethod(keywords, classMethods) --> method;
 	//			printV(StringV("cool5")) => _;
 				executeMethod(objAddr, Class(className, obj, classAttributes, classMethods), method, keywords, values) :: S, H --> v :: S S1, H H1
 			}
@@ -90,23 +105,39 @@ rules
 			Class(_, obj, classAttributes, classMethods) =>
 				values[0] => StringV(newClassName);
 				obj => Object(_, objAttributes, objMethods);
-				allocateHelper() :: S, H --> newClassRef :: S, H1;
+				allocateHelper() :: S, H --> newClassRef :: S, H H1;
 				Object(newClassRef, objAttributes, objMethods) => newObj;
 				Class(objRef, newObj, classAttributes, classMethods) => newClass;
-				write(newClassRef, newClass) :: S, H1 --> _ :: S, H2;
-				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H H3
+				write(newClassRef, newClass) :: S, H1 --> _ :: S, H H2;
+				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H _
+		}
+		
+	executeMethod(objRef, incomingObject, _, ["subclass"], values) :: S, H --> newClassRef :: S S1, H H2
+	where
+		case incomingObject of {
+			Class(_, obj, classAttributes, classMethods) =>
+				values[0] => StringV(newClassName);
+				obj => Object(_, objAttributes, objMethods);
+				allocateHelper() :: S, H --> newClassRef :: S, H H1;
+				Object(newClassRef, objAttributes, objMethods) => newObj;
+				Class(objRef, newObj, classAttributes, classMethods) => newClass;
+				write(newClassRef, newClass) :: S, H1 --> _ :: S, H H2;
+				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H _
 		}
 		
 	executeMethod(objRef, incomingObject, Method(_, bindings, code), _, values) :: S, H --> result :: S S, H H1
 	where
 		case incomingObject of {
 			Class(parentRef, obj, classAttributes, classMethods) =>
-				mapFrom2Lists(bindings, values) => newScope;
+				mapFrom2Lists(bindings, values) => newScope : Map(String, V);
+				{"self" |--> objRef, "super" |--> parentRef, newScope} => newScope;
 				{"class" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, S} => S1;
 				code :: S1, H --> result :: S, H H1
 			Object(classRef, objAttributes, objMethods) =>
-				mapFrom2Lists(bindings, values) => newScope;
+				read(classRef) :: S, H --> Class(parentRef, _, _, _);
+				mapFrom2Lists(bindings, values) => newScope : Map(String, V);
+				{"self" |--> objRef, "super" |--> parentRef, newScope} => newScope;
 				{"object" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, S} => S1;
 				code :: S1, H --> result :: S, H H1

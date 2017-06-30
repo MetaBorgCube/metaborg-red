@@ -13,14 +13,16 @@ context-free syntax
   	Prog.Program = Start
   	Start.ProgramSegments = ProgramSegment*
   	// class method
-	ProgramSegment.ClassMethodDeclaration = <$M$ <Reference> \>\> <MethodDeclaration>>
+	ProgramSegment.ClassMethodDeclaration = <$M$ <Reference> class\>\> <MethodDeclaration>>
 	// method
-	ProgramSegment.MethodDeclaration = <$M$ <Reference> <MethodDeclaration>>
+	ProgramSegment.MethodDeclaration = <$M$ <Reference> \>\> <MethodDeclaration>>
 	ProgramSegment.ExecutableCode = <$E$ <ExecutableCodeRest>>
 //	Start.Start = Expression
 //	Start.Empty = <>
 	
 	Reference.ReferenceID = Identifier
+	
+	StringLiteral.StringLit = <' <StringLiteralContent> '>
 	
 	ConstantReference.Null = <nil>
 	ConstantReference.False = <false>

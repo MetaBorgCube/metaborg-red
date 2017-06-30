@@ -19,7 +19,8 @@ rules
 	ExecutableCodeRest(statements, finalstmt) :: S, H --> v :: S S2, H H2
 		where
 			StatementExecutor(DotRemover(statements)) :: S, H --> _ :: S1, H1;
-			finalstmt :: S1, H1 --> v :: S2, H2.
+			finalstmt --> stmt;
+			stmt :: S1, H1 --> v :: S2, H2.
 			
 	BlockLiteral(block) --> blockRed
 		where

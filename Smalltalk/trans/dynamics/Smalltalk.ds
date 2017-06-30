@@ -30,7 +30,9 @@ rules
 		printV(addr) => _;
 		read(addr) :: S1, H1 --> cls :: S _, H _;
 		printV(ObjectV(cls)) => _;
-		progSegments :: S1, H1 --> v :: S _, H _.
+		progSegments :: S1, H1 --> v :: S _, H _;
+		printV(StringV("final result")) => _;
+		printV(v) => _.
 		
 	ProgramSegments(segments) --> ProgramSegmentExecutor(segments).
 		

@@ -54,5 +54,5 @@ rules
 		StringsFromAssignmentOperations(tail) --> rest.
 			
 	    
-	FinalStatement(stmt) --> stmt.
+	FinalStatement(stmt) --> stmt
 	

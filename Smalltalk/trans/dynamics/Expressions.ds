@@ -31,6 +31,7 @@ signature
     
     SymbolInArrayLiteral --> V
     SymbolLiteral --> V
+    StringLiteral --> String
   	
   	Literal --> V
   	Reference --> V
@@ -68,6 +69,8 @@ signature
   	L : List(Message)
 
 rules
+	
+	StringLit(str) --> str
 
 	SingletonExpression(operand) --> operand.	
 	
@@ -159,7 +162,9 @@ rules
 	
 	SIALSymbolLiteral(sym) --> sym.
 	ConstantSymbolLiteral(sym) --> sym.
-	StringSymbolLiteral(str) --> StringV(str).
+	StringSymbolLiteral(str) --> StringV(strv)
+	where
+		str --> strv
 	
 		
 	Literal(e1) --> e1.
@@ -171,7 +176,9 @@ rules
 	IntegerLiteral(s) --> NumV(parseI(s)).
 	ConstantReference(bool) --> bool
 		where bool --> BoolV(b).
-	StringLiteral(s) --> StringV(s).
+	StringLiteral(str) --> StringV(strv)
+	where
+		str --> strv
 	LiteralSymbol(sym) --> sym.
 //	LiteralArray(arr) --> arr.
 	LiteralBlock(blk) --> blk.

@@ -24,9 +24,9 @@ rules
 	where
 		initObjectSystem() :: S {}, H {} --> _ :: S1, H1 ;
 		readVar("Object") :: S1, H1 --> addr :: S _, H _;
-		printV(addr) => _;
-		read(addr) :: S1, H1 --> cls :: S _, H _;
-		printV(ObjectV(cls)) => _;
+//		printV(addr) => _;
+//		read(addr) :: S1, H1 --> cls :: S _, H _;
+//		printV(ObjectV(cls)) => _;
 		progSegments :: S1, H1 --> v :: S _, H _;
 		printV(StringV("final result")) => _;
 		printV(v) => _.

@@ -154,6 +154,18 @@ rules
 				write(objRef, newClass) :: S, H --> _ :: S, H H1
 		}
 		
+	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["classVariableNames"], values) :: S, H --> objRef :: S, H H1
+	where
+		case incomingObject of {
+			Class(parentRef, Object(classRef, objAttributes, objMethods), classAttributes, classMethods) =>
+				values[0] => StringV(attributesString);
+				splitString(attributesString) => varNames;
+				mapFrom1List(varNames) => newAttributes : Map(String, V);
+				Object(classRef, objAttributes, objMethods) => newObj;
+				Class(parentRef, newObj, {newAttributes, classAttributes}, classMethods) => newClass;
+				write(objRef, newClass) :: S, H --> _ :: S, H H1
+		}
+		
 	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["new"], values) :: S, H --> newRef :: S S1, H H1
 	where
 		case incomingObject of {
@@ -169,14 +181,14 @@ rules
 				mapFrom2Lists(bindings, values) => newScope : Map(String, V);
 				{"self" |--> objRef, "super" |--> parentRef, newScope} => newScope;
 				{"class" |--> objRef} => refs;
-				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1
 			Object(classRef, objAttributes, objMethods) =>
 				read(classRef) :: S, H --> Class(parentRef, _, _, _);
 				mapFrom2Lists(bindings, values) => newScope : Map(String, V);
 				{"self" |--> objRef, "super" |--> parentRef, newScope} => newScope;
 				{"object" |--> objRef} => refs;
-				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1
 		}
 		
@@ -186,13 +198,13 @@ rules
 			Class(parentRef, obj, classAttributes, classMethods) =>
 				{"self" |--> objRef, "super" |--> parentRef} => newScope;
 				{"class" |--> objRef} => refs;
-				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1
 			Object(classRef, objAttributes, objMethods) =>
 				read(classRef) :: S, H --> Class(parentRef, _, _, _);
 				{"self" |--> objRef, "super" |--> parentRef} => newScope;
 				{"object" |--> objRef} => refs;
-				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1
 		}
 		

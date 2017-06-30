@@ -11,12 +11,18 @@ context-free start-symbols
 context-free syntax
   
   	Prog.Program = Start
-	Start.MethodDeclaration = MethodDeclaration
-	Start.ExecutableCode = ExecutableCodeRest
+  	Start.ProgramSegments = ProgramSegment*
+  	// class method
+	ProgramSegment.ClassMethodDeclaration = <$M$ <Reference> class\>\> <MethodDeclaration>>
+	// method
+	ProgramSegment.MethodDeclaration = <$M$ <Reference> \>\> <MethodDeclaration>>
+	ProgramSegment.ExecutableCode = <$E$ <ExecutableCodeRest>>
 //	Start.Start = Expression
-	Start.Empty = <>
+//	Start.Empty = <>
 	
 	Reference.ReferenceID = Identifier
+	
+	StringLiteral.StringLit = <' <StringLiteralContent> '>
 	
 	ConstantReference.Null = <nil>
 	ConstantReference.False = <false>
@@ -35,14 +41,14 @@ context-free syntax
 	KeywordMessageSelector.KeywordMessageSelector = Keyword+  //duplicate, can combine?
 		
 	
-	SymbolInArrayLiteral = UnaryMessageSelector
+	SymbolInArrayLiteral.UnarySIAL = UnaryMessageSelector
 	SymbolInArrayLiteral = ConstantReference {reject} //duplicate, can combine?
-	SymbolInArrayLiteral = KeywordMessageSelector
-	SymbolInArrayLiteral = BinarySelectorChar
+	SymbolInArrayLiteral.KeywordSIAL = KeywordMessageSelector
+	SymbolInArrayLiteral.BinarySIAL = BinarySelectorChar
 	
-	SymbolLiteral = <# <SymbolInArrayLiteral>>  
-	SymbolLiteral = <# <ConstantReference>> 
-	SymbolLiteral = <# <StringLiteral>> 
+	SymbolLiteral.SIALSymbolLiteral = <# <SymbolInArrayLiteral>>  
+	SymbolLiteral.ConstantSymbolLiteral = <# <ConstantReference>> 
+	SymbolLiteral.StringSymbolLiteral = <# <StringLiteral>> 
 	ArrayLiteral.ObjectAL = ObjectArrayLiteral 
 	ArrayLiteral.ByteArrayAL = <#[ <{UnsignedIntegerLiteral ""}*> ]>
 	ObjectArrayLiteral.ObjectArrayLiteral = <# <NestedObjectArrayLiteral>>
@@ -116,10 +122,9 @@ context-free syntax
 	MethodHeader.UnaryMethodHeader = UnaryMessageSelector 
 	MethodHeader.BinaryMethodHeader = <<BinarySelectorChar> <BindableIdentifier>>
 	MethodHeader.KeywordMethodHeader = KeywordMethodHeaderSegment+
-	MethodDeclaration.MethodDeclaration = <<MethodHeader> <ExecutableCode>>
+	MethodDeclaration.MethodDecl = <<MethodHeader> <ExecutableCode>>
 	
 context-free priorities
-
-	
+	ProgramSegment.MethodDeclaration > ProgramSegment.ExecutableCode
 
 

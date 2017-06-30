@@ -32,7 +32,7 @@ lexical syntax
 	Exponent = ("e"|"d"|"q") ("-"? DecimalIntegerLiteral)?
 	
 	CharacterLiteral = "$" Character
-	StringLiteral = "'" (StringLiteralCharacter|"''")* "'"
+	StringLiteralContent = (StringLiteralCharacter|"''")*
 	StringLiteralCharacter = ~[\']
 	
 	BackSlashChar  = "\\"

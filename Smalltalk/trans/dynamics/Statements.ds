@@ -16,13 +16,8 @@ signature
     DotRemover(List(DottedStatement)) --> List(Statement)
     StatementExecutor(List(Statement)) --> V
     Statement --> V
-  	ExecutableCode --> V
-    
-//    AssignmentOperation --> Ex
     
     StringsFromAssignmentOperations(List(AssignmentOperation)) --> List(String)
-    
-    UnaryMessageSelector --> String
 
 rules
 
@@ -31,20 +26,27 @@ rules
 	where
 		DotRemover(tail) --> rest.
 			
-	StatementExecutor([]) --> BoolV(false).
-	StatementExecutor([stmt]) --> v
+	StatementExecutor([]) :: S, H --> BoolV(false) :: S, H.
+	StatementExecutor([stmt]) :: S, H --> v :: S1, H1
 	where
-		stmt --> v.
-	StatementExecutor([stmt | tail]) --> v
+		stmt :: S, H --> v :: S1, H1.
+	StatementExecutor([stmt | tail]) :: S, H --> v :: S S2, H H2
 	where
-		stmt --> _;
-		StatementExecutor(tail) --> v.
+		tail != [] : List(Statement);
+		stmt :: S, H --> _ :: S1, H1;
+		StatementExecutor(tail) :: S {S1, S}, H H1 --> v :: S S2, H H2.
 		
-	Statement(assignmentOperations, expression) --> v
+	Statement(assignmentOperations, expression) :: S, H --> v :: S S2, H H2
 	where
-		expression --> v;
-//		printStr("wtf") => _;
-		bindVar(StringsFromAssignmentOperations(assignmentOperations), v) --> _.
+		expression :: S, H --> v :: S1, H1;
+//		printV(BoolV(S1["Metaborg"?])) => _;
+		case S1["isGlobal"?] of {
+			true =>
+				bindVarMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
+			otherwise =>
+				bindToGlobalMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
+				
+		}
 		
 	StringsFromAssignmentOperations([]) --> [].
 	StringsFromAssignmentOperations([AssignmentOperation(BindableIdentifier(id)) | tail]) --> [id | rest]
@@ -52,13 +54,5 @@ rules
 		StringsFromAssignmentOperations(tail) --> rest.
 			
 	    
-	FinalStatement(stmt) --> stmt.
-	
-	LiteralBlock(blockLiteral) --> blockLiteral
-	
-	BlockLiteral(block) --> blockRed
-		where
-			block --> blockRed.
-			
-	ExecutableCodeStmtsOnly(executableCodeRest) --> executableCodeRest.
+	FinalStatement(stmt) --> stmt
 	

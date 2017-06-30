@@ -2,38 +2,217 @@ module trans/runtime/store
 
 imports
   trans/runtime/values
+  
+  trans/dynamics/Objects
 
 signature
+  constructors
+  	RefV: Int -> V
+
   sort aliases
-    Scope = Map(String, V)
-    Heap = Map(Int, V)
+    Scope = Map(String, Map(String, V))
+    Heap = Map(V, Object)
 
   components
     H : Heap
     S : Scope
 
   arrows
-    read(Int) --> V
-    allocate(V) --> Int
-    write(Int, V) --> V
+    read(V) --> Object
+    allocate(Object) --> V
+    write(V, Object) --> Object
 
-    bindVar(List(String), V) --> V
+	bindToGlobalMap(List(String), V) --> V
+	bindToGlobal(String, V) --> V
+
+    bindVarMap(List(String), V) --> V
+    bindVar(String, V) --> V
+    bindVarToObject(String, V) --> V
+    bindVarToGlobal(String, V) --> V
+    
     readVar(String) --> V
+    readVarFromObject(String) --> V
+    readVarFromGlobal(String) --> V
+   
+   native operators
+   	errorV: String -> V
 
 rules
 
-  read(addr) :: H --> H[addr].
+  read(addr) :: S, H --> H[addr].
 
-  allocate(v) --> addr
+  allocate(o) :: S, H --> addr :: S, H H1
   where
-    fresh => addr;
-    write(addr, v) --> _.
+    fresh => addrint;
+    RefV(addrint) => addr;
+    write(addr, o) --> _ :: S, H1.
 
-  write(addr, v) :: H --> v :: H {addr |--> v, H}.
+  write(addr, o) :: S, H --> o :: S, H {addr |--> o, H}.
   
-  bindVar([], v) --> v.
-  bindVar([id | tail], v) :: S, H --> v :: S {id |--> v, S}, H
+  bindToGlobalMap([], v) --> v.
+  bindToGlobalMap([id | tail], v) :: S, H --> v :: S S2, H H2
   where
-  	bindVar(tail, v) --> E.
+  	bindToGlobal(id, v) :: S, H --> _ :: S1, H1;
+  	bindToGlobalMap(tail, v) :: S1, H1 --> E :: S2, H2.
+  
+  bindVarMap([], v) --> v.
+  bindVarMap([id | tail], v) :: S, H --> v :: S S2, H H2
+  where
+  	bindVar(id, v) :: S, H --> _ :: S1, H1;
+  	bindVarMap(tail, v) :: S1, H1 --> E :: S2, H2.
 
-  readVar(id) :: S, H --> S[id].
+  readVar(id) :: S, H --> v
+  where
+  	case S["local"?] of {
+  		true =>
+  			S["local"] => localScope;
+  			case localScope[id?] of {
+  				true =>
+  					localScope[id] => v
+  				otherwise =>
+  					readVarFromObject(id) --> v
+  			}
+  		otherwise =>
+  			readVarFromObject(id) --> v
+  	}
+  	
+  readVarFromObject(id) :: S, H --> v
+  where
+  	case S["refs"?] of {
+  		true =>
+  			S["refs"] => objectReferences;
+  			case objectReferences["object"?] of {
+  				true =>
+  					case objectReferences["object"] of {
+				  		RefV(addr) =>
+				  			case read(RefV(addr)) of {
+				  				Object(classRef, attributes, methods) =>
+				  					case attributes[id?] of {
+				  						true =>
+				  							attributes[id] => v
+				  						otherwise =>
+				  							readVarFromGlobal(id) --> v
+				  					}
+				  			}
+				  	}
+  				otherwise =>
+  					case objectReferences["class"?] of {
+  						true =>
+  							case objectReferences["class"] of {
+						  		RefV(addr) =>
+						  			case read(RefV(addr)) of {
+						  				Class(parentRef, obj, attributes, methods) =>
+						  					case attributes[id?] of {
+						  						true =>
+						  							attributes[id] => v
+						  						otherwise =>
+						  							readVarFromGlobal(id) --> v
+						  					}
+						  			}
+						  	}
+  						otherwise =>
+  							errorV("variable not found to read: object/class not found") => v
+  					}
+  			}
+  		otherwise =>
+  			readVarFromGlobal(id) --> v
+  	}
+  	
+  readVarFromGlobal(id) :: S, H --> v
+  where
+  	S["global"] => globalScope;
+	case globalScope[id?] of {
+		true =>
+			globalScope[id] => v
+		otherwise =>
+			errorV("variable not found to read: local/object/class/global not found") => v
+	}
+  		
+  bindToGlobal(id, value) :: S, H --> value :: S S1, H
+  where
+  	case S["global"?] of {
+  		true =>
+  			S["global"] => globalScope
+  		otherwise =>
+  			{} : Map(String, V) => globalScope
+  	};
+  	{id |--> value, globalScope} => globalScope;
+  	{"global" |--> globalScope, S} => S1.
+  		
+  		
+  bindVar(id, value) :: S, H --> value :: S S1, H H1
+  where
+  	case S["local"?] of {
+  		true =>
+  			S["local"] => localScope;
+  			case localScope[id?] of {
+  				true =>
+  					{id |--> value, localScope} => localScope;
+  					{"local" |--> localScope} => S1;
+  					H => H1
+  				otherwise =>
+  					bindVarToObject(id, value) --> _ :: S S1, H H1
+  			}
+  		otherwise =>
+  			bindVarToObject(id, value) --> _ :: S S1, H H1
+  	}
+  	
+  bindVarToObject(id, value) :: S, H --> value :: S S1, H H1
+  where
+  	case S["refs"?] of {
+  		true =>
+  			S["refs"] => objectReferences;
+  			case objectReferences["object"?] of {
+  				true =>
+  					case objectReferences["object"] of {
+				  		RefV(addr) =>
+				  			case read(RefV(addr)) of {
+				  				Object(classRef, attributes, methods) =>
+				  					case attributes[id?] of {
+				  						true =>
+				  							{id |--> value, attributes} => newAttributes;
+				  							write(RefV(addr), Object(classRef, newAttributes, methods)) :: S, H --> _ :: S S1, H H1
+				  						otherwise =>
+				  							bindVarToGlobal(id, value) --> v :: S S1, H H1
+				  					}
+				  			}
+				  	}
+  				otherwise =>
+  					case objectReferences["class"?] of {
+		  				true =>
+		  					case objectReferences["class"] of {
+						  		RefV(addr) =>
+						  			case read(RefV(addr)) of {
+						  				Class(parentRef, obj, attributes, methods) =>
+						  					case attributes[id?] of {
+						  						true =>
+						  							{id |--> value, attributes} => newAttributes;
+						  							write(RefV(addr), Class(parentRef, obj, newAttributes, methods)) :: S, H --> _ :: S S1, H H1
+						  						otherwise =>
+						  							bindVarToGlobal(id, value) --> v :: S S1, H H1
+						  					}
+						  			}
+						  	}
+		  				otherwise =>
+		  					errorV("variable not found to write: object/class not found") => v;
+		  					S => S1;
+		  					H => H1
+		  			}
+  			}
+  		otherwise =>
+  			bindVarToGlobal(id, value) :: S, H --> _ :: S S1, H H1
+  	}
+  		
+  	bindVarToGlobal(id, value) :: S, H --> value :: S S1, H
+  	where
+  		S["global"] => globalScope;
+  		case globalScope[id?] of {
+  			true =>
+  				{id |--> value, globalScope} => newScope;
+  				{"global" |--> newScope, S} => S1
+  			otherwise =>
+  				errorV("variable not found to write: local/object/class/global not found") => _;
+  				S => S1
+  		}
+  		
+  		

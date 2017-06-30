@@ -7,6 +7,8 @@ src-gen/ds-signatures/Base-sig
 trans/runtime/values
 trans/runtime/store
 
+trans/dynamics/Objects
+
 signature
 
   constructors
@@ -14,6 +16,7 @@ signature
     NumV: Int -> V
     BoolV: Bool -> V
     StringV: String -> V
+    ListStringV: List(String) -> V
   	BinaryMessageCall: String * V -> Message
     UnaryMessageCall: String -> Message
     KeywordValuePair: String * V ->	KeywordMessageElement
@@ -22,6 +25,13 @@ signature
     
   arrows
     Expression --> V
+    
+    UnaryMessageSelector --> String
+    KeywordMessageSelector --> List(String)
+    
+    SymbolInArrayLiteral --> V
+    SymbolLiteral --> V
+    StringLiteral --> String
   	
   	Literal --> V
   	Reference --> V
@@ -34,14 +44,12 @@ signature
   	UnaryMessageChain --> List(Message)
   	CascadedMessage --> MessageChain
   	BinaryMessageOperand --> V
-  	UnaryMessageSelector --> String
   	Keyword --> String
   	KeywordMessageArgument --> V
   	Statement --> V
   	ConstantReference --> V
   	ExecutableCodeRest --> V
   	Message --> Message
-  	BlockLiteral --> V
   	V --> V
   	List(V) --> List(V)
   	List(BinaryMessage) --> List(Message)
@@ -64,6 +72,8 @@ signature
   	L : List(Message)
 
 rules
+	
+	StringLit(str) --> str
 
 	SingletonExpression(operand) --> operand.	
 	
@@ -82,8 +92,10 @@ rules
 	where 
 		ExpI(operand, chain) --> result.
 		
-	ExpI(operand, [headMessage | tailMessages]) --> v4
+	ExpI(operand, [headMessage | tailMessages])  :: S, H --> v4 :: S S2, H H2
 		where
+		S => S2;
+		H => H2;
 		case headMessage of {
 		UnaryMessageCall(messageName) =>
 			case operand of {
@@ -141,17 +153,34 @@ rules
 								methodV --> v4
 						}
 				}
+			RefV(_) =>
+//				printV(StringV("cool1")) => _;
+				callKeywordMethod(operand, keywords, MethodVMap(methodVs)) :: S, H --> v3 :: S1, H1;
+//				printV(BoolV(S1["Metaborg"?])) => _;
+				ExpI(v3, tailMessages) :: S1, H1 --> v4 :: S S2, H H2
 			}
 		}
 			
 	ExpI(e3, []) --> e3.
 	
 	MethodVMap([methodVHead | methodVTail]) --> [valueHead | valueTail]
-		where 
-		methodVHead --> valueHead;
-		MethodVMap(methodVTail) => valueTail.
-		
-	MethodVMap([]) --> [].
+        where 
+        methodVHead --> valueHead;
+        MethodVMap(methodVTail) => valueTail.
+        
+    MethodVMap([]) --> [].
+	
+	
+	UnarySIAL(selector) --> StringV(selector).
+	KeywordSIAL(selector) --> ListStringV(selector).
+	BinarySIAL(selector) --> StringV(selector).
+	
+	SIALSymbolLiteral(sym) --> sym.
+	ConstantSymbolLiteral(sym) --> sym.
+	StringSymbolLiteral(str) --> StringV(strv)
+	where
+		str --> strv
+	
 		
 	Literal(e1) --> e1.
 	
@@ -167,6 +196,13 @@ rules
 	
 	ConstantReference(bool) --> bool
 		where bool --> BoolV(b).
+	StringLiteral(str) --> StringV(strv)
+	where
+		str --> strv
+	LiteralSymbol(sym) --> sym.
+//	LiteralArray(arr) --> arr.
+	LiteralBlock(blk) --> blk.
+	
 	
 	True() --> BoolV(true).
 	False() --> BoolV(false).

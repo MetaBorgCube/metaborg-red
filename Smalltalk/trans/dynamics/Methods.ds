@@ -1,0 +1,38 @@
+module trans/dynamics/Methods
+
+imports
+src-gen/ds-signatures/Smalltalk-sig
+src-gen/ds-signatures/Base-sig
+
+trans/runtime/values
+trans/runtime/store
+
+trans/dynamics/Expressions
+trans/dynamics/ExecutableCode
+
+signature
+  arrows
+//    MethodDeclaration --> V
+	MethodHeader --> (List(String) * List(String))
+	KeywordMethodHeaderSegment --> (String * String)
+    
+    simplifyMethod(MethodDeclaration) --> Method
+
+rules
+
+	simplifyMethod(MethodDecl(header, code)) --> Method(selectors, bindings, code)
+	where
+		header --> (selectors, bindings).
+		
+	UnaryMethodHeader(UnaryMessageSelector(id)) --> ([id], [] : List(String)).
+	
+	BinaryMethodHeader(selector, BindableIdentifier(binding)) --> ([selector], [binding]).
+	
+	KeywordMethodHeader([]) --> ([] : List(String), [] : List(String))
+	KeywordMethodHeader([ segment | tail]) --> ([selector | rest_selectors], [binding | rest_bindings])
+	where
+		segment --> (selector, binding);
+		KeywordMethodHeader(tail) --> (rest_selectors, rest_bindings).
+	
+	KeywordMethodHeaderSegment(Keyword(selector), BindableIdentifier(binding)) --> (selector, binding).
+		

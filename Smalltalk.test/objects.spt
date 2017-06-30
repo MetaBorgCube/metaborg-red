@@ -15,12 +15,12 @@ test createSubClass [[
 
 test methodDeclaration [[
 	$M$ 
-	keyword1: a keyword2: b
+	A class>>keyword1: a keyword2: b
 ]] parse succeeds
 
 test methodDeclarationSTMTSOnly [[
 	$M$ 
-	keyword1: a keyword2: b
+	A class>>keyword1: a keyword2: b
 	a + b.
 	1 + 3.
 ]] parse succeeds
@@ -43,7 +43,7 @@ test methodDeclaration [[
 
 test methodDeclaration [[
 	$M$ 
-	keyword1: a keyword2: b
+	A class>>keyword1: a keyword2: b
 	|a b c|
 	a + b.
 	1 + 3.
@@ -51,5 +51,5 @@ test methodDeclaration [[
 
 test unaryDeclaration [[
 	$M$ 
-	Object unarymessage ^true
+	Object class>> unarymessage ^true
 ]] parse succeeds

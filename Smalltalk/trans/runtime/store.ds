@@ -78,21 +78,29 @@ rules
   	
   readVarFromObject(id) :: S, H --> v
   where
+//  	printV(StringV("accessing store 1")) => _;
   	case S["refs"?] of {
   		true =>
+//  			printV(StringV("accessing store 2")) => _;
   			S["refs"] => objectReferences;
   			case objectReferences["object"?] of {
   				true =>
+//  					printV(StringV("accessing store 3")) => _;
   					case objectReferences["object"] of {
 				  		RefV(addr) =>
-				  			case read(RefV(addr)) of {
-				  				Object(classRef, attributes, methods) =>
-				  					case attributes[id?] of {
+//				  			printV(StringV("accessing store 4")) => _;
+				  			read(RefV(addr)) --> obj;
+				  			case obj of {
+				  				Object(_, objAttributes, _) =>
+//				  					printV(StringV("accessing store 5")) => _;
+				  					case objAttributes[id?] of {
 				  						true =>
-				  							attributes[id] => v
+				  							objAttributes[id] => v
 				  						otherwise =>
 				  							readVarFromGlobal(id) --> v
 				  					}
+				  				otherwise =>
+				  					errorV("variable not found to read: object not found") => v
 				  			}
 				  	}
   				otherwise =>
@@ -100,14 +108,17 @@ rules
   						true =>
   							case objectReferences["class"] of {
 						  		RefV(addr) =>
-						  			case read(RefV(addr)) of {
-						  				Class(parentRef, obj, attributes, methods) =>
-						  					case attributes[id?] of {
+						  			read(RefV(addr)) --> class;
+						  			case class of {
+						  				Class(_, _, classAttributes, _) =>
+						  					case classAttributes[id?] of {
 						  						true =>
-						  							attributes[id] => v
+						  							classAttributes[id] => v
 						  						otherwise =>
 						  							readVarFromGlobal(id) --> v
 						  					}
+						  				otherwise =>
+				  							errorV("variable not found to read: class not found") => v
 						  			}
 						  	}
   						otherwise =>
@@ -166,7 +177,8 @@ rules
   				true =>
   					case objectReferences["object"] of {
 				  		RefV(addr) =>
-				  			case read(RefV(addr)) of {
+				  			read(RefV(addr)) --> obj;
+				  			case obj of {
 				  				Object(classRef, attributes, methods) =>
 				  					case attributes[id?] of {
 				  						true =>
@@ -175,6 +187,10 @@ rules
 				  						otherwise =>
 				  							bindVarToGlobal(id, value) --> v :: S S1, H H1
 				  					}
+				  				otherwise =>
+					  					errorV("variable not found to write: class not found") => v;
+					  					S => S1;
+					  					H => H1
 				  			}
 				  	}
   				otherwise =>
@@ -182,7 +198,8 @@ rules
 		  				true =>
 		  					case objectReferences["class"] of {
 						  		RefV(addr) =>
-						  			case read(RefV(addr)) of {
+						  			read(RefV(addr)) --> class;
+						  			case class of {
 						  				Class(parentRef, obj, attributes, methods) =>
 						  					case attributes[id?] of {
 						  						true =>
@@ -191,6 +208,10 @@ rules
 						  						otherwise =>
 						  							bindVarToGlobal(id, value) --> v :: S S1, H H1
 						  					}
+						  				otherwise =>
+						  					errorV("variable not found to write: class not found") => v;
+						  					S => S1;
+						  					H => H1
 						  			}
 						  	}
 		  				otherwise =>

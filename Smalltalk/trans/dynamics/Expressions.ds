@@ -91,6 +91,9 @@ rules
 			BoolV(_) =>		
 				bool-call-native(messageName, operand) => v3;
 				ExpI(v3, tailMessages) --> v4
+			RefV(_) =>
+				callUnaryMethod(operand, messageName) :: S, H --> v3 :: S1, H1;
+				ExpI(v3, tailMessages) :: S1, H1 --> v4 :: S S2, H H2
 			}	
 		BinaryMessageCall(messageName, v2) =>
 			case operand of {

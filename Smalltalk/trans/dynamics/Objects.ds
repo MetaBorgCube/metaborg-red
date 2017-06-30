@@ -19,6 +19,7 @@ signature
 			// class * attributes * methods -> object
 		Method: List(String) * List(String) * ExecutableCode -> Method
 			// selectors * bindings * code -> method
+		ObjectV: Object -> V
 			
 	arrows
 		allocateHelper() --> V
@@ -28,10 +29,15 @@ signature
 		addClassMethod(V, Method) --> Method
 		
 		callKeywordMethod(V, List(String), List(V)) --> V
+		callUnaryMethod(V, String) --> V
 		findMethod(List(String), List(Method)) --> Method
 		executeMethod(V, Object, Method, List(String), List(V)) --> V
 		mapFrom2Lists(List(String), List(V)) --> Map(String, V)
+		mapFrom1List(List(String)) --> Map(String, V)
 		compare2Lists(List(String), List(String)) --> Bool
+		
+	native operators
+		splitString: String -> List(String)
 		
 rules
 
@@ -97,9 +103,33 @@ rules
 				findMethod(keywords, classMethods) --> method;
 	//			printV(StringV("cool5")) => _;
 				executeMethod(objAddr, Class(className, obj, classAttributes, classMethods), method, keywords, values) :: S, H --> v :: S S1, H H1
+			Object(classRef, objAttributes, objMethods) =>
+//				printV(StringV("cool4")) => _;
+				findMethod(keywords, objMethods) --> method;
+	//			printV(StringV("cool5")) => _;
+				executeMethod(objAddr, Object(classRef, objAttributes, objMethods), method, keywords, values) :: S, H --> v :: S S1, H H1
+			}
+			
+	callUnaryMethod(objAddr, selector) :: S, H --> v :: S S1, H H1
+	where
+//		printV(StringV("cool2")) => _;
+		read(objAddr) --> object;
+		printV(StringV("unary method call")) => _;
+		printV(StringV(selector)) => _;
+		case object of {
+			Class(className, obj, classAttributes, classMethods) =>
+//				printV(StringV("cool4")) => _;
+				findMethod([selector], classMethods) --> method;
+//				printV(StringV("cool5")) => _;
+				executeMethod(objAddr, Class(className, obj, classAttributes, classMethods), method, [selector], []) :: S, H --> v :: S S1, H H1
+			Object(classRef, objAttributes, objMethods) =>
+//				printV(StringV("cool4")) => _;
+				findMethod([selector], objMethods) --> method;
+	//			printV(StringV("cool5")) => _;
+				executeMethod(objAddr, Object(classRef, objAttributes, objMethods), method, [selector], []) :: S, H --> v :: S S1, H H1
 			}
 		
-	executeMethod(objRef, incomingObject, _, ["subclass"], values) :: S, H --> newClassRef :: S S1, H H2
+	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["subclass"], values) :: S, H --> newClassRef :: S S1, H H2
 	where
 		case incomingObject of {
 			Class(_, obj, classAttributes, classMethods) =>
@@ -112,17 +142,24 @@ rules
 				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H _
 		}
 		
-	executeMethod(objRef, incomingObject, _, ["subclass"], values) :: S, H --> newClassRef :: S S1, H H2
+	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["instanceVariableNames"], values) :: S, H --> objRef :: S, H H1
 	where
 		case incomingObject of {
-			Class(_, obj, classAttributes, classMethods) =>
-				values[0] => StringV(newClassName);
-				obj => Object(_, objAttributes, objMethods);
-				allocateHelper() :: S, H --> newClassRef :: S, H H1;
-				Object(newClassRef, objAttributes, objMethods) => newObj;
-				Class(objRef, newObj, classAttributes, classMethods) => newClass;
-				write(newClassRef, newClass) :: S, H1 --> _ :: S, H H2;
-				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H _
+			Class(parentRef, Object(classRef, objAttributes, objMethods), classAttributes, classMethods) =>
+				values[0] => StringV(attributesString);
+				splitString(attributesString) => varNames;
+				mapFrom1List(varNames) => newAttributes : Map(String, V);
+				Object(classRef, {newAttributes, objAttributes}, objMethods) => newObj;
+				Class(parentRef, newObj, classAttributes, classMethods) => newClass;
+				write(objRef, newClass) :: S, H --> _ :: S, H H1
+		}
+		
+	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["new"], values) :: S, H --> newRef :: S S1, H H1
+	where
+		case incomingObject of {
+			Class(_, Object(classRef, objAttributes, objMethods), _, _) =>
+				Object(classRef, objAttributes, objMethods) => newObj;
+				allocate(newObj) :: S, H --> newRef :: S S1, H H1
 		}
 		
 	executeMethod(objRef, incomingObject, Method(_, bindings, code), _, values) :: S, H --> result :: S S, H H1
@@ -143,9 +180,30 @@ rules
 				code :: S1, H --> result :: S, H H1
 		}
 		
+	executeMethod(objRef, incomingObject, Method(_, _, code), _, []) :: S, H --> result :: S S, H H1
+	where
+		case incomingObject of {
+			Class(parentRef, obj, classAttributes, classMethods) =>
+				{"self" |--> objRef, "super" |--> parentRef} => newScope;
+				{"class" |--> objRef} => refs;
+				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				code :: S1, H --> result :: S, H H1
+			Object(classRef, objAttributes, objMethods) =>
+				read(classRef) :: S, H --> Class(parentRef, _, _, _);
+				{"self" |--> objRef, "super" |--> parentRef} => newScope;
+				{"object" |--> objRef} => refs;
+				{"local" |--> newScope, "refs" |--> refs, S} => S1;
+				code :: S1, H --> result :: S, H H1
+		}
+		
 	mapFrom2Lists([] : List(String), [] : List(V)) --> {} : Map(String, V).
 	mapFrom2Lists([varName | restNames], [varValue | restValues]) --> {varName |--> varValue, restMap}
 	where
 		mapFrom2Lists(restNames, restValues) => restMap : Map(String, V).
+		
+	mapFrom1List([] : List(String)) --> {} : Map(String, V).
+	mapFrom1List([varName | restNames]) --> {varName |--> NilV(), restMap}
+	where
+		mapFrom1List(restNames) => restMap : Map(String, V).
 	
 		

@@ -11,9 +11,6 @@ trans/dynamics/Objects
 trans/dynamics/Methods
 
 signature
-  constructors
-    ObjectV: Object -> V
-
   arrows
     Prog -init-> V
     Start --> V

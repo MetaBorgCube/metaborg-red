@@ -42,6 +42,7 @@ signature
   	KeywordMessage --> List(Message)
   	MessageChain -->  List(Message)
   	UnaryMessageChain --> List(Message)
+  	CascadedMessage --> MessageChain
   	BinaryMessageOperand --> V
   	Keyword --> String
   	KeywordMessageArgument --> V
@@ -50,11 +51,13 @@ signature
   	ExecutableCodeRest --> V
   	Message --> Message
   	V --> V
+  	List(V) --> List(V)
   	List(BinaryMessage) --> List(Message)
   	List(UnaryMessage) --> List(Message)
   	List(String) --> List(String)
   	KeywordMessageMap(List(KeywordMessageSegment), Message) --> Message
   	ExpI(V, List(Message)) --> V
+  	ExpressionCascaded(Operand, MessageChain, List(CascadedMessage)) --> V
   	MethodVMap(List(V)) --> List(V)
 //    DynamicDispatch: List(Message) -> V
   native operators
@@ -73,6 +76,17 @@ rules
 	StringLit(str) --> str
 
 	SingletonExpression(operand) --> operand.	
+	
+	Expression(operand, chain, cascaded) --> ExpressionCascaded(operand, chain, cascaded).
+	
+	ExpressionCascaded(operand, chain, []) --> ExpI(operand, chain).
+	
+	ExpressionCascaded(operand, chain, [cascadedHead | cascadedTail]) --> result
+		where
+		ExpI(operand, chain) --> someValue;
+		ExpressionCascaded(operand, cascadedHead, cascadedTail) --> result.
+	
+	CascadedMessage(messageChain) --> messageChain.
 	
 	Expression(operand, chain, cascaded) --> result
 	where 
@@ -104,9 +118,10 @@ rules
 				bool-call-native(messageName, operand, v2) => v3;
 				ExpI(v3, tailMessages) --> v4
 			}
-		KeywordMessageCall(keywords, values) =>
+		KeywordMessageCall(keywords, methodVs) =>
 			case operand of {
 			NumV(_) => 
+				MethodVMap(methodVs) => values;
 				num-calls-native(keywords, values, operand) => v3;
 				ExpI(v3, tailMessages) --> v4
 			BoolV(true) =>
@@ -115,13 +130,13 @@ rules
 					"ifTrue" =>
 						case b of {
 							"ifFalse" => 
-								values[0] => methodV;
+								methodVs[0] => methodV;
 								methodV --> v4
 						}
 					"ifFalse" =>
 						case b of {
 							"ifTrue" =>
-								values[1] => methodV;
+								methodVs[1] => methodV;
 								methodV --> v4
 						}
 				}
@@ -131,19 +146,19 @@ rules
 					"ifTrue" =>
 						case b of {
 							"ifFalse" => 
-								values[1] => methodV;
-								methodV --> v4 :: S2, H2
+								methodVs[1] => methodV;
+								methodV --> v4
 						}
 					"ifFalse" =>
 						case b of {
 							"ifTrue" =>
-								values[0] => methodV;
-								methodV --> v4 :: S2, H2
+								methodVs[0] => methodV;
+								methodV --> v4
 						}
 				}
 			RefV(_) =>
 //				printV(StringV("cool1")) => _;
-				callKeywordMethod(operand, keywords, MethodVMap(values)) :: S, H --> v3 :: S1, H1;
+				callKeywordMethod(operand, keywords, MethodVMap(methodVs)) :: S, H --> v3 :: S1, H1;
 //				printV(BoolV(S1["Metaborg"?])) => _;
 				ExpI(v3, tailMessages) :: S1, H1 --> v4 :: S S2, H H2
 			}
@@ -173,10 +188,15 @@ rules
 	Literal(e1) --> e1.
 	
 	ReferenceOperand(ref) --> ref.
+		
+	Parenthesis(statement) --> statement.
 	
 	ReferenceID(id) --> readVar(id).
 		
 	IntegerLiteral(s) --> NumV(parseI(s)).
+	
+	StringLiteral(s) --> StringV(s).
+	
 	ConstantReference(bool) --> bool
 		where bool --> BoolV(b).
 	StringLiteral(str) --> StringV(strv)

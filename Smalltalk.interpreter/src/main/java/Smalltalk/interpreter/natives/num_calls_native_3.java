@@ -6,7 +6,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.metaborg.Smalltalk.interpreter.generated.TypesGen;
+import org.metaborg.Smalltalk.interpreter.generated.terms.BoolV_1_Term;
 import org.metaborg.Smalltalk.interpreter.generated.terms.IKeywordMessageElementTerm;
 import org.metaborg.Smalltalk.interpreter.generated.terms.IVTerm;
 import org.metaborg.Smalltalk.interpreter.generated.terms.List_IKeywordMessageSegmentTerm;
@@ -49,12 +51,8 @@ public class num_calls_native_3 extends TermBuild {
 		if(values.length != n) {
 			throw new ArrayIndexOutOfBoundsException("amount of keys not equal to amount of values");
 		}
-		//sort
-		SortedMap<String, IVTerm> map = new TreeMap<String, IVTerm>();
-		for(int i = 0; i<n; i++) {
-			map.put(keys[i], values[i]);
-		}
-		
+		ArrayUtils.reverse(keys);
+		ArrayUtils.reverse(values);
 		//Check for known operations
 		switch (n) {
 		case 0:
@@ -66,7 +64,7 @@ public class num_calls_native_3 extends TermBuild {
 			} catch(ClassCastException e) {
 				throw new IllegalArgumentException("Operators on integers require integers as argument");
 			}
-			switch(map.firstKey()) { //again, only integer operations
+			switch(keys[0]) { //again, only integer operations
 			case "raisedTo":
 			case  "raisedToInteger":
 				return doPower(operand, right);
@@ -79,8 +77,19 @@ public class num_calls_native_3 extends TermBuild {
 			case "max":
 				return doMax(operand, right);
 			}
+		case 2:
+			if(keys[0].equals("between") && keys[1].equals("and")) {
+				return isBetween(operand, values[0], values[1]);
+			}
 		}
 		throw new IllegalArgumentException("Unknown selectors on number.");
+	}
+
+	private IVTerm isBetween(NumV_1_Term operand, IVTerm ivTerm1, IVTerm ivTerm2) {
+		NumV_1_Term first = (NumV_1_Term) ivTerm1;
+		NumV_1_Term second = (NumV_1_Term) ivTerm2;
+		int i = operand.get_1();
+		return new BoolV_1_Term(i>first.get_1() && i<second.get_1());
 	}
 
 	private IVTerm doMax(NumV_1_Term operand, NumV_1_Term right) {

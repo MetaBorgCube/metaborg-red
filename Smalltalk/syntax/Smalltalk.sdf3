@@ -28,13 +28,13 @@ context-free syntax
 	ConstantReference.False = <false>
 	ConstantReference.True = <true>
 	
-	PsuedoVariableReference.Self = <self>
-	PsuedoVariableReference.Super = <super>
-	PsuedoVariableReference.This = <thisContext>
+	PseudoVariableReference.Self = <self>
+	PseudoVariableReference.Super = <super>
+	PseudoVariableReference.This = <thisContext>
 	
 	BindableIdentifier.BindableIdentifier = Identifier
 	BindableIdentifier = ConstantReference {reject}
-	BindableIdentifier = PsuedoVariableReference {reject}
+	BindableIdentifier = PseudoVariableReference {reject}
 
 	UnaryMessageSelector.UnaryMessageSelector = Identifier  //duplicate constructor, can combine?
 	Keyword.Keyword = <<Identifier> :>
@@ -66,8 +66,8 @@ context-free syntax
 	
 	Literal.ConstantReference = ConstantReference
 	Literal.IntegerLiteral = IntegerLiteral 
-	Literal.ScaledDecimalLiteral = ScaledDecimalLiteral 
-	Literal.FloatingPointLiteral = FloatingPointLiteral 
+//	Literal.ScaledDecimalLiteral = ScaledDecimalLiteral 
+//	Literal.FloatingPointLiteral = FloatingPointLiteral 
 	Literal.CharacterLiteral = CharacterLiteral 
 	Literal.StringLiteral = StringLiteral 
 	Literal.LiteralSymbol = SymbolLiteral 
@@ -76,7 +76,7 @@ context-free syntax
 	
 	Operand.Literal = Literal
 	Operand.ReferenceOperand = Reference
-	Operand = <( <Statement> )> 
+	Operand.Parenthesis = <( <Statement> )> 
 	
 	UnaryMessage.UnaryMessage = UnaryMessageSelector
 	UnaryMessageChain.UnaryMessageChain = UnaryMessage*

@@ -1,5 +1,6 @@
 package Smalltalk.interpreter.natives;
 import org.metaborg.Smalltalk.interpreter.generated.TypesGen;
+import org.metaborg.Smalltalk.interpreter.generated.terms.BoolV_1_Term;
 import org.metaborg.Smalltalk.interpreter.generated.terms.IVTerm;
 import org.metaborg.Smalltalk.interpreter.generated.terms.NumV_1_Term;
 import org.metaborg.meta.lang.dynsem.interpreter.nodes.building.TermBuild;
@@ -45,10 +46,46 @@ public class num_call_native_2 extends TermBuild {
 			return doLog(left);
 		case "atRandom":
 			return doRandom(left);
+		case "negative":
+			return isNegative(left);
+		case "positive":
+			return isPositive(left);
+		case "strictlyPositive":
+			return isSPositive(left);
+		case "even":
+			return isEven(left);
+		case "odd":
+			return isOdd(left);
+		case "isZero":
+			return isZero(left);
 		//everything else don't work with integers only (trigonimic functions, reciprocals)
 		default:
 			throw new IllegalArgumentException("operator: '" + op + "' not recognised as operator on number.");
 		}
+	}
+
+	private IVTerm isZero(NumV_1_Term left) {
+		return new BoolV_1_Term(left.get_1() == 0);
+	}
+
+	private IVTerm isOdd(NumV_1_Term left) {
+		return new BoolV_1_Term(left.get_1() % 2 == 1);
+	}
+
+	private IVTerm isEven(NumV_1_Term left) {
+		return new BoolV_1_Term(left.get_1() % 2 == 0);
+	}
+
+	private IVTerm isSPositive(NumV_1_Term left) {
+		return new BoolV_1_Term(left.get_1() > 0);
+	}
+
+	private IVTerm isPositive(NumV_1_Term left) {
+		return new BoolV_1_Term(left.get_1() >= 0);
+	}
+
+	private IVTerm isNegative(NumV_1_Term left) {
+		return new BoolV_1_Term(left.get_1() < 0);
 	}
 
 	private IVTerm doRandom(NumV_1_Term left) {

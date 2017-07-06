@@ -42,8 +42,10 @@ rules
 		{S1, S} => S1;
 		case S1["isGlobal"?] of {
 			true =>
+				printV(StringV("bind global map")) => _;
 				bindToGlobalMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
 			otherwise =>
+				printV(StringV("bind var map")) => _;
 				bindVarMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
 		}
 		

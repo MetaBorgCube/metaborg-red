@@ -27,8 +27,8 @@ lexical syntax
 	DecimalIntegerLiteral = DecimalDigit+
 	Radix = DecimalIntegerLiteral
 	BaseNIntegerLiteral = LetterOrDigit+
-	ScaledDecimalLiteral = "-"? DecimalIntegerLiteral ("." DecimalIntegerLiteral)? "s" DecimalIntegerLiteral?
-	FloatingPointLiteral = "-"? DecimalIntegerLiteral (("." DecimalIntegerLiteral Exponent?) | Exponent)
+//	ScaledDecimalLiteral = "-"? DecimalIntegerLiteral ("." DecimalIntegerLiteral)? "s" DecimalIntegerLiteral?
+//	FloatingPointLiteral = "-"? DecimalIntegerLiteral (("." DecimalIntegerLiteral Exponent?) | Exponent)
 	Exponent = ("e"|"d"|"q") ("-"? DecimalIntegerLiteral)?
 	
 	CharacterLiteral = "$" Character

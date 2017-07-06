@@ -29,23 +29,17 @@ rules
 	StatementExecutor([]) :: S, H --> BoolV(false) :: S, H.
 	StatementExecutor([stmt]) :: S, H --> v :: S S1, H H1
 	where
-		printV(StringV("stmtexec 3")) => _;
-		stmt :: S, H --> v :: S1, H1;
-		printV(StringV("stmtexec 4")) => _.
+		stmt :: S, H --> v :: S1, H1.
 	StatementExecutor([stmt | tail]) :: S, H --> v :: S S2, H H2
 	where
 		tail != [] : List(Statement);
-		printV(StringV("stmtexec 1")) => _;
 		stmt :: S, H --> _ :: S1, H1;
-		StatementExecutor(tail) :: S S1, H H1 --> v :: S S2, H H2;
-		printV(StringV("stmtexec 2")) => _.
+		StatementExecutor(tail) :: S S1, H H1 --> v :: S S2, H H2.
 		
 	Statement(assignmentOperations, expression) :: S, H --> v :: S S2, H H2
 	where
 		expression :: S, H --> v :: S1, H1;
 		{S1, S} => S1;
-//		printV(StringV("in statement after expressions")) => _;
-//		printV(BoolV(S1["isGlobal"?])) => _;
 		case S1["isGlobal"?] of {
 			true =>
 				bindToGlobalMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2

@@ -1,18 +1,16 @@
-module trans/dynamics/Smalltalk.core
+module trans/dynamics/Expressions.core
 
 imports 
 
 signature
     sorts
-      ProgramSegmentExecutor_1_Meta
-      simplifyMethod_1_Meta
+      KeywordMessageMap_2_Meta
+      ExpI_2_Meta
+      MethodVMap_1_Meta
       MapStatements_1_Meta
       DotRemover_1_Meta
       StatementExecutor_1_Meta
       StringsFromAssignmentOperations_1_Meta
-      KeywordMessageMap_2_Meta
-      ExpI_2_Meta
-      MethodVMap_1_Meta
       allocateHelper_0_Meta
       initObjectSystem_0_Meta
       addMethod_2_Meta
@@ -84,12 +82,6 @@ signature
       MethodHeader
       MethodDeclaration
     constructors
-      ProgramSegmentExecutor : List(ProgramSegment) -> ProgramSegmentExecutor_1_Meta {meta-function}
-      simplifyMethod : MethodDeclaration -> simplifyMethod_1_Meta {meta-function}
-      MapStatements : List(Statement) -> MapStatements_1_Meta {meta-function}
-      DotRemover : List(DottedStatement) -> DotRemover_1_Meta {meta-function}
-      StatementExecutor : List(Statement) -> StatementExecutor_1_Meta {meta-function}
-      StringsFromAssignmentOperations : List(AssignmentOperation) -> StringsFromAssignmentOperations_1_Meta {meta-function}
       KeywordMessageMap : List(KeywordMessageSegment) * Message -> KeywordMessageMap_2_Meta {meta-function}
       ExpI : V * List(Message) -> ExpI_2_Meta {meta-function}
       MethodVMap : List(V) -> MethodVMap_1_Meta {meta-function}
@@ -103,6 +95,10 @@ signature
       KeywordValuePair : String * V -> KeywordMessageElement 
       KeywordMessageCall : List(String) * List(V) -> Message 
       MethodExpressionV : BinaryMessageOperand * List(BinaryMessage) -> V 
+      MapStatements : List(Statement) -> MapStatements_1_Meta {meta-function}
+      DotRemover : List(DottedStatement) -> DotRemover_1_Meta {meta-function}
+      StatementExecutor : List(Statement) -> StatementExecutor_1_Meta {meta-function}
+      StringsFromAssignmentOperations : List(AssignmentOperation) -> StringsFromAssignmentOperations_1_Meta {meta-function}
       allocateHelper : allocateHelper_0_Meta {meta-function}
       initObjectSystem : initObjectSystem_0_Meta {meta-function}
       addMethod : V * Method -> addMethod_2_Meta {meta-function}
@@ -221,22 +217,6 @@ signature
       splitString : String -> List(String)
       errorV : String -> V
     arrows
-       Prog  -init-> V 
-       Start :: S, H --> V :: S, H
-       ProgramSegment :: S, H --> V :: S, H
-       ProgramSegmentExecutor_1_Meta :: S, H --> V :: S, H
-       MethodHeader  --> (List(String) * List(String)) 
-       KeywordMethodHeaderSegment  --> (String * String) 
-       simplifyMethod_1_Meta  --> Method 
-       FinalStatement  --> Statement 
-       MapStatements_1_Meta  --> V 
-       DotRemover_1_Meta  --> List(Statement) 
-       StatementExecutor_1_Meta :: S, H --> V :: S, H
-       Statement :: S, H --> V :: S, H
-       StringsFromAssignmentOperations_1_Meta  --> List(String) 
-       ExecutableCodeRest :: S, H --> V :: S, H
-       ExecutableCode :: S, H --> V :: S, H
-       BlockLiteral :: S, H --> V :: S, H
        Expression :: S, H --> V :: S, H
        UnaryMessageSelector  --> String 
        KeywordMessageSelector  --> List(String) 
@@ -266,6 +246,15 @@ signature
        KeywordMessageMap_2_Meta  --> Message 
        ExpI_2_Meta :: S, H --> V :: S, H
        MethodVMap_1_Meta :: S, H --> List(V) :: S, H
+       FinalStatement  --> Statement 
+       MapStatements_1_Meta  --> V 
+       DotRemover_1_Meta  --> List(Statement) 
+       StatementExecutor_1_Meta :: S, H --> V :: S, H
+       Statement :: S, H --> V :: S, H
+       StringsFromAssignmentOperations_1_Meta  --> List(String) 
+       ExecutableCodeRest :: S, H --> V :: S, H
+       ExecutableCode :: S, H --> V :: S, H
+       BlockLiteral :: S, H --> V :: S, H
        allocateHelper_0_Meta :: S, H --> V :: S, H
        initObjectSystem_0_Meta :: S, H --> V :: S, H
        addMethod_2_Meta :: S, H --> Method :: S, H
@@ -304,8 +293,6 @@ rules
   UnarySIAL(selector) --> StringV(s1)
   where
     selector --> s1
-
-  UnaryMethodHeader(UnaryMessageSelector(id)) --> ([ id | [  ] ], [  ] : List(String))
 
   UnaryMessageSelector(identifier) --> identifier
 
@@ -390,10 +377,6 @@ rules
   SingletonExpression(operand) :: S S1, H H1 --> v1 :: S S2, H H2
   where
     operand :: S S1, H H1 --> v1 :: S S2, H H2
-
-  simplifyMethod(MethodDecl(header, code)) --> Method(selectors, bindings, code)
-  where
-    header --> (selectors, bindings)
 
   SIALSymbolLiteral(sym) --> v1
   where
@@ -515,33 +498,6 @@ rules
 
   read(addr) :: S S, H H --> H[addr] :: S S, H H
 
-  ProgramSegments(segments) :: S S1, H H1 --> v1 :: S S2, H H2
-  where
-    ProgramSegmentExecutor(segments) :: S S1, H H1 --> v1 :: S S2, H H2
-
-  ProgramSegmentExecutor([  ] : List(ProgramSegment)) :: S S, H H --> NilV() :: S S, H H
-
-  ProgramSegmentExecutor([ seg | [  ] : List(ProgramSegment) ]) :: S S, H H --> v :: S S1, H H1
-  where
-    printV(StringV("last segment")) => _;
-    seg :: S S, H H --> v : V :: S S1, H H1
-
-  ProgramSegmentExecutor([ seg | tail ]) :: S S, H H --> v :: S S2, H H2
-  where
-    tail != [  ] : List(ProgramSegment);
-    printV(StringV("segment executed")) => _;
-    seg :: S S, H H --> _ :: S S1, H H1;
-    ProgramSegments(tail) :: S S1, H H1 --> v : V :: S S2, H H2
-
-  Program(progSegments) -init-> v
-  where
-    initObjectSystem() :: S {}, H {} --> _ :: S S1, H H1;
-    readVar("Object") :: S S1, H H1 --> addr :: S _, H _;
-    printV(addr) => _;
-    progSegments :: S S1, H H1 --> v : V :: S _, H _;
-    printV(StringV("final result")) => _;
-    printV(v) => _
-
   MethodVMap([ methodVHead | methodVTail ]) :: S S1, H H1 --> [ valueHead | l1 ] :: S S3, H H3
   where
     methodVHead :: S S1, H H1 --> valueHead :: S S2, H H2;
@@ -554,12 +510,6 @@ rules
     binaryMessageOperand :: S S1, H H1 --> v1 :: S S2, H H2;
     BinaryMessageChain(binaryMessages) :: S S2, H H2 --> L1 :: S S3, H H3;
     ExpI(v1, L1) :: S S3, H H3 --> v2 :: S S4, H H4
-
-  MethodDeclaration(ref, decl) :: S S, H H --> refv :: S S1, H H1
-  where
-    simplifyMethod(decl) --> method;
-    ref :: S S, H H --> refv :: S _, H _;
-    addMethod(refv, method) :: S S, H H --> _ :: S S1, H H1
 
   mapFrom2Lists([  ] : List(String), [  ] : List(V)) --> {}
 
@@ -588,15 +538,6 @@ rules
   KeywordSIAL(selector) --> ListStringV(l1)
   where
     selector --> l1
-
-  KeywordMethodHeaderSegment(Keyword(selector), BindableIdentifier(binding)) --> (selector, binding)
-
-  KeywordMethodHeader([  ] : List(KeywordMethodHeaderSegment)) --> ([  ] : List(String), [  ] : List(String))
-
-  KeywordMethodHeader([ segment | tail ]) --> ([ selector | rest_selectors ], [ binding | rest_bindings ])
-  where
-    segment --> (selector, binding);
-    KeywordMethodHeader(tail) --> (rest_selectors, rest_bindings)
 
   KeywordMessageSegment(keyword, keywordMessageArgument) --> KeywordValuePair(key, MethodExpressionV(binOperand, binMessages))
   where
@@ -937,10 +878,6 @@ rules
 
   ExecutableCodeEmpty() :: S S1, H H1 --> NilV() :: S S1, H H1
 
-  ExecutableCode(code) :: S S1, H H1 --> codeRed :: S S2, H H2
-  where
-    code :: S S1, H H1 --> codeRed :: S S2, H H2
-
   DotRemover([  ] : List(DottedStatement)) --> [  ] : List(Statement)
 
   DotRemover([ DottedStatement(head) | tail ]) --> [ head | rest ]
@@ -970,12 +907,6 @@ rules
   compare2Lists([ _ | _ ], [  ] : List(String)) --> false
 
   compare2Lists([  ] : List(String), [ _ | _ ]) --> false
-
-  ClassMethodDeclaration(ref, decl) :: S S, H H --> refv :: S S, H H1
-  where
-    simplifyMethod(decl) --> method;
-    ref :: S S, H H --> refv :: S _, H _;
-    addClassMethod(refv, method) :: S S, H H --> _ :: S _, H H1 : Map(V,Object)
 
   callUnaryMethod(objAddr, selector) :: S S, H H --> v :: S S1, H H1
   where
@@ -1227,8 +1158,6 @@ rules
     {"global" |--> globalScope} + S => S1 : Map(String,Map(String,V))
 
   BinarySIAL(selector) --> StringV(selector)
-
-  BinaryMethodHeader(selector, BindableIdentifier(binding)) --> ([ selector | [  ] ], [ binding | [  ] ])
 
   BinaryMessageOperand(operand, unarychain) :: S S1, H H1 --> v2 :: S S3, H H3
   where

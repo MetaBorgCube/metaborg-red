@@ -24,9 +24,7 @@ rules
 	where
 		initObjectSystem() :: S {}, H {} --> _ :: S1, H1 ;
 		readVar("Object") :: S1, H1 --> addr :: S _, H _;
-//		printV(addr) => _;
-//		read(addr) :: S1, H1 --> cls :: S _, H _;
-//		printV(ObjectV(cls)) => _;
+		printV(addr) => _;
 		progSegments :: S1, H1 --> v :: S _, H _;
 		printV(StringV("final result")) => _;
 		printV(v) => _.
@@ -48,13 +46,13 @@ rules
 	ExecutableCode(code) --> codeRed
 	where
 		code --> codeRed.
-	MethodDeclaration(ref, decl) :: S, H --> refv :: S S1, H H1
+	MethodDeclaration(ref, decl) :: S, H --> refv :: S S, H H1
 	where
 		simplifyMethod(decl) --> method;
 		ref --> refv;
-		addMethod(refv, method) :: S, H --> _ :: S S1, H H1.
-	ClassMethodDeclaration(ref, decl) :: S, H --> refv :: S S1, H H1
+		addMethod(refv, method) :: S, H --> _ :: S _, H H1.
+	ClassMethodDeclaration(ref, decl) :: S, H --> refv :: S S, H H1
 	where
 		simplifyMethod(decl) --> method;
 		ref --> refv;
-		addClassMethod(refv, method) :: S, H --> _ :: S S1, H H1.
+		addClassMethod(refv, method) :: S, H --> _ :: S _, H H1.

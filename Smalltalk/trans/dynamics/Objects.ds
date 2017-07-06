@@ -45,15 +45,10 @@ rules
 	
 	initObjectSystem() :: S, H --> addr :: S S2, H H3
 	where
-//		printV(StringV("init system 0")) => _;
 		allocateHelper() :: S, H --> addr :: S, H H1;
-//		printV(StringV("init system 1")) => _;
 		write(addr, Class(addr, Object(addr, {}, []), {}, [])) :: S, H1 --> _ :: S, H H2;
-//		printV(StringV("init system 2")) => _;
 		bindToGlobal("Object", addr) :: S, H2 --> _ :: S S1, H H3;
-//		printV(StringV("init system 3")) => _;
 		{"isGlobal" |--> {} : Map(String, V), S1} => S2
-//		printV(StringV("init system 4")) => _.
 		
 	addMethod(classAddr, methodDecl) :: S, H --> methodDecl :: S S1, H H1
 	where

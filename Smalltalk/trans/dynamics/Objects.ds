@@ -13,8 +13,8 @@ trans/dynamics/ExecutableCode
 signature
 
 	constructors
-		Class: V * Object * Map(String, V) * List(Method) -> Object
-			// parent * object * class attributes * class methods -> class object
+		Class: V * Object * Map(String, V) * List(String) * List(Method) -> Object
+			// parent * object * class attributes * class attribute list * class methods -> class object
 		Object: V * Map(String, V) * List(Method) -> Object
 			// class * attributes * methods -> object
 		Method: List(String) * List(String) * ExecutableCode -> Method
@@ -41,24 +41,24 @@ signature
 		
 rules
 
-	allocateHelper() --> allocate(Class(RefV(0), Object(RefV(0), {}, []), {}, [])).
+	allocateHelper() --> allocate(Class(RefV(0), Object(RefV(0), {}, []), {}, [], [])).
 	
 	initObjectSystem() :: S, H --> addr :: S S2, H H3
 	where
 		allocateHelper() :: S, H --> addr :: S, H H1;
-		write(addr, Class(addr, Object(addr, {}, []), {}, [])) :: S, H1 --> _ :: S, H H2;
+		write(addr, Class(addr, Object(addr, {}, []), {}, [], [])) :: S, H1 --> _ :: S, H H2;
 		bindToGlobal("Object", addr) :: S, H2 --> _ :: S S1, H H3;
 		{"isGlobal" |--> {} : Map(String, V), S1} => S2
 		
 	addMethod(classAddr, methodDecl) :: S, H --> methodDecl :: S S1, H H1
 	where
-		read(classAddr) --> Class(parentAddr, Object(classRef, objAttributes, objMethods), classAttributes, classMethods);
-		write(classAddr, Class(parentAddr, Object(classRef, objAttributes, [methodDecl | objMethods]), classAttributes, classMethods)) :: S, H --> _ :: S1, H1.
+		read(classAddr) --> Class(parentAddr, Object(classRef, objAttributes, objMethods), classAttributes, classAttributeNames, classMethods);
+		write(classAddr, Class(parentAddr, Object(classRef, objAttributes, [methodDecl | objMethods]), classAttributes, classAttributeNames, classMethods)) :: S, H --> _ :: S1, H1.
 		
 	addClassMethod(classAddr, methodDecl) :: S, H --> methodDecl :: S S1, H H1
 	where
-		read(classAddr) --> Class(parentAddr, obj, classAttributes, classMethods);
-		write(classAddr, Class(parentAddr, obj, classAttributes, [methodDecl | classMethods])) :: S, H --> _ :: S1, H1.
+		read(classAddr) --> Class(parentAddr, obj, classAttributes, classAttributeNames, classMethods);
+		write(classAddr, Class(parentAddr, obj, classAttributes, classAttributeNames, [methodDecl | classMethods])) :: S, H --> _ :: S1, H1.
 		
 		
 		
@@ -90,15 +90,16 @@ rules
 	where
 //		printV(StringV("cool2")) => _;
 		read(objAddr) --> object;
-		`keywords => keywords;
+		`keywords => keywords; // keywords and values need to be reversed as they are parsed in reverse order
+		`values => values;
 		printV(StringV("keyword method call")) => _;
 		printV(StringV(keywords[0])) => _;
 		case object of {
-			Class(className, obj, classAttributes, classMethods) =>
+			Class(className, obj, classAttributes, classAttributeNames, classMethods) =>
 //				printV(StringV("cool4")) => _;
 				findMethod(keywords, classMethods) --> method;
 	//			printV(StringV("cool5")) => _;
-				executeMethod(objAddr, Class(className, obj, classAttributes, classMethods), method, keywords, values) :: S, H --> v :: S S1, H H1
+				executeMethod(objAddr, Class(className, obj, classAttributes, classAttributeNames, classMethods), method, keywords, values) :: S, H --> v :: S S1, H H1
 			Object(classRef, objAttributes, objMethods) =>
 //				printV(StringV("cool4")) => _;
 				findMethod(keywords, objMethods) --> method;
@@ -113,11 +114,11 @@ rules
 		printV(StringV("unary method call")) => _;
 		printV(StringV(selector)) => _;
 		case object of {
-			Class(className, obj, classAttributes, classMethods) =>
+			Class(className, obj, classAttributes, classAttributeNames, classMethods) =>
 //				printV(StringV("cool4")) => _;
 				findMethod([selector], classMethods) --> method;
 //				printV(StringV("cool5")) => _;
-				executeMethod(objAddr, Class(className, obj, classAttributes, classMethods), method, [selector], []) :: S, H --> v :: S S1, H H1
+				executeMethod(objAddr, Class(className, obj, classAttributes, classAttributeNames, classMethods), method, [selector], []) :: S, H --> v :: S S1, H H1
 			Object(classRef, objAttributes, objMethods) =>
 //				printV(StringV("cool4")) => _;
 				findMethod([selector], objMethods) --> method;
@@ -128,12 +129,13 @@ rules
 	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["subclass"], values) :: S, H --> newClassRef :: S S1, H H2
 	where
 		case incomingObject of {
-			Class(_, obj, classAttributes, classMethods) =>
+			Class(_, obj, classAttributes, classAttributeNames, classMethods) =>
 				values[0] => StringV(newClassName);
 				obj => Object(_, objAttributes, objMethods);
 				allocateHelper() :: S, H --> newClassRef :: S, H H1;
 				Object(newClassRef, objAttributes, objMethods) => newObj;
-				Class(objRef, newObj, classAttributes, classMethods) => newClass;
+				mapFrom1List(classAttributeNames) => newAttributes : Map(String, V);
+				Class(objRef, newObj, newAttributes, classAttributeNames, classMethods) => newClass;
 				write(newClassRef, newClass) :: S, H1 --> _ :: S, H H2;
 				bindToGlobal(newClassName, newClassRef) :: S, H2 --> _ :: S S1, H _
 		}
@@ -141,31 +143,31 @@ rules
 	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["instanceVariableNames"], values) :: S, H --> objRef :: S, H H1
 	where
 		case incomingObject of {
-			Class(parentRef, Object(classRef, objAttributes, objMethods), classAttributes, classMethods) =>
+			Class(parentRef, Object(classRef, objAttributes, objMethods), classAttributes, classAttributeNames, classMethods) =>
 				values[0] => StringV(attributesString);
 				splitString(attributesString) => varNames;
 				mapFrom1List(varNames) => newAttributes : Map(String, V);
 				Object(classRef, {newAttributes, objAttributes}, objMethods) => newObj;
-				Class(parentRef, newObj, classAttributes, classMethods) => newClass;
+				Class(parentRef, newObj, classAttributes, classAttributeNames, classMethods) => newClass;
 				write(objRef, newClass) :: S, H --> _ :: S, H H1
 		}
 		
 	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["classVariableNames"], values) :: S, H --> objRef :: S, H H1
 	where
 		case incomingObject of {
-			Class(parentRef, Object(classRef, objAttributes, objMethods), classAttributes, classMethods) =>
+			Class(parentRef, Object(classRef, objAttributes, objMethods), classAttributes, classAttributeNames, classMethods) =>
 				values[0] => StringV(attributesString);
 				splitString(attributesString) => varNames;
 				mapFrom1List(varNames) => newAttributes : Map(String, V);
 				Object(classRef, objAttributes, objMethods) => newObj;
-				Class(parentRef, newObj, {newAttributes, classAttributes}, classMethods) => newClass;
+				Class(parentRef, newObj, {newAttributes, classAttributes}, varNames ++ classAttributeNames, classMethods) => newClass;
 				write(objRef, newClass) :: S, H --> _ :: S, H H1
 		}
 		
 	executeMethod(objRef, incomingObject, Method([] : List(String), [] : List(String),  ExecutableCodeEmpty()), ["new"], values) :: S, H --> newRef :: S S1, H H1
 	where
 		case incomingObject of {
-			Class(_, Object(classRef, objAttributes, objMethods), _, _) =>
+			Class(_, Object(classRef, objAttributes, objMethods), _, _, _) =>
 				Object(classRef, objAttributes, objMethods) => newObj;
 				allocate(newObj) :: S, H --> newRef :: S S1, H H1
 		}
@@ -173,14 +175,14 @@ rules
 	executeMethod(objRef, incomingObject, Method(_, bindings, code), _, values) :: S, H --> result :: S S, H H1
 	where
 		case incomingObject of {
-			Class(parentRef, obj, classAttributes, classMethods) =>
+			Class(parentRef, obj, classAttributes, classAttributeNames, classMethods) =>
 				mapFrom2Lists(bindings, values) => newScope : Map(String, V);
 				{"self" |--> objRef, "super" |--> parentRef, newScope} => newScope;
 				{"class" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1
 			Object(classRef, objAttributes, objMethods) =>
-				read(classRef) :: S, H --> Class(parentRef, _, _, _);
+				read(classRef) :: S, H --> Class(parentRef, _, _, _, _);
 				mapFrom2Lists(bindings, values) => newScope : Map(String, V);
 				{"self" |--> objRef, "super" |--> parentRef, newScope} => newScope;
 				{"object" |--> objRef} => refs;
@@ -191,14 +193,14 @@ rules
 	executeMethod(objRef, incomingObject, Method(_, _, code), _, []) :: S, H --> result :: S S, H H1
 	where
 		case incomingObject of {
-			Class(parentRef, obj, classAttributes, classMethods) =>
+			Class(parentRef, obj, classAttributes, classAttributeNames, classMethods) =>
 				{"self" |--> objRef, "super" |--> parentRef} => newScope;
 				{"class" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1
 			Object(classRef, objAttributes, objMethods) =>
-				read(classRef) :: S, H --> Class(parentRef, _, _, _);
-				{"self" |--> objRef, "super" |--> parentRef} => newScope;
+//				read(classRef) :: S, H --> Class(parentRef, _, _, _, _);
+				{"self" |--> objRef} => newScope;
 				{"object" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
 				code :: S1, H --> result :: S, H H1

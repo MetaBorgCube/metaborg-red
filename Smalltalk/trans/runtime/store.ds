@@ -110,7 +110,7 @@ rules
 						  		RefV(addr) =>
 						  			read(RefV(addr)) --> class;
 						  			case class of {
-						  				Class(_, _, classAttributes, _) =>
+						  				Class(_, _, classAttributes, _, _) =>
 						  					case classAttributes[id?] of {
 						  						true =>
 						  							classAttributes[id] => v
@@ -200,11 +200,11 @@ rules
 						  		RefV(addr) =>
 						  			read(RefV(addr)) --> class;
 						  			case class of {
-						  				Class(parentRef, obj, attributes, methods) =>
+						  				Class(parentRef, obj, attributes, attributeNames, methods) =>
 						  					case attributes[id?] of {
 						  						true =>
 						  							{id |--> value, attributes} => newAttributes;
-						  							write(RefV(addr), Class(parentRef, obj, newAttributes, methods)) :: S, H --> _ :: S S1, H H1
+						  							write(RefV(addr), Class(parentRef, obj, newAttributes, attributeNames, methods)) :: S, H --> _ :: S S1, H H1
 						  						otherwise =>
 						  							bindVarToGlobal(id, value) --> v :: S S1, H H1
 						  					}

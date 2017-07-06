@@ -20,7 +20,7 @@ signature
     
 rules      
 	
-	Program(progSegments) -init-> v  
+	Program(progSegments) -init-> v
 	where
 		initObjectSystem() :: S {}, H {} --> _ :: S1, H1 ;
 		readVar("Object") :: S1, H1 --> addr :: S _, H _;

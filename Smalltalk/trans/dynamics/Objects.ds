@@ -95,6 +95,7 @@ rules
 	where
 //		printV(StringV("cool2")) => _;
 		read(objAddr) --> object;
+		`keywords => keywords;
 		printV(StringV("keyword method call")) => _;
 		printV(StringV(keywords[0])) => _;
 		case object of {

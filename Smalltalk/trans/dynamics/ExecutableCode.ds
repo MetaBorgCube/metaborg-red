@@ -15,12 +15,17 @@ signature
     ExecutableCode --> V
     BlockLiteral --> V
     
+    LocalVariableDeclarationList --> List(String)
+    
 rules
 	ExecutableCodeRest(statements, finalstmt) :: S, H --> v :: S S2, H H2
 		where
+			printV(BoolV(S["refs"?])) => _;
 			StatementExecutor(DotRemover(statements)) :: S, H --> _ :: S S1, H H1;
+			printV(BoolV(S1["refs"?])) => _;
 			printV(StringV("finalstmt 1")) => _;
 			finalstmt --> stmt;
+			printV(BoolV(S1["refs"?])) => _;
 			printV(StringV("finalstmt 2")) => _;
 			stmt :: S1, H1 --> v :: S S2, H H2;
 			printV(StringV("finalstmt 3")) => _.
@@ -35,5 +40,14 @@ rules
 			
 	ExecutableCodeStmtsOnly(executableCodeRest) --> executableCodeRest.
 	ExecutableCodeEmpty() --> NilV().
-	ExecutableCodeVarsOnly(vars) --> NilV().
-	ExecutableCodeVarsNStmts(vars, executableCodeRest) --> executableCodeRest.
+	ExecutableCodeVarsOnly(vars) :: S, H --> NilV() :: S S1, H
+	where
+		bindToLocalMap(vars, NilV()) :: S, H --> _ :: S S1, H
+	ExecutableCodeVarsNStmts(vars, executableCodeRest) :: S, H --> v :: S S2, H H1
+	where
+		printV(BoolV(S["refs"?])) => _;
+		ExecutableCodeVarsOnly(vars) :: S, H --> _ :: S S1, H;
+		printV(BoolV(S1["refs"?])) => _;
+		executableCodeRest :: S1, H --> v :: S S2, H H1
+		
+	LocalVariableDeclarationList(bindableIdentifiers) --> StringsFromBindableIdentifiers(bindableIdentifiers)

@@ -17,7 +17,8 @@ signature
     StatementExecutor(List(Statement)) --> V
     Statement --> V
     
-    StringsFromAssignmentOperations(List(AssignmentOperation)) --> List(String)
+    StringsFromAssignmentOperations(List(AssignmentOperation)) --> List(BindableIdentifier)
+    StringsFromBindableIdentifiers(List(BindableIdentifier)) --> List(String)
 
 rules
 
@@ -38,21 +39,34 @@ rules
 		
 	Statement(assignmentOperations, expression) :: S, H --> v :: S S2, H H2
 	where
+		printV(StringV("cool1")) => _;
+		printV(BoolV(S["refs"?])) => _;
 		expression :: S, H --> v :: S1, H1;
+		printV(StringV("cool2")) => _;
+		printV(BoolV(S1["refs"?])) => _;
 		{S1, S} => S1;
+		printV(StringV("cool3")) => _;
+		printV(BoolV(S1["refs"?])) => _;
 		case S1["isGlobal"?] of {
 			true =>
 				printV(StringV("bind global map")) => _;
-				bindToGlobalMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
+				bindToGlobalMap(StringsFromBindableIdentifiers(StringsFromAssignmentOperations(assignmentOperations)), v) :: S1, H1 --> _ :: S S2, H H2
 			otherwise =>
 				printV(StringV("bind var map")) => _;
-				bindVarMap(StringsFromAssignmentOperations(assignmentOperations), v) :: S1, H1 --> _ :: S S2, H H2
-		}
+				bindVarMap(StringsFromBindableIdentifiers(StringsFromAssignmentOperations(assignmentOperations)), v) :: S1, H1 --> _ :: S S2, H H2
+		};
+		printV(StringV("cool4")) => _;
+		printV(BoolV(S2["refs"?])) => _
 		
-	StringsFromAssignmentOperations([]) --> [].
-	StringsFromAssignmentOperations([AssignmentOperation(BindableIdentifier(id)) | tail]) --> [id | rest]
+	StringsFromAssignmentOperations([]) --> []
+	StringsFromAssignmentOperations([AssignmentOperation(bi) | tail]) --> [bi | rest]
 	where
-		StringsFromAssignmentOperations(tail) --> rest.
+		StringsFromAssignmentOperations(tail) --> rest
+		
+	StringsFromBindableIdentifiers([]) --> []
+	StringsFromBindableIdentifiers([BindableIdentifier(id) | tail]) --> [id | rest]
+	where
+		StringsFromBindableIdentifiers(tail) --> rest
 			
 	    
 	FinalStatement(stmt) --> stmt

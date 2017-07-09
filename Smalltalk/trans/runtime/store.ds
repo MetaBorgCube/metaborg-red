@@ -24,6 +24,8 @@ signature
 
 	bindToGlobalMap(List(String), V) --> V
 	bindToGlobal(String, V) --> V
+	bindToLocalMap(List(String), V) --> V
+	bindToLocal(String, V) --> V
 
     bindVarMap(List(String), V) --> V
     bindVar(String, V) --> V
@@ -54,6 +56,12 @@ rules
   where
   	bindToGlobal(id, v) :: S, H --> _ :: S1, H1;
   	bindToGlobalMap(tail, v) :: S1, H1 --> E :: S2, H2.
+  	
+  bindToLocalMap([], v) --> v.
+  bindToLocalMap([id | tail], v) :: S, H --> v :: S S2, H H2
+  where
+  	bindToLocal(id, v) :: S, H --> _ :: S1, H1;
+  	bindToLocalMap(tail, v) :: S1, H1 --> E :: S2, H2.
   
   bindVarMap([], v) --> v.
   bindVarMap([id | tail], v) :: S, H --> v :: S S2, H H2
@@ -78,21 +86,21 @@ rules
   	
   readVarFromObject(id) :: S, H --> v
   where
-//  	printV(StringV("accessing store 1")) => _;
+  	printV(StringV("accessing store 1")) => _;
   	case S["refs"?] of {
   		true =>
-//  			printV(StringV("accessing store 2")) => _;
+  			printV(StringV("accessing store 2")) => _;
   			S["refs"] => objectReferences;
   			case objectReferences["object"?] of {
   				true =>
-//  					printV(StringV("accessing store 3")) => _;
+  					printV(StringV("accessing store 3")) => _;
   					case objectReferences["object"] of {
 				  		RefV(addr) =>
-//				  			printV(StringV("accessing store 4")) => _;
+				  			printV(StringV("accessing store 4")) => _;
 				  			read(RefV(addr)) --> obj;
 				  			case obj of {
 				  				Object(_, objAttributes, _) =>
-//				  					printV(StringV("accessing store 5")) => _;
+				  					printV(StringV("accessing store 5")) => _;
 				  					case objAttributes[id?] of {
 				  						true =>
 				  							objAttributes[id] => v
@@ -131,13 +139,18 @@ rules
   	
   readVarFromGlobal(id) :: S, H --> v
   where
-  	S["global"] => globalScope;
-	case globalScope[id?] of {
-		true =>
-			globalScope[id] => v
-		otherwise =>
-			errorV("variable not found to read: local/object/class/global not found") => v
-	}
+    case S["global"?] of {
+  		true =>
+  			S["global"] => globalScope;
+			case globalScope[id?] of {
+				true =>
+					globalScope[id] => v
+				otherwise =>
+					errorV("variable not found to read: local/object/class/global not found") => v
+			}
+  		otherwise =>
+  			errorV("variable not found to read: global not found " ++ id) => v
+  	}
   		
   bindToGlobal(id, value) :: S, H --> value :: S S1, H
   where
@@ -149,6 +162,17 @@ rules
   	};
   	{id |--> value, globalScope} => globalScope;
   	{"global" |--> globalScope, S} => S1.
+  	
+  bindToLocal(id, value) :: S, H --> value :: S S1, H
+  where
+  	case S["local"?] of {
+  		true =>
+  			S["local"] => localScope
+  		otherwise =>
+  			{} : Map(String, V) => localScope
+  	};
+  	{id |--> value, localScope} => localScope;
+  	{"local" |--> localScope, S} => S1.
   		
   		
   bindVar(id, value) :: S, H --> value :: S S1, H H1
@@ -159,7 +183,7 @@ rules
   			case localScope[id?] of {
   				true =>
   					{id |--> value, localScope} => localScope;
-  					{"local" |--> localScope} => S1;
+  					{"local" |--> localScope, S} => S1;
   					H => H1
   				otherwise =>
   					bindVarToObject(id, value) --> _ :: S S1, H H1
@@ -226,14 +250,20 @@ rules
   		
   	bindVarToGlobal(id, value) :: S, H --> value :: S S1, H
   	where
-  		S["global"] => globalScope;
-  		case globalScope[id?] of {
-  			true =>
-  				{id |--> value, globalScope} => newScope;
-  				{"global" |--> newScope, S} => S1
-  			otherwise =>
-  				errorV("variable not found to write: local/object/class/global not found") => _;
-  				S => S1
-  		}
+  		case S["global"?] of {
+	  		true =>
+	  			S["global"] => globalScope;
+		  		case globalScope[id?] of {
+		  			true =>
+		  				{id |--> value, globalScope} => newScope;
+		  				{"global" |--> newScope, S} => S1
+		  			otherwise =>
+		  				errorV("variable not found to write: local/object/class/global not found") => _;
+		  				S => S1
+		  		}
+	  		otherwise =>
+	  			errorV("variable not found to write: global not found " ++ id) => _;
+		  		S => S1
+	  	}
   		
   		

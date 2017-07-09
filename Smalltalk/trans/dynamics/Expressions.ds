@@ -55,7 +55,7 @@ signature
   	List(BinaryMessage) --> List(Message)
   	List(UnaryMessage) --> List(Message)
   	List(String) --> List(String)
-  	KeywordMessageMap(List(KeywordMessageSegment), Message) --> Message
+  	KeywordMessageMap(List(KeywordMessageSegment)) --> Message
   	ExpI(V, List(Message)) --> V
   	ExpressionCascaded(Operand, MessageChain, List(CascadedMessage)) --> V
   	MethodVMap(List(V)) --> List(V)
@@ -255,14 +255,14 @@ rules
 	
 	KeywordMessage(messageSegment) --> [KeywordMessageCall(keys, values)]
 		where
-			KeywordMessageMap(messageSegment, KeywordMessageCall([],[])) => KeywordMessageCall(keys, values).
+			KeywordMessageMap(messageSegment) => KeywordMessageCall(keys, values).
 			
-	KeywordMessageMap([messageSegmentHead | messageSegmentTail], KeywordMessageCall(curKeys, curVals)) --> message
+	KeywordMessageMap([messageSegmentHead | messageSegmentTail]) --> KeywordMessageCall([key | restKeys], [value | restVals])
 		where
 		messageSegmentHead --> KeywordValuePair(key, value);
-		KeywordMessageMap(messageSegmentTail, KeywordMessageCall([key | curKeys], [value | curVals])) => message.
+		KeywordMessageMap(messageSegmentTail) => KeywordMessageCall(restKeys, restVals)
 		
-	KeywordMessageMap([], KeywordMessageCall(keys, vals)) --> KeywordMessageCall(keys, vals).
+	KeywordMessageMap([]) --> KeywordMessageCall([], [])
 	
 	KeywordMessageSegment(keyword, keywordMessageArgument) --> KeywordValuePair(key, MethodExpressionV(binOperand, binMessages))
 		where

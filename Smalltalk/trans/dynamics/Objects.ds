@@ -90,8 +90,6 @@ rules
 	where
 //		printV(StringV("cool2")) => _;
 		read(objAddr) --> object;
-		`keywords => keywords; // keywords and values need to be reversed as they are parsed in reverse order
-		`values => values;
 		printV(StringV("keyword method call")) => _;
 		printV(StringV(keywords[0])) => _;
 		case object of {
@@ -197,13 +195,13 @@ rules
 				{"self" |--> objRef, "super" |--> parentRef} => newScope;
 				{"class" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
-				code :: S1, H --> result :: S, H H1
+				code :: S1, H --> result :: S _, H H1
 			Object(classRef, objAttributes, objMethods) =>
 //				read(classRef) :: S, H --> Class(parentRef, _, _, _, _);
 				{"self" |--> objRef} => newScope;
 				{"object" |--> objRef} => refs;
 				{"local" |--> newScope, "refs" |--> refs, "global" |--> S["global"]} => S1;
-				code :: S1, H --> result :: S, H H1
+				code :: S1, H --> result :: S _, H H1
 		}
 		
 	mapFrom2Lists([] : List(String), [] : List(V)) --> {} : Map(String, V).
